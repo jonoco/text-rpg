@@ -1,0 +1,14 @@
+{
+  "name": "textrpg",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joshua N. Cox <joshua.n.cox@gmail.com> (http://jonoco.me/)",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "6.2.0"
+  }
+}
