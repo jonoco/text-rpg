@@ -23,6 +23,11 @@ function debug(text) {
 }
 
 
+function message(text) {
+  console.log(text);
+}
+
+
 function clearScreen() {
   console.log('\x1Bc'); // Clear Terminal
 }
@@ -71,7 +76,7 @@ class GameMap {
         break;
     }
     clearScreen();
-    console.log(
+    message(
       `You're at (${this.location.x} : ${this.location.y})\n${this.getLocation().description}`
     );
   }
@@ -193,13 +198,13 @@ class Item {
         break;
     }
 
-    debug(name);
-
     const modifiers = [
       'Dazzlement', 'Frogliness', 'Pointiness', 'Vajayjays', 'Befuddlement',
       'Neatness', 'Okayity', 'Sinfulness', 'Something', 'Itemness',
     ];
     name += ` of ${modifiers[getRandomInt(0, modifiers.length)]}`;
+
+    debug(`Generated item name: ${name}`);
 
     let item = new Item(name);
     item.type = type;
@@ -243,7 +248,7 @@ class Character {
 
   hit(damage)
   {
-    console.log(`${this.name} was hit for ${damage}`);
+    message(`${this.name} was hit for ${damage}`);
 
     this.health -= damage;
     this.health = this.health < 0 ? 0 : this.health;
@@ -265,7 +270,7 @@ class Character {
 
   receiveItem(item)
   {
-    console.log(`You received ${item.name}.`);
+    message(`You received ${item.name}.`);
 
     this.inventory.push(item);
   }
@@ -274,7 +279,7 @@ class Character {
   async checkInventory()
   {
     clearScreen();
-    console.log(`---------=---------\nInventory\n---------=---------`);
+    message(`---------=---------\nInventory\n---------=---------`);
     
     if (this.inventory.length == 0)
     {
@@ -293,7 +298,7 @@ class Character {
   async changeEquipment()
   {
     clearScreen();
-    console.log(`---------=---------\nEquipment\n---------=---------`);
+    message(`---------=---------\nEquipment\n---------=---------`);
 
     let choices = [];
     for (var slot in this.equipment) {
@@ -302,9 +307,9 @@ class Character {
         value: slot
       };
       choices.push(choice);
-      // console.log(`${item}: ${this.equipment[item] ? this.equipment[item].name : 'empty'}`);
     };
   
+    // Get slot to swap out
     let slotSelected;
     await inquirer
       .prompt([{ 
@@ -410,13 +415,13 @@ class Battle {
   async start()
   {
     clearScreen();
-    console.log(`---------=---------\nBattle!\n---------=---------`);
+    message(`---------=---------\nBattle!\n---------=---------`);
 
     while (!this.battleOver)
     {      
-      console.log(`Fighting a ${this.enemy.name}.`);
-      console.log(`${this.enemy.name} health: ${this.enemy.health}`);
-      console.log(`${this.player.name} health: ${this.player.health}`);
+      message(`Fighting a ${this.enemy.name}.`);
+      message(`${this.enemy.name} health: ${this.enemy.health}`);
+      message(`${this.player.name} health: ${this.player.health}`);
 
       await this.askAttackChoice();  
     }
@@ -427,13 +432,13 @@ class Battle {
   {
     // choice is unused
 
-    console.log(`Attacking ${this.enemy.name}.`);
+    message(`Attacking ${this.enemy.name}.`);
 
     this.enemy.hit(this.player.attackPower());
 
     if (!this.enemy.isAlive())
     {
-      console.log(`${this.enemy.name} was killed.`);
+      message(`${this.enemy.name} was killed.`);
       this.battleOver = true;
       this.victory = true;
     }
@@ -446,13 +451,13 @@ class Battle {
   
   attackPlayer()
   {
-    console.log(`${this.enemy.name} is attacking.`);
+    message(`${this.enemy.name} is attacking.`);
 
     this.player.hit(this.enemy.attackPower());
 
     if (!this.player.isAlive())
     {
-      console.log(`You were killed by a ${this.enemy.name}`);
+      message(`You were killed by a ${this.enemy.name}`);
       this.battleOver = true;
     }
   }
@@ -507,12 +512,12 @@ class Game {
 
         if (battle.victory)
         {
-          console.log(`You beat the ${battle.enemy.name}!`);
+          message(`You beat the ${battle.enemy.name}!`);
           this.player.receiveItem(Item.createRandomItem());
         }
         else
         {
-          console.log(`You lost, fool!`);
+          message(`You lost, fool!`);
           this.gameOver = true;
         }
         break;
@@ -524,7 +529,7 @@ class Game {
   async start()
   {
     const intro = `You wake up in a graveyard.`;
-    console.log(intro);
+    message(intro);
 
     this.player.receiveItem(Item.createRandomItem());
     this.player.receiveItem(Item.createRandomItem());
