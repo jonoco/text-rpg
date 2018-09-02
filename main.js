@@ -3,7 +3,8 @@ var inquirer = require('inquirer');
 // Constants
 
 
-const _DEBUG_ = false;
+const _DEBUG_ = true;
+const CANCEL = 'Cancel';
 
 
 // Utility functions
@@ -18,7 +19,7 @@ function getRandomInt(min, max) {
 
 
 function debug(text) {
-  if (_DEBUG_) console.log(text);
+  if (_DEBUG_) console.dir(text);
 }
 
 
@@ -78,17 +79,30 @@ class GameMap {
 
   async askDirection() 
   {
+    let cancel = false;
+
     await inquirer
-      .prompt([
-        { name: "direction", message: "Which direction? (w,a,s,d)\n" }
-      ])
+      .prompt([{ 
+        name: "direction", 
+        message: "Which direction? (w,a,s,d,stop)\n",
+        filter: function(val) { return val.toLowerCase(); } 
+      }])
       .then(answers => {
-        if (['w', 'a', 's', 'd'].includes(answers.direction)) {
+        if (answers.direction == 'stop')
+        {
+          cancel = true;
+        }
+        else if (['w', 'a', 's', 'd'].includes(answers.direction)) 
+        {
           return this.move(answers["direction"]);
-        } else {
+        } 
+        else 
+        {
           return this.askDirection();
         }
       });
+
+    return cancel;
   }
 
 
@@ -127,13 +141,69 @@ class Item {
   constructor(name) 
   {
     this.name = name;
-    this.itemType = null;
+    this.type = null;
+    this.itemID = Math.floor(Math.random()*100000);
   }
 
 
   static isValidItemType(type)
   {
     return ItemType.includes(type);
+  }
+
+
+  static createRandomItem()
+  {
+    let type = Object.keys(ItemType)[getRandomInt(0, Object.keys(ItemType).length)];
+    
+    debug(type);
+
+    let name;
+    switch (type)
+    {
+      case 'head':
+        name = 'Helm'
+        break;
+      case 'shoulders':
+        name = 'Paldrons'
+        break;
+      case 'hands':
+        name = 'Gloves'
+        break;
+      case 'torso':
+        name = 'Breastplate'
+        break;
+      case 'legs':
+        name = 'Leggings'
+        break;
+      case 'feet':
+        name = 'Boots'
+        break;
+      case 'weapon':
+        name = 'Sword'
+        break;
+      case 'shield':
+        name = 'Buckler'
+        break;
+      case 'necklace':
+        name = 'Chain'
+        break;
+      case 'ring':
+        name = 'Band'
+        break;
+    }
+
+    debug(name);
+
+    const modifiers = [
+      'Dazzlement', 'Frogliness', 'Pointiness', 'Vajayjays', 'Befuddlement',
+      'Neatness', 'Okayity', 'Sinfulness', 'Something', 'Itemness',
+    ];
+    name += ` of ${modifiers[getRandomInt(0, modifiers.length)]}`;
+
+    let item = new Item(name);
+    item.type = type;
+    return item;
   }
 }
 
@@ -145,19 +215,19 @@ class Character {
     this.defautlHealth = defaultHealth;
     this.health = defaultHealth;
     this.equipment = {
-      head: null,
-      shoulders: null,
-      hands: null,
-      torso: null,
-      legs: null,
-      feet: null,
-      leftHand: null,
-      rightHand: null,
-      neck: null,
-      ring1: null,
-      ring2: null,
-      ring3: null,
-      ring4: null,
+      head:       {item: null, type: 'head'},
+      shoulders:  {item: null, type: 'shoulders'},
+      hands:      {item: null, type: 'hands'},
+      torso:      {item: null, type: 'torso'},
+      legs:       {item: null, type: 'legs'},
+      feet:       {item: null, type: 'feet'},
+      leftHand:   {item: null, type: 'shield'},
+      rightHand:  {item: null, type: 'weapon'},
+      neck:       {item: null, type: 'necklace'},
+      ring1:      {item: null, type: 'ring'},
+      ring2:      {item: null, type: 'ring'},
+      ring3:      {item: null, type: 'ring'},
+      ring4:      {item: null, type: 'ring'},
     };
     this.inventory = [];
 
@@ -191,6 +261,138 @@ class Character {
   {
     return this.health > 0;
   }
+
+
+  receiveItem(item)
+  {
+    console.log(`You received ${item.name}.`);
+
+    this.inventory.push(item);
+  }
+
+
+  async checkInventory()
+  {
+    clearScreen();
+    console.log(`---------=---------\nInventory\n---------=---------`);
+    
+    if (this.inventory.length == 0)
+    {
+      console.log('Inventory empty.')
+    }
+    else
+    {
+      this.inventory.forEach(item => {
+        console.log(`${item.name} - ${item.type}`);
+        debug(`${item.itemID}`);
+      });  
+    }
+  }
+
+
+  async changeEquipment()
+  {
+    clearScreen();
+    console.log(`---------=---------\nEquipment\n---------=---------`);
+
+    let choices = [];
+    for (var slot in this.equipment) {
+      let choice = {
+        name: `${slot}: ${this.equipment[slot].item ? this.equipment[slot].item.name : 'empty'}`, 
+        value: slot
+      };
+      choices.push(choice);
+      // console.log(`${item}: ${this.equipment[item] ? this.equipment[item].name : 'empty'}`);
+    };
+  
+    let slotSelected;
+    await inquirer
+      .prompt([{ 
+        type: 'list',
+        name: 'slot',
+        message: 'Which slot do you want to change?',
+        choices: [
+          ...choices,
+          {name: CANCEL},
+        ] 
+      }])
+      .then(answers => {
+        slotSelected = answers.slot;
+        debug(`Item type selected: ${slotSelected}`);
+      });
+    if (slotSelected === CANCEL) return;
+      
+    let item = await this.selectItem(this.equipment[slotSelected].type);
+    
+    // Swap item in equipment
+    if (item != CANCEL)
+    {
+        debug(`Swapping ${item.name} ${item.itemID}.`);
+
+        if (this.equipment[slotSelected].item) // Check slot isn't empty
+        {
+          this.inventory.push(this.equipment[slotSelected].item);  
+        }
+        this.equipment[slotSelected].item = item;
+        this.removeItemFromInventory(item);
+    }
+    else // Try again
+    {
+      await this.changeEquipment();
+    }
+  }
+
+  async selectItem(type = null)
+  {
+    // Gives a list of items from the inventory matching the type
+    // Show all items if type is null
+    // Returns selected item
+
+    debug(`Showing items of type ${type}`);
+
+    let choices = [];
+    this.inventory.forEach(item => {
+      if (type && item.type != type)
+      {
+        debug(`${item.name} does not match type specified`);
+      }
+      else
+      {
+        let choice = {
+          name: `${item.name}`,
+          value: item,
+        };
+        choices.push(choice);
+      }  
+    }); 
+    
+    let itemSelected;
+    await inquirer
+      .prompt([{ 
+        type: 'list',
+        name: 'item',
+        message: 'Select item',
+        choices: [
+          ...choices,
+          {name: CANCEL},
+        ] 
+      }])
+      .then(answers => {
+        itemSelected = answers.item;
+        debug(`Item selected: ${itemSelected.name}`);
+      });
+    
+    return itemSelected;
+  }
+
+
+  removeItemFromInventory(itemToRemove)
+  {
+    debug(`Removing: `);
+    debug(itemToRemove);
+
+    this.inventory = this.inventory.filter(item => item.itemID != itemToRemove.itemID);
+  }
 }
 
 
@@ -208,12 +410,11 @@ class Battle {
   async start()
   {
     clearScreen();
+    console.log(`---------=---------\nBattle!\n---------=---------`);
 
     while (!this.battleOver)
-    {
-      console.log(`---------=---------\nBattle!\n---------=---------`);
-      
-      console.log(`${this.enemy.name} is attacking.`);
+    {      
+      console.log(`Fighting a ${this.enemy.name}.`);
       console.log(`${this.enemy.name} health: ${this.enemy.health}`);
       console.log(`${this.player.name} health: ${this.player.health}`);
 
@@ -288,16 +489,15 @@ class Game {
     this.gameOver = false;
   }  
 
-
-  async start()
+  
+  async move()
   {
-    const intro = `You wake up in a graveyard.`;
-    console.log(intro);
-
-    while(!this.gameOver)
+    while (true)
     {
-      await this.map.askDirection();
-      
+      let cancel = await this.map.askDirection();
+    
+      if (cancel) break;
+
       if (this.checkStartFight())
       {
         const battle = new Battle(this.player);
@@ -308,12 +508,60 @@ class Game {
         if (battle.victory)
         {
           console.log(`You beat the ${battle.enemy.name}!`);
+          this.player.receiveItem(Item.createRandomItem());
         }
         else
         {
           console.log(`You lost, fool!`);
           this.gameOver = true;
         }
+        break;
+      }
+    }
+  }
+
+
+  async start()
+  {
+    const intro = `You wake up in a graveyard.`;
+    console.log(intro);
+
+    this.player.receiveItem(Item.createRandomItem());
+    this.player.receiveItem(Item.createRandomItem());
+    this.player.receiveItem(Item.createRandomItem());
+    this.player.receiveItem(Item.createRandomItem());
+
+    while(!this.gameOver)
+    {
+      let choice;
+
+      await inquirer
+      .prompt([{ 
+        type: 'list',
+        name: 'choice',
+        message: 'What do you want to do?',
+        choices: [
+          'Move',
+          {name: 'Check inventory', value: 'inventory'},
+          {name: 'Change equipment', value: 'equipment'},
+          { name: 'Rest', disabled: 'not implemented'},
+        ] 
+      }])
+      .then(answers => {
+        choice = answers.choice;
+      });
+
+      switch (choice)
+      {
+        case 'Move':
+          await this.move();
+          break;
+        case 'inventory':
+          await this.player.checkInventory();
+          break;
+        case 'equipment':
+          await this.player.changeEquipment();
+          break;
       }
     }
   }
