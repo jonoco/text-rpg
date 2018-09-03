@@ -9,25 +9,40 @@ const CANCEL = 'Cancel';
 
 // Utility functions
 
-
+/*
+  Returns random int from [min, max)
+*/
 function getRandomInt(min, max) {
-  //The maximum is exclusive and the minimum is inclusive
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min; 
 }
 
 
+/*
+  Returns random choice from array
+*/
+function getRandomChoice(array) {
+  return array[getRandomInt(0, array.length)];
+}
+
+/*
+  Prints message if debug flag is on
+*/
 function debug(text) {
   if (_DEBUG_) console.dir(text);
 }
 
-
+/*
+  Prints formatted console message
+*/
 function message(text) {
   console.log(text);
 }
 
-
+/*
+  Clear terminal
+*/
 function clearScreen() {
   console.log('\x1Bc'); // Clear Terminal
 }
@@ -47,7 +62,7 @@ class GameMap {
   constructor() 
   {
     this.location = { x: 0, y: 0 };
-    this.locations = [];
+    this.environments = [];
     this.width = 10;
     this.height = 10;
 
@@ -55,6 +70,9 @@ class GameMap {
   }
 
 
+  /*
+    Change location based on direction
+  */
   move(direction) 
   {
     switch (direction) {
@@ -77,11 +95,14 @@ class GameMap {
     }
     clearScreen();
     message(
-      `You're at (${this.location.x} : ${this.location.y})\n${this.getLocation().description}`
+      `You're at (${this.location.x} : ${this.location.y})\n${this.getEnvironment().description}`
     );
   }
 
 
+  /*
+    Ask user to choose move direction
+  */
   async askDirection() 
   {
     let cancel = false;
@@ -111,13 +132,28 @@ class GameMap {
   }
 
 
-  getLocation() 
+  /*
+    Returns coordinates
+  */
+  getLocation()
   {
-    const index = (this.location.y * 10) + this.location.x;
-    return this.locations[index];
+    return this.location;
   }
 
 
+  /*
+    Returns current environment object
+  */
+  getEnvironment() 
+  {
+    const index = (this.location.y * 10) + this.location.x;
+    return this.environments[index];
+  }
+
+
+  /*
+    Create environments across the map
+  */
   createMap()
   {
     let locations = [
@@ -128,7 +164,7 @@ class GameMap {
 
     for (var i = 0; i < this.width*this.height; i++) 
     {
-      this.locations.push(locations[getRandomInt(0, locations.length)]);
+      this.environments.push(locations[getRandomInt(0, locations.length)]);
     }
   }
 }
@@ -217,8 +253,18 @@ class Character {
   constructor(name, defaultHealth)
   {
     this.name = name;
-    this.defautlHealth = defaultHealth;
-    this.health = defaultHealth;
+    this.defaultHealth = defaultHealth;
+    this.health = this.defaultHealth;
+
+    this.statusEffects = {
+      poisoned: false,
+      cursed: false,
+      paralyzed: false,
+      insane: false,
+      afraid: false,
+    };
+
+    // type indicates the type of item the slot allows
     this.equipment = {
       head:       {item: null, type: 'head'},
       shoulders:  {item: null, type: 'shoulders'},
@@ -276,6 +322,34 @@ class Character {
   }
 
 
+  /*
+    Prints character status
+  */
+  async checkStatus()
+  {
+    clearScreen();
+    message(`---------=---------\nStatus\n---------=---------`);
+    message(`health: ${this.health}`);
+    for (let stat in this.statusEffects)
+    {
+      if (this.statusEffects[stat]) message(stat);
+    }
+
+    await inquirer
+      .prompt([{ 
+        type: 'list',
+        name: 'choice',
+        message: 'Finished?',
+        choices: [
+          {name: CANCEL},
+        ] 
+      }])
+      .then(answers => {
+        //...
+      });
+  }
+
+
   async checkInventory()
   {
     clearScreen();
@@ -283,12 +357,12 @@ class Character {
     
     if (this.inventory.length == 0)
     {
-      console.log('Inventory empty.')
+      message('Inventory empty.')
     }
     else
     {
       this.inventory.forEach(item => {
-        console.log(`${item.name} - ${item.type}`);
+        message(`${item.name} - ${item.type}`);
         debug(`${item.itemID}`);
       });  
     }
@@ -398,6 +472,15 @@ class Character {
 
     this.inventory = this.inventory.filter(item => item.itemID != itemToRemove.itemID);
   }
+
+
+  static createRandomEnemy()
+  {
+    const names = ['Goblin', 'Slime', 'Bandit', 'Wolf'];
+    const health = getRandomInt(20, 40);
+    let enemy = new Character(getRandomChoice(names), health);
+    return enemy;
+  }
 }
 
 
@@ -407,7 +490,7 @@ class Battle {
     this.battleOver = false;
     this.victory = false;
 
-    this.enemy = new Character("Goblin", 20);
+    this.enemy = Character.createRandomEnemy();
     this.player = player;
   }
 
@@ -495,6 +578,9 @@ class Game {
   }  
 
   
+  /*
+    Allow player to move, possibly encountering battles
+  */
   async move()
   {
     while (true)
@@ -526,30 +612,32 @@ class Game {
   }
 
 
+  /*
+    Main game loop and entry point
+  */
   async start()
   {
     const intro = `You wake up in a graveyard.`;
     message(intro);
 
-    this.player.receiveItem(Item.createRandomItem());
-    this.player.receiveItem(Item.createRandomItem());
-    this.player.receiveItem(Item.createRandomItem());
-    this.player.receiveItem(Item.createRandomItem());
-
     while(!this.gameOver)
     {
-      let choice;
+      clearScreen();
+      message(`You're at (${this.map.getLocation().x}, ${this.map.getLocation().y})`);
+      message(`${this.map.getEnvironment().description}`);
 
+      let choice;
       await inquirer
       .prompt([{ 
         type: 'list',
         name: 'choice',
         message: 'What do you want to do?',
         choices: [
-          'Move',
+          {name: 'Move'},
+          {name: 'Rest'},
           {name: 'Check inventory', value: 'inventory'},
           {name: 'Change equipment', value: 'equipment'},
-          { name: 'Rest', disabled: 'not implemented'},
+          {name: 'Check status', value: 'status'},
         ] 
       }])
       .then(answers => {
@@ -561,17 +649,39 @@ class Game {
         case 'Move':
           await this.move();
           break;
+        case 'Rest':
+          this.rest();
+          break;
         case 'inventory':
           await this.player.checkInventory();
           break;
         case 'equipment':
           await this.player.changeEquipment();
           break;
+        case 'status':
+          await this.player.checkStatus();
+          break;
       }
     }
   }
 
 
+  /*
+    Let player regenerate health, risking battle
+  */
+  rest() 
+  {
+    debug (`Healing for ${this.player.defaultHealth}`);
+
+    this.player.heal(this.player.defaultHealth);
+
+    message(`Health recovered. (${this.player.health})`);
+  }
+
+
+  /*
+    Determine whether a battle should occur
+  */
   checkStartFight()
   {
     const shouldStartFight = Math.random() < this.battleFrequency;
