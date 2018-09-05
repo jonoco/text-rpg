@@ -36,6 +36,9 @@ export class Character {
     this.inventory = [];
 
     this.skillPoints = 0;
+  
+    this.level = 0;
+    this.experience = 0;
 
     // Base stats only changed by leveling up
     this.baseStats = {
@@ -58,6 +61,51 @@ export class Character {
 
 
   /*
+    Check if character can level up
+  */
+  checkLevelup()
+  {
+    let highestLevel;
+    for (let i = 0; i < 99; i++)
+    {
+      if (this.experience > (100 * i^2))
+        highestLevel = i + 1;
+      else
+        break;
+    }
+    
+    for (let level = 0; level < highestLevel - this.level; level++)
+    {
+      this.levelup();
+    }
+  }
+
+
+  /*
+    Increase player stats
+  */
+  levelup()
+  {
+    this.level++;
+    this.skillPoints += 5;
+    this.health = this.defaultHealth;
+
+    message(`${this.name} leveled up to ${this.level}!`);
+
+    this.checkStatModifiers();
+  }
+
+
+  /*
+    Get the experience point value of killing this character
+  */
+  getExperienceValue()
+  {
+    return 50 + (this.level * 25);
+  }
+
+
+  /*
     Calculate current stat modifiers
   */
   checkStatModifiers()
@@ -70,18 +118,21 @@ export class Character {
       intelligence: 0
     };
 
-    for (let slot in this.equipment)
+    for (var slot in this.equipment)
     {
-      if (slot.item)
+      if (this.equipment[slot].item)
       {
-        for (let stat in slot.item.statModifiers)
+        let item = this.equipment[slot].item;
+        for (var stat in item.statModifiers)
         {
-          statModifiers[stat] += slot.item.statModifiers[stat];
+          statModifiers[stat] += item.statModifiers[stat];
         }
       }
     }
 
     this.statModifiers = statModifiers;
+
+    return statModifiers;
   }
 
 
@@ -93,8 +144,8 @@ export class Character {
       damage = this.equipment.rightHand.item.damage;
     }
     
-    const minDamage = ((this.modifiedStats.strength + this.baseStats.strength) / 2) + damage;
-    const maxDamage = ((this.modifiedStats.strength + this.baseStats.strength) * 1.5) + damage;
+    const minDamage = ((this.statModifiers.strength + this.baseStats.strength) / 2) + damage;
+    const maxDamage = ((this.statModifiers.strength + this.baseStats.strength) * 1.5) + damage;
 
     return getRandomInt(minDamage, maxDamage+1);
   }
@@ -136,11 +187,18 @@ export class Character {
   async checkStatus()
   {
     clearScreen();
-    message(`---------=---------\nStatus\n---------=---------`);
+    message(`---------=---------\nStats\n---------=---------`);
     message(`health: ${this.health}`);
-    for (let stat in this.statusEffects)
+
+    for (let stat in this.baseStats)
     {
-      if (this.statusEffects[stat]) message(stat);
+      message(`${stat}: ${this.baseStats[stat] + this.statModifiers[stat]}`);
+    }
+
+    message(`---------=---------\nStatus effects\n---------=---------`);
+    for (let effect in this.statusEffects)
+    {
+      if (this.statusEffects[effect]) message(effect);
     }
 
     await inquirer
@@ -269,9 +327,21 @@ export class Character {
       }
       else
       {
+        let damage = '';
+        if (item.type === 'weapon')
+          damage = `\ndamage: ${item.damage}`;
+
+        let modifiers = '';
+        for (let stat in item.statModifiers)
+        {
+          if (item.statModifiers[stat] > 0)
+            modifiers += `\n\t${stat}: ${item.statModifiers[stat]}`;
+        }
+
         let choice = {
-          name: `${item.name}`,
+          name: `${item.name}${damage}${modifiers}`,
           value: item,
+          paginated: true
         };
         choices.push(choice);
       }  
@@ -363,12 +433,13 @@ export class Character {
     const names = ['Goblin', 'Slime', 'Bandit', 'Wolf'];
     const health = getRandomInt(20, 40);
     let enemy = new Character(getRandomChoice(names), health);
+    enemy.level = getRandomInt(1, 4);
     enemy.baseStats = {
-      strength: getRandomInt(2, 5),
-      dexterity: getRandomInt(2, 5),
-      agility: getRandomInt(2, 5),
-      endurance: getRandomInt(2, 5),
-      intelligence: getRandomInt(2, 5)
+      strength:     getRandomInt(1, enemy.level),
+      dexterity:    getRandomInt(1, enemy.level),
+      agility:      getRandomInt(1, enemy.level),
+      endurance:    getRandomInt(1, enemy.level),
+      intelligence: getRandomInt(1, enemy.level)
     };
 
     return enemy;

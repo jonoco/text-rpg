@@ -36,37 +36,55 @@ export class Item {
     debug(type);
 
     let name;
+    let defence = 0;
+    let damage = 1;
+    let statModifiers = {
+      strength: 0,
+      dexterity: 0,
+      agility: 0,
+      endurance: 0,
+      intelligence: 0
+    };
+
     switch (type)
     {
       case 'head':
-        name = 'Helm'
+        defence = getRandomInt(1, 7);
+        name = 'Helm';
         break;
       case 'shoulders':
-        name = 'Paldrons'
+        defence = getRandomInt(1, 7);
+        name = 'Paldrons';
         break;
       case 'hands':
-        name = 'Gloves'
+        defence = getRandomInt(1, 7);
+        name = 'Gloves';
         break;
       case 'torso':
-        name = 'Breastplate'
+        defence = getRandomInt(1, 7);
+        name = 'Breastplate';
         break;
       case 'legs':
-        name = 'Leggings'
+        defence = getRandomInt(1, 7);
+        name = 'Leggings';
         break;
       case 'feet':
-        name = 'Boots'
+        defence = getRandomInt(1, 7);
+        name = 'Boots';
         break;
       case 'weapon':
-        name = 'Sword'
+        damage = getRandomInt(2, 8);
+        name = 'Sword';
         break;
       case 'shield':
-        name = 'Buckler'
+        defence = getRandomInt(5, 10);
+        name = 'Buckler';
         break;
       case 'necklace':
-        name = 'Chain'
+        name = 'Chain';
         break;
       case 'ring':
-        name = 'Band'
+        name = 'Band';
         break;
     }
 
@@ -80,6 +98,20 @@ export class Item {
 
     let item = new Item(name);
     item.type = type;
+    item.statModifiers = {
+      strength: getRandomInt(0,5),
+      dexterity: getRandomInt(0,5),
+      agility: getRandomInt(0,5),
+      endurance: getRandomInt(0,5),
+      intelligence: getRandomInt(0,5)
+    };
+    
+    if (type === 'weapon')
+    {
+      item.damage = damage;
+      item.defence = defence;
+    }
+
     return item;
   }
 }

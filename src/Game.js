@@ -51,6 +51,10 @@ export class Game {
     if (battle.victory)
     {
       message(`You beat the ${battle.enemy.name}!`);
+      message(`You received ${battle.enemy.getExperienceValue()} experience!`);
+      
+      this.player.experience += battle.enemy.getExperienceValue();
+      this.player.checkLevelup();
       this.player.receiveItem(Item.createRandomItem());
     }
     else
