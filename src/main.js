@@ -2,7 +2,6 @@ import inquirer from 'inquirer';
 import { Game } from './Game';
 import { clearScreen } from './utility';
 
-// Constants
 
 const main = () => {
   clearScreen();

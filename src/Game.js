@@ -6,6 +6,7 @@ import { Battle } from './Battle'
 import { message, clearScreen, debug } from './utility';
 import { CANCEL, CONFIRM } from './constants';
 
+
 export class Game {
   constructor() 
   {
@@ -99,6 +100,7 @@ export class Game {
           {name: 'Check inventory', value: 'inventory'},
           {name: 'Change equipment', value: 'equipment'},
           {name: 'Check status', value: 'status'},
+          {name: 'Upgrade stats', value: 'upgradeStats'},
         ] 
       }])
       .then(answers => {
@@ -122,6 +124,9 @@ export class Game {
         case 'status':
           await this.player.checkStatus();
           break;
+        case 'upgradeStats':
+          await this.player.chooseStats();
+          break;
       }
     }
   }
@@ -144,7 +149,7 @@ export class Game {
         name: 'choice',
         message: 'Finished?',
         choices: [
-          {name: CANCEL},
+          {name: CONFIRM},
         ] 
       }])
       .then(answers => {

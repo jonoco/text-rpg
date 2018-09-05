@@ -19,29 +19,84 @@ export class Character {
 
     // type indicates the type of item the slot allows
     this.equipment = {
-      head:       {item: null, type: 'head'},
-      shoulders:  {item: null, type: 'shoulders'},
-      hands:      {item: null, type: 'hands'},
-      torso:      {item: null, type: 'torso'},
-      legs:       {item: null, type: 'legs'},
-      feet:       {item: null, type: 'feet'},
-      leftHand:   {item: null, type: 'shield'},
-      rightHand:  {item: null, type: 'weapon'},
-      neck:       {item: null, type: 'necklace'},
-      ring1:      {item: null, type: 'ring'},
-      ring2:      {item: null, type: 'ring'},
-      ring3:      {item: null, type: 'ring'},
-      ring4:      {item: null, type: 'ring'},
+      head:       { item: null, type: 'head' },
+      shoulders:  { item: null, type: 'shoulders' },
+      hands:      { item: null, type: 'hands' },
+      torso:      { item: null, type: 'torso' },
+      legs:       { item: null, type: 'legs' },
+      feet:       { item: null, type: 'feet' },
+      leftHand:   { item: null, type: 'shield' },
+      rightHand:  { item: null, type: 'weapon' },
+      neck:       { item: null, type: 'necklace' },
+      ring1:      { item: null, type: 'ring' },
+      ring2:      { item: null, type: 'ring' },
+      ring3:      { item: null, type: 'ring' },
+      ring4:      { item: null, type: 'ring' },
     };
     this.inventory = [];
 
-    this.strength = 5;
+    this.skillPoints = 0;
+
+    // Base stats only changed by leveling up
+    this.baseStats = {
+      strength: 1,
+      dexterity: 1,
+      agility: 1,
+      endurance: 1,
+      intelligence: 1
+    };
+    
+    // Stat modifiers from equipment or status effects
+    this.statModifiers = {
+      strength: 0,
+      dexterity: 0,
+      agility: 0,
+      endurance: 0,
+      intelligence: 0
+    };
+  }
+
+
+  /*
+    Calculate current stat modifiers
+  */
+  checkStatModifiers()
+  {
+    let statModifiers = {
+      strength: 0,
+      dexterity: 0,
+      agility: 0,
+      endurance: 0,
+      intelligence: 0
+    };
+
+    for (let slot in this.equipment)
+    {
+      if (slot.item)
+      {
+        for (let stat in slot.item.statModifiers)
+        {
+          statModifiers[stat] += slot.item.statModifiers[stat];
+        }
+      }
+    }
+
+    this.statModifiers = statModifiers;
   }
 
 
   attackPower()
   {
-    return this.strength + Math.random() * 2;
+    let damage = 1;
+    if (this.equipment.rightHand.item)
+    {
+      damage = this.equipment.rightHand.item.damage;
+    }
+    
+    const minDamage = ((this.modifiedStats.strength + this.baseStats.strength) / 2) + damage;
+    const maxDamage = ((this.modifiedStats.strength + this.baseStats.strength) * 1.5) + damage;
+
+    return getRandomInt(minDamage, maxDamage+1);
   }
 
 
@@ -135,15 +190,19 @@ export class Character {
   }
 
 
+  /*
+    Ask user to change item in equipment slot
+  */
   async changeEquipment()
   {
     clearScreen();
     message(`---------=---------\nEquipment\n---------=---------`);
 
     let choices = [];
-    for (var slot in this.equipment) {
+    for (let slot in this.equipment) {
       let choice = {
-        name: `${slot}: ${this.equipment[slot].item ? this.equipment[slot].item.name : 'empty'}`, 
+        name: `${slot}: ${this.equipment[slot].item 
+          ? this.equipment[slot].item.name : 'empty'}`,
         value: slot
       };
       choices.push(choice);
@@ -166,7 +225,8 @@ export class Character {
         debug(`Item type selected: ${slotSelected}`);
       });
     if (slotSelected === CANCEL) return;
-      
+    
+    // Ask for item from inventory to swap in
     let item = await this.selectItem(this.equipment[slotSelected].type);
     
     // Swap item in equipment
@@ -174,12 +234,18 @@ export class Character {
     {
         debug(`Swapping ${item.name} ${item.itemID}.`);
 
-        if (this.equipment[slotSelected].item) // Check slot isn't empty
+        // If slot isn't empty, send item to inventory
+        if (this.equipment[slotSelected].item)
         {
           this.inventory.push(this.equipment[slotSelected].item);  
         }
+
+        // Move item from invnetory to equipment
         this.equipment[slotSelected].item = item;
         this.removeItemFromInventory(item);
+
+        // Update stat modifiers
+        this.checkStatModifiers();
     }
     else // Try again
     {
@@ -231,6 +297,55 @@ export class Character {
   }
 
 
+  /*
+    Choose skill points
+  */
+  async chooseStats()
+  {
+    let itemSelected;
+    let choices = [];
+    for (let stat in this.baseStats)
+    {
+      let choice = { name: `${stat} - ${this.baseStats[stat]}`, value: stat };
+      
+      if (this.skillPoints == 0)
+        choice['disabled'] = 'not enough skill points'
+      
+      choices.push(choice);
+    }
+
+    clearScreen();
+    message(`---------=---------\nStats\n---------=---------`);
+    message(`skill points available: ${this.skillPoints}`);
+
+    await inquirer
+      .prompt([{ 
+        type: 'list',
+        name: 'item',
+        message: 'Choose stat to upgrade',
+        choices: [
+          ...choices,
+          {name: CANCEL},
+        ] 
+      }])
+      .then(answers => {
+        itemSelected = answers.item;
+        debug(`Item selected: ${itemSelected.name}`);
+      });
+      
+    if (itemSelected != CANCEL && this.skillPoints > 0)
+    {
+      this.skillPoints--;
+      this.baseStats[itemSelected]++;
+
+      await this.chooseStats();
+    }
+  }
+
+
+  /*
+    Delete item from invnetory
+  */
   removeItemFromInventory(itemToRemove)
   {
     debug(`Removing: `);
@@ -240,11 +355,22 @@ export class Character {
   }
 
 
+  /*
+    Create a random character
+  */
   static createRandomEnemy()
   {
     const names = ['Goblin', 'Slime', 'Bandit', 'Wolf'];
     const health = getRandomInt(20, 40);
     let enemy = new Character(getRandomChoice(names), health);
+    enemy.baseStats = {
+      strength: getRandomInt(2, 5),
+      dexterity: getRandomInt(2, 5),
+      agility: getRandomInt(2, 5),
+      endurance: getRandomInt(2, 5),
+      intelligence: getRandomInt(2, 5)
+    };
+
     return enemy;
   }
 }

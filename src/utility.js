@@ -1,5 +1,6 @@
 import { _DEBUG_ } from './constants';
 
+
 /*
   Returns random int from [min, max)
 */
@@ -17,6 +18,7 @@ export function getRandomChoice(array) {
   return array[getRandomInt(0, array.length)];
 }
 
+
 /*
   Prints message if debug flag is on
 */
@@ -24,12 +26,14 @@ export function debug(text) {
   if (_DEBUG_) console.dir(text);
 }
 
+
 /*
   Prints formatted console message
 */
 export const message = (text) => {
   console.log(text);
 }
+
 
 /*
   Clear terminal

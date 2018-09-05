@@ -1,6 +1,7 @@
 import inquirer from 'inquirer';
 import { message, getRandomInt, clearScreen } from './utility';
 
+
 export class GameMap {
   constructor() 
   {

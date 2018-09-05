@@ -9,6 +9,17 @@ export class Item {
     this.name = name;
     this.type = null;
     this.itemID = Math.floor(Math.random()*100000);
+
+    // Only applicable for weapons
+    this.damage = 1;
+
+    this.statModifiers = {
+      strength: 0,
+      dexterity: 0,
+      agility: 0,
+      endurance: 0,
+      intelligence: 0
+    };
   }
 
 
