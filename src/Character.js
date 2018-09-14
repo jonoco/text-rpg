@@ -155,6 +155,8 @@ export class Character {
 
     this.health -= damage;
     this.health = this.health < 0 ? 0 : this.health;
+
+    return damage;
   }
 
 

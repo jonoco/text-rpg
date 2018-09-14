@@ -13,13 +13,16 @@ import ErrorUI from './ui/error';
 import BattleUI from './ui/battle';
 import GameOverUI from './ui/gameover';
 
+
 const GameState = { 
     world: 0      // world movement
   , battle: 1     // battle screen
-  , inventory: 2  // inventory and equipment
-  , stats: 3      // player stats and level up
-  , gameover: 4   // game over
+  , postbattle: 2 // after battle -> rewards
+  , inventory: 3  // inventory and equipment
+  , stats: 4      // player stats and level up
+  , gameover: 5   // game over
 };
+
 
 export class Game {
   constructor() 
@@ -28,9 +31,8 @@ export class Game {
     this.player = new Character(`Player`, 100);
 
     this.battleFrequency = 0.2; // probability to start a fight
-    this.gameOver = false;
 
-    this.gameState = GameState.world;
+    this.gameState;
 
     // Current battle object
     this.battle = new Battle();
@@ -51,10 +53,12 @@ export class Game {
     this.battleUI = new BattleUI();
     this.gameoverUI = new GameOverUI();
 
+    // Setup any global input hooks
     this.screen.key(['e'], (ch, key) => {
       this.switchScreen(GameState.world);
     });
 
+    // Subcribe to event hooks
     dispatch.on('move', () => { 
       this.mapUI.log.log('moved around');
 
@@ -148,43 +152,14 @@ export class Game {
   */
   battleState()
   {
-    this.battle.initialize(this.player, this.enemy);
     this.switchScreen(GameState.battle);
 
     // Generate an enemy based on player level and location, then provide it to the battle
-    
-    // await battle.start();
+    let enemy = Character.createRandomEnemy();
 
-    // clearScreen();
-
-    // if (battle.victory)
-    // {
-    //   message(`You beat the ${battle.enemy.name}!`);
-    //   message(`You received ${battle.enemy.getExperienceValue()} experience!`);
-      
-    //   this.player.experience += battle.enemy.getExperienceValue();
-    //   this.player.checkLevelup();
-    //   this.player.receiveItem(Item.createRandomItem());
-    // }
-    // else
-    // {
-    //   message(`You lost, fool!`);
-    //   this.gameOver = true;
-    // }
-
-    // await inquirer
-    //   .prompt([{ 
-    //     type: 'list',
-    //     name: 'choice',
-    //     message: 'Finished?',
-    //     choices: [
-    //       {name: CONFIRM},
-    //     ] 
-    //   }])
-    //   .then(answers => {
-    //     //...
-    //   });
+    this.battle.initialize(this.player, enemy);
   }
+
 
   /*
     Post-battle check
@@ -193,6 +168,7 @@ export class Game {
   postBattleState(battle)
   {
     // Return to world after showing reward
+    this.mapUI.log.log('won the battle, yippee!');
     this.moveState();
   }
 
@@ -211,6 +187,8 @@ export class Game {
   */
   async start()
   {
+    // show introduction, character creation screen, etc.
+
     // just start world movement for now
     this.moveState();
 
@@ -270,26 +248,11 @@ export class Game {
   /*
     Let player regenerate health, risking battle
   */
-  async rest() 
+  rest() 
   {
     debug (`Healing for ${this.player.defaultHealth}`);
 
     this.player.heal(this.player.defaultHealth);
-
-    message(`Health recovered. (${this.player.health})`);
-
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'choice',
-        message: 'Finished?',
-        choices: [
-          {name: CONFIRM},
-        ] 
-      }])
-      .then(answers => {
-        //...
-      });
   }
 
 

@@ -4,6 +4,9 @@ import dispatch from '../dispatch';
 
 function BattleUI ()
 {
+  dispatch.on('battle.start', this.start.bind(this));
+  dispatch.on('battle.update', this.update.bind(this));
+
   this.widget = blessed.box();
 
   this.log = contrib.log({ 
@@ -86,18 +89,29 @@ function BattleUI ()
         break;
     }
   });
+}
 
-  // Set initial battle conditions
-  dispatch.on('battle.update', event => {
-    const enemy = event.enemy;
-    const player = event.player;
 
-    let enemyInfo = `${enemy.name}\n health: ${enemy.health}`;
-    this.enemy.setContent(enemyInfo);
+BattleUI.prototype.start = function(event)
+{
+  this.log.logLines = []; // clear the log
 
-    let playerInfo = `${player.name}\n health: ${player.health}`;
-    this.player.setContent(playerInfo);
-  });
+  this.update(event);
+}
+
+
+BattleUI.prototype.update = function(event)
+{
+  const enemy = event.enemy;
+  const player = event.player;
+
+  let enemyInfo = `${enemy.name}\n health: ${enemy.health}`;
+  this.enemy.setContent(enemyInfo);
+
+  let playerInfo = `${player.name}\n health: ${player.health}`;
+  this.player.setContent(playerInfo);
+
+  this.log.log(event.text);
 }
 
 export default BattleUI;

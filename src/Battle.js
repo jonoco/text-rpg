@@ -18,15 +18,19 @@ export class Battle {
     dispatch.on('battle.escape', this.escape.bind(this));
   }
 
-
+  
+  /*
+    Initialize a new battle
+  */
   initialize(player, enemy)
   {
     this.enemy = enemy || Character.createRandomEnemy();
     this.player = player;
 
-    dispatch.emit('battle.update', {
+    dispatch.emit('battle.start', {
       enemy: this.enemy,
-      player: this.player
+      player: this.player,
+      text: `Encountered a ${this.enemy.name}!`
     });
   }
 
@@ -48,11 +52,12 @@ export class Battle {
   */
   attackEnemy(event)
   {
-    this.enemy.hit(this.player.attackPower());
+    const damage = this.enemy.hit(this.player.attackPower());
 
     dispatch.emit('battle.update', {
       enemy: this.enemy,
-      player: this.player
+      player: this.player,
+      text: `${this.enemy.name} hit for ${damage}`
     });
 
     if (!this.enemy.isAlive())
@@ -72,11 +77,12 @@ export class Battle {
   // Enemy attacks player
   attackPlayer()
   {
-    this.player.hit(this.enemy.attackPower());
+    const damage = this.player.hit(this.enemy.attackPower());
 
     dispatch.emit('battle.update', {
       enemy: this.enemy,
-      player: this.player
+      player: this.player,
+      text: `${this.player.name} hit for ${damage}`
     });
 
     if (!this.player.isAlive())
