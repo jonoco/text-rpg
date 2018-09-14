@@ -1,47 +1,66 @@
-import inquirer from 'inquirer';
 import { Character } from './Character';
-import { message, clearScreen } from './utility';
+import dispatch from './dispatch';
 
+export const BattleCondition = {
+  Escape: 0,
+  Victory: 1,
+  Lose: 2
+};
+
+
+/*
+  Handles battle logic
+*/
 export class Battle {
-  constructor(player)
+  constructor(player, enemy)
   {
-    this.battleOver = false;
-    this.victory = false;
+    dispatch.on('battle.playerAttack', this.attackEnemy.bind(this));
+    dispatch.on('battle.escape', this.escape.bind(this));
+  }
 
-    this.enemy = Character.createRandomEnemy();
+
+  initialize(player, enemy)
+  {
+    this.enemy = enemy || Character.createRandomEnemy();
     this.player = player;
+
+    dispatch.emit('battle.update', {
+      enemy: this.enemy,
+      player: this.player
+    });
   }
 
 
-  async start()
+  /*
+    Escape from battle
+  */
+  escape()
   {
-    clearScreen();
-    message(`---------=---------\nBattle!\n---------=---------`);
-
-    while (!this.battleOver)
-    {      
-      message(`Fighting a ${this.enemy.name}.`);
-      message(`${this.enemy.name} health: ${this.enemy.health}`);
-      message(`${this.player.name} health: ${this.player.health}`);
-
-      await this.askAttackChoice();  
-    }
+    dispatch.emit('battle.end', {
+      battle: this,
+      condition: BattleCondition.Escape
+    });
   }
 
-
-  attackEnemy(choice)
+  
+  /*
+    Get attack selection from event
+  */
+  attackEnemy(event)
   {
-    // choice is unused
-
-    message(`Attacking ${this.enemy.name}.`);
-
     this.enemy.hit(this.player.attackPower());
+
+    dispatch.emit('battle.update', {
+      enemy: this.enemy,
+      player: this.player
+    });
 
     if (!this.enemy.isAlive())
     {
-      message(`${this.enemy.name} was killed.`);
-      this.battleOver = true;
-      this.victory = true;
+      dispatch.emit('battle.end', {
+        battle: this,
+        condition: BattleCondition.Victory
+      });
     }
     else
     {
@@ -50,36 +69,22 @@ export class Battle {
   }
 
   
+  // Enemy attacks player
   attackPlayer()
   {
-    message(`${this.enemy.name} is attacking.`);
-
     this.player.hit(this.enemy.attackPower());
+
+    dispatch.emit('battle.update', {
+      enemy: this.enemy,
+      player: this.player
+    });
 
     if (!this.player.isAlive())
     {
-      message(`You were killed by a ${this.enemy.name}`);
-      this.battleOver = true;
-    }
-  }
-
-
-  async askAttackChoice()
-  {
-    await inquirer
-      .prompt([
-        { name: "attack", message: "Choose your attack? (1,2)\n" }
-      ])
-      .then(answers => {
-        if (['1','2'].includes(answers.attack)) 
-        {
-          clearScreen();
-          return this.attackEnemy(answers["attack"]);
-        } 
-        else 
-        {
-          return this.askAttackChoice();
-        }
+      dispatch.emit('battle.end', {
+        battle: this,
+        condition: BattleCondition.Lose
       });
+    }
   }
 }

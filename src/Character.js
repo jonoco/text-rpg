@@ -90,8 +90,6 @@ export class Character {
     this.skillPoints += 5;
     this.health = this.defaultHealth;
 
-    message(`${this.name} leveled up to ${this.level}!`);
-
     this.checkStatModifiers();
   }
 
@@ -153,7 +151,7 @@ export class Character {
 
   hit(damage)
   {
-    message(`${this.name} was hit for ${damage}`);
+    debug(`${this.name} was hit for ${damage}`);
 
     this.health -= damage;
     this.health = this.health < 0 ? 0 : this.health;
@@ -175,8 +173,6 @@ export class Character {
 
   receiveItem(item)
   {
-    message(`You received ${item.name}.`);
-
     this.inventory.push(item);
   }
 

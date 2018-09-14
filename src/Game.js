@@ -1,80 +1,208 @@
 import inquirer from 'inquirer';
+import blessed from 'blessed';
 import { Character } from './Character';
 import { GameMap } from './GameMap';
 import { Item } from './Item';
-import { Battle } from './Battle'
+import { Battle, BattleCondition } from './Battle'
 import { message, clearScreen, debug } from './utility';
 import { CANCEL, CONFIRM } from './constants';
+import dispatch from './dispatch';
 
+import WorldMapUI from './ui/worldMap';
+import ErrorUI from './ui/error';
+import BattleUI from './ui/battle';
+import GameOverUI from './ui/gameover';
+
+const GameState = { 
+    world: 0      // world movement
+  , battle: 1     // battle screen
+  , inventory: 2  // inventory and equipment
+  , stats: 3      // player stats and level up
+  , gameover: 4   // game over
+};
 
 export class Game {
   constructor() 
   {
-    this.map = new GameMap();
+    // this.map = new GameMap();
     this.player = new Character(`Player`, 100);
 
     this.battleFrequency = 0.2; // probability to start a fight
     this.gameOver = false;
+
+    this.gameState = GameState.world;
+
+    // Current battle object
+    this.battle = new Battle();
+
+    this.screen = blessed.screen({
+      smartCSR: true,
+      log: 'mylog'
+    });
+
+    // Quit on Escape, q, or Control-C.
+    this.screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+      return process.exit(0);
+    });
+
+    // Create UI screens 
+    this.errorUI = new ErrorUI();
+    this.mapUI = new WorldMapUI();
+    this.battleUI = new BattleUI();
+    this.gameoverUI = new GameOverUI();
+
+    this.screen.key(['e'], (ch, key) => {
+      this.switchScreen(GameState.world);
+    });
+
+    dispatch.on('move', () => { 
+      this.mapUI.log.log('moved around');
+
+      if (this.checkStartFight())
+      {
+        // switch to Battle state
+        this.mapUI.log.log('starting fight');
+        this.battleState();
+      }
+    });
+
+    // Exit BatleUI
+    dispatch.on('exit', () => {
+      this.moveState();
+    });
+
+    // Handle the end of a battle
+    dispatch.on('battle.end', event => {
+      const condition = event.condition;
+      const battle = event.battle;
+
+      switch (condition)
+      {
+        case BattleCondition.Escape:
+          this.moveState();
+          break;
+        case BattleCondition.Lose:
+          this.gameOverState();
+          break;
+        case BattleCondition.Victory:
+          this.postBattleState(battle);
+          break;
+      }
+    });
   }  
 
   
   /*
-    Allow player to move, possibly encountering battles
+    Switch screen based on gameState
+    gs - GameState object
   */
-  async move()
+  switchScreen(gs)
   {
-    while (true)
-    {
-      let cancel = await this.map.askDirection();
-    
-      if (cancel) break;
+    this.gameState = gs;
 
-      if (this.checkStartFight())
-      {
-        await this.battle();
+    // dump ui widgets
+    this.screen.children.forEach(child => { this.screen.remove(child) });
+
+    switch (gs)
+    {
+      case GameState.world:
+        this.screen.append(this.mapUI.widget);
+        this.mapUI.map.focus();
         break;
-      }
+      case GameState.battle:
+        this.screen.append(this.battleUI.widget);
+        this.battleUI.list.focus();
+        this.battleUI.list.up(10);
+        break;
+      case GameState.inventory:
+        this.screen.append(this.errorUI.widget);
+        break;
+      case GameState.stats:
+        this.screen.append(this.errorUI.widget);
+        break;
+      case GameState.gameover:
+        this.screen.append(this.gameoverUI.widget);
+        break;
+      default:
+        // load an error screen or menu
+        this.screen.append(this.errorUI.widget);
     }
+
+    this.screen.render();
   }
 
 
   /*
-    Handle battle
+    Move state
+    Allow player to move, possibly encountering battles
   */
-  async battle()
+  moveState()
   {
-    const battle = new Battle(this.player);
-    await battle.start();
+    this.switchScreen(GameState.world);
+  }
 
-    clearScreen();
 
-    if (battle.victory)
-    {
-      message(`You beat the ${battle.enemy.name}!`);
-      message(`You received ${battle.enemy.getExperienceValue()} experience!`);
+  /*
+    Battle state
+    Handle battle data injection
+  */
+  battleState()
+  {
+    this.battle.initialize(this.player, this.enemy);
+    this.switchScreen(GameState.battle);
+
+    // Generate an enemy based on player level and location, then provide it to the battle
+    
+    // await battle.start();
+
+    // clearScreen();
+
+    // if (battle.victory)
+    // {
+    //   message(`You beat the ${battle.enemy.name}!`);
+    //   message(`You received ${battle.enemy.getExperienceValue()} experience!`);
       
-      this.player.experience += battle.enemy.getExperienceValue();
-      this.player.checkLevelup();
-      this.player.receiveItem(Item.createRandomItem());
-    }
-    else
-    {
-      message(`You lost, fool!`);
-      this.gameOver = true;
-    }
+    //   this.player.experience += battle.enemy.getExperienceValue();
+    //   this.player.checkLevelup();
+    //   this.player.receiveItem(Item.createRandomItem());
+    // }
+    // else
+    // {
+    //   message(`You lost, fool!`);
+    //   this.gameOver = true;
+    // }
 
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'choice',
-        message: 'Finished?',
-        choices: [
-          {name: CONFIRM},
-        ] 
-      }])
-      .then(answers => {
-        //...
-      });
+    // await inquirer
+    //   .prompt([{ 
+    //     type: 'list',
+    //     name: 'choice',
+    //     message: 'Finished?',
+    //     choices: [
+    //       {name: CONFIRM},
+    //     ] 
+    //   }])
+    //   .then(answers => {
+    //     //...
+    //   });
+  }
+
+  /*
+    Post-battle check
+    Give rewards, experience, etc.
+  */
+  postBattleState(battle)
+  {
+    // Return to world after showing reward
+    this.moveState();
+  }
+
+
+  /*
+    Game over handling
+  */
+  gameOverState()
+  {
+    this.switchScreen(GameState.gameover);
   }
 
 
@@ -83,56 +211,59 @@ export class Game {
   */
   async start()
   {
-    const intro = `You wake up in a graveyard.`;
-    message(intro);
+    // just start world movement for now
+    this.moveState();
 
-    while(!this.gameOver)
-    {
-      clearScreen();
-      message(`You're at (${this.map.getLocation().x}, ${this.map.getLocation().y})`);
-      message(`${this.map.getEnvironment().description}`);
+    // const intro = `You wake up in a graveyard.`;
+    // message(intro);
 
-      let choice;
-      await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'choice',
-        message: 'What do you want to do?',
-        choices: [
-          {name: 'Move'},
-          {name: 'Rest'},
-          {name: 'Check inventory', value: 'inventory'},
-          {name: 'Change equipment', value: 'equipment'},
-          {name: 'Check status', value: 'status'},
-          {name: 'Upgrade stats', value: 'upgradeStats'},
-        ] 
-      }])
-      .then(answers => {
-        choice = answers.choice;
-      });
+    // while(!this.gameOver)
+    // {
+    //   clearScreen();
+    //   message(`You're at (${this.map.getLocation().x}, ${this.map.getLocation().y})`);
+    //   message(`${this.map.getEnvironment().description}`);
 
-      switch (choice)
-      {
-        case 'Move':
-          await this.move();
-          break;
-        case 'Rest':
-          await this.rest();
-          break;
-        case 'inventory':
-          await this.player.checkInventory();
-          break;
-        case 'equipment':
-          await this.player.changeEquipment();
-          break;
-        case 'status':
-          await this.player.checkStatus();
-          break;
-        case 'upgradeStats':
-          await this.player.chooseStats();
-          break;
-      }
-    }
+    //   let choice;
+    //   await inquirer
+    //   .prompt([{ 
+    //     type: 'list',
+    //     name: 'choice',
+    //     message: 'What do you want to do?',
+    //     choices: [
+    //       {name: 'Move'},
+    //       {name: 'Rest'},
+    //       {name: 'Check inventory', value: 'inventory'},
+    //       {name: 'Change equipment', value: 'equipment'},
+    //       {name: 'Check status', value: 'status'},
+    //       {name: 'Upgrade stats', value: 'upgradeStats'},
+    //     ] 
+    //   }])
+    //   .then(answers => {
+    //     choice = answers.choice;
+    //   });
+
+    //   switch (choice)
+    //   {
+    //     case 'Move':
+    //       await this.move();
+    //       break;
+    //     case 'Rest':
+    //       await this.rest();
+    //       break;
+    //     case 'inventory':
+    //       await this.player.checkInventory();
+    //       break;
+    //     case 'equipment':
+    //       await this.player.changeEquipment();
+    //       break;
+    //     case 'status':
+    //       await this.player.checkStatus();
+    //       break;
+    //     case 'upgradeStats':
+    //       await this.player.chooseStats();
+    //       break;
+    //   }
+    // }
   }
 
 

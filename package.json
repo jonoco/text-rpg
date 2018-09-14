@@ -11,11 +11,18 @@
   "author": "Joshua N. Cox <joshua.n.cox@gmail.com> (http://jonoco.me/)",
   "license": "MIT",
   "dependencies": {
-    "inquirer": "6.2.0"
+    "inquirer": "6.2.0",
+    "pty": "0.0.0",
+    "pty.js": "0.3.1",
+    "term": "0.0.2",
+    "term.js": "0.0.7"
   },
   "devDependencies": {
+    "blessed": "0.1.81",
+    "blessed-contrib": "4.8.6",
+    "seedrandom": "2.4.4",
+    "url": "x.x.x",
     "webpack": "4.17.2",
-    "webpack-cli": "3.1.0",
-    "url": "x.x.x"
+    "webpack-cli": "3.1.0"
   }
 }
