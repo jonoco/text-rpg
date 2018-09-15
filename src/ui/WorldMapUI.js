@@ -92,6 +92,10 @@ function WorldMapUI ()
     this.move('right', this.map, this.info);
   });
 
+  this.map.key('i', () => {
+    dispatch.emit('inventory.open');
+  });
+
   this.updateInfo(this.info, this.map);
   
   // this.map.focus();

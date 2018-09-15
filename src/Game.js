@@ -8,16 +8,18 @@ import { message, clearScreen, debug } from './utility';
 import { CANCEL, CONFIRM } from './constants';
 import dispatch from './dispatch';
 
-import WorldMapUI from './ui/worldMap';
-import ErrorUI from './ui/error';
-import BattleUI from './ui/battle';
-import GameOverUI from './ui/gameover';
+import WorldMapUI from './ui/WorldMapUI';
+import ErrorUI from './ui/ErrorUI';
+import BattleUI from './ui/BattleUI';
+import GameOverUI from './ui/GameOverUI';
+import PostBattleUI from './ui/PostBattleUI';
+import InventoryUI from './ui/InventoryUI';
 
 
 const GameState = { 
     world: 0      // world movement
   , battle: 1     // battle screen
-  , postbattle: 2 // after battle -> rewards
+  , postBattle: 2 // after battle -> rewards
   , inventory: 3  // inventory and equipment
   , stats: 4      // player stats and level up
   , gameover: 5   // game over
@@ -52,13 +54,24 @@ export class Game {
     this.mapUI = new WorldMapUI();
     this.battleUI = new BattleUI();
     this.gameoverUI = new GameOverUI();
+    this.postBattleUI = new PostBattleUI();
+    this.inventoryUI = new InventoryUI();
 
     // Setup any global input hooks
     this.screen.key(['e'], (ch, key) => {
       this.switchScreen(GameState.world);
     });
 
-    // Subcribe to event hooks
+    this.subscribeEvents();
+  }  
+
+
+  /*
+    Subscribe to event hooks
+  */
+  subscribeEvents()
+  {
+    // Check for battle after moving
     dispatch.on('move', () => { 
       this.mapUI.log.log('moved around');
 
@@ -93,7 +106,12 @@ export class Game {
           break;
       }
     });
-  }  
+
+    // Handle postbattle event; go to world screen after postbattle screen
+    dispatch.on('battle.postend', () => { this.moveState() });
+
+    dispatch.on('inventory.open', () => { this.inventoryState() });
+  }
 
   
   /*
@@ -118,8 +136,11 @@ export class Game {
         this.battleUI.list.focus();
         this.battleUI.list.up(10);
         break;
+      case GameState.postBattle:
+        this.screen.append(this.postBattleUI.widget);
+        break;
       case GameState.inventory:
-        this.screen.append(this.errorUI.widget);
+        this.screen.append(this.inventoryUI.widget);
         break;
       case GameState.stats:
         this.screen.append(this.errorUI.widget);
@@ -167,9 +188,17 @@ export class Game {
   */
   postBattleState(battle)
   {
-    // Return to world after showing reward
+    this.switchScreen(GameState.postBattle);
+
+    this.postBattleUI.widget.focus();
     this.mapUI.log.log('won the battle, yippee!');
-    this.moveState();
+
+    // generate an appropriate reward and emit reward data
+    const item = Item.createRandomItem();
+    this.player.receiveItem(item);
+    this.player.experience += battle.enemy.getExperienceValue();
+
+    dispatch.emit('battle.poststart', { item, battle });
   }
 
 
@@ -179,6 +208,15 @@ export class Game {
   gameOverState()
   {
     this.switchScreen(GameState.gameover);
+  }
+
+
+  /*
+    Inventory state
+  */
+  inventoryState()
+  {
+    this.switchScreen(GameState.inventory);
   }
 
 
