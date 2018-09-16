@@ -23,6 +23,7 @@ const GameState = {
   , inventory: 3  // inventory and equipment
   , stats: 4      // player stats and level up
   , gameover: 5   // game over
+  , error: 6      // display error
 };
 
 
@@ -41,7 +42,7 @@ export class Game {
 
     this.screen = blessed.screen({
       smartCSR: true,
-      log: 'mylog'
+      log: 'mylog.log'
     });
 
     // Quit on Escape, q, or Control-C.
@@ -57,9 +58,25 @@ export class Game {
     this.postBattleUI = new PostBattleUI();
     this.inventoryUI = new InventoryUI();
 
+    // this.errorPrompt = blessed.message({
+    //     parent: this.screen
+    //   , top: 0
+    //   , left: 0
+    //   , width: '100%'
+    //   , height: '100%'
+    //   , tags: true
+    // });
+    // this.errorPrompt.setIndex(0);
+
     // Setup any global input hooks
     this.screen.key(['e'], (ch, key) => {
-      this.switchScreen(GameState.world);
+      this.moveState();
+    });
+
+    // handle 'Cancel' input
+    this.screen.key('c', () => {
+      if (this.gameState == GameState.inventory)
+        this.moveState();
     });
 
     this.subscribeEvents();
@@ -111,6 +128,12 @@ export class Game {
     dispatch.on('battle.postend', () => { this.moveState() });
 
     dispatch.on('inventory.open', () => { this.inventoryState() });
+    dispatch.on('inventory.close', () => { this.moveState() });
+
+    dispatch.on('error', event => {
+      this.errorUI.widget.setContent(`error:\n${event.text}`);
+      this.switchScreen(GameState.error);
+    });
   }
 
   
@@ -141,12 +164,16 @@ export class Game {
         break;
       case GameState.inventory:
         this.screen.append(this.inventoryUI.widget);
+        this.inventoryUI.inventory.focus();
         break;
       case GameState.stats:
         this.screen.append(this.errorUI.widget);
         break;
       case GameState.gameover:
         this.screen.append(this.gameoverUI.widget);
+        break;
+      case GameState.error:
+        this.screen.append(this.errorUI.widget);
         break;
       default:
         // load an error screen or menu
@@ -217,6 +244,7 @@ export class Game {
   inventoryState()
   {
     this.switchScreen(GameState.inventory);
+    this.inventoryUI.setCharacter(this.player);
   }
 
 
@@ -226,6 +254,10 @@ export class Game {
   async start()
   {
     // show introduction, character creation screen, etc.
+
+    // starting equipment
+    for (let i = 0; i < 4; i++)
+      this.player.receiveItem(Item.createRandomItem());
 
     // just start world movement for now
     this.moveState();

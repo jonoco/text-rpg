@@ -17,21 +17,21 @@ export class Character {
       afraid: false,
     };
 
-    // type indicates the type of item the slot allows
+    // type indicates the type of items the slot allows
     this.equipment = {
-      head:       { item: null, type: 'head' },
-      shoulders:  { item: null, type: 'shoulders' },
-      hands:      { item: null, type: 'hands' },
-      torso:      { item: null, type: 'torso' },
-      legs:       { item: null, type: 'legs' },
-      feet:       { item: null, type: 'feet' },
-      leftHand:   { item: null, type: 'shield' },
-      rightHand:  { item: null, type: 'weapon' },
-      neck:       { item: null, type: 'necklace' },
-      ring1:      { item: null, type: 'ring' },
-      ring2:      { item: null, type: 'ring' },
-      ring3:      { item: null, type: 'ring' },
-      ring4:      { item: null, type: 'ring' },
+      head:       { item: null, type: ['head'] },
+      shoulders:  { item: null, type: ['shoulders'] },
+      hands:      { item: null, type: ['hands'] },
+      torso:      { item: null, type: ['torso'] },
+      legs:       { item: null, type: ['legs'] },
+      feet:       { item: null, type: ['feet'] },
+      leftHand:   { item: null, type: ['weapon', 'shield'] },
+      rightHand:  { item: null, type: ['weapon', 'shield'] },
+      neck:       { item: null, type: ['necklace'] },
+      ring1:      { item: null, type: ['ring'] },
+      ring2:      { item: null, type: ['ring'] },
+      ring3:      { item: null, type: ['ring'] },
+      ring4:      { item: null, type: ['ring'] },
     };
     this.inventory = [];
 
@@ -100,6 +100,23 @@ export class Character {
   getExperienceValue()
   {
     return 50 + (this.level * 25);
+  }
+
+
+  /*
+    Returns array of equipment slots which accept a given item
+  */
+  getEquipmentSlots(item)
+  {
+    let validSlots = [];
+    
+    for (let slot in this.equipment)
+    {
+      if (this.equipment[slot].type.includes(item.type))
+        validSlots.push(slot);
+    }
+
+    return validSlots;
   }
 
 
@@ -176,6 +193,58 @@ export class Character {
   receiveItem(item)
   {
     this.inventory.push(item);
+  }
+
+
+  /*
+    Equip item in first available slot
+    Return true if equip was successful, otherwise false
+  */
+  equipItem(item)
+  {
+    let selectedSlot;
+    for (let slot in this.equipment)
+    {
+      if (!this.equipment[slot].item && this.equipment[slot].type.includes(item.type))
+      {
+        selectedSlot = slot;
+        break;
+      }
+    }
+
+    return selectedSlot ? this.equipItemInSlot(item, selectedSlot) : false;
+  }
+
+
+  /*
+    Equip item at a given slot
+    If slot is invalid, equip is cancelled
+    If slot is occupied, item is swapped and placed in inventory
+
+    Returns true if equip was successful, otherwise false
+  */
+  equipItemInSlot(item, slot)
+  {
+    // Check valid slot
+    // if (!Object.keys(this.equipment).includes(slot)) return false;
+
+    // Check item is valid for equipment slot
+    if (!this.equipment[slot].type.includes(item.type)) return false;
+  
+    // If slot isn't empty, send item to inventory
+    if (this.equipment[slot].item)
+    {
+      this.inventory.push(this.equipment[slot].item);  
+    }
+
+    // Move item from inventory to equipment
+    this.equipment[slot].item = item;
+    this.removeItemFromInventory(item);
+
+    // Update stat modifiers
+    this.checkStatModifiers();
+
+    return true;
   }
 
 
@@ -257,8 +326,7 @@ export class Character {
     let choices = [];
     for (let slot in this.equipment) {
       let choice = {
-        name: `${slot}: ${this.equipment[slot].item 
-          ? this.equipment[slot].item.name : 'empty'}`,
+        name: `${slot}: ${this.equipment[slot].item ? this.equipment[slot].item.name : 'empty'}`,
         value: slot
       };
       choices.push(choice);
