@@ -259,7 +259,7 @@ export class Game {
 
 
   /*
-    Main game loop and entry point
+    Main game entry point
   */
   async start()
   {

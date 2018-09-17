@@ -6,6 +6,9 @@ function BattleUI ()
 {
   dispatch.on('battle.start', this.start.bind(this));
   dispatch.on('battle.update', this.update.bind(this));
+  dispatch.on('battle.log', event => {
+    this.log.log(event.text);
+  });
 
   this.widget = blessed.box();
 
@@ -42,10 +45,10 @@ function BattleUI ()
     , content: 'the player guy' 
   });
 
-  const choices = {
-    attack: { name: 'first things first' },
-    escape: { name: 'escape' }
-  };
+  // const choices = {
+  //   attack: { name: 'first things first' },
+  //   escape: { name: 'escape' }
+  // };
 
   this.list = blessed.list({
       parent: this.widget
@@ -55,7 +58,7 @@ function BattleUI ()
     , height: 6
     , label: 'list'
     , keys: true
-    , items: Object.keys(choices)
+    , items: []
     , border: {
         type: 'line'
       }
@@ -76,18 +79,20 @@ function BattleUI ()
 
   // Handle input selection
   this.list.on( 'select', cb => {
-    const key = cb.content;
-    this.log.log(key);
+    const ability = cb.content;
+    this.log.log(`Using ${ability}.`);
 
-    switch (key)
-    {
-      case 'attack':
-        dispatch.emit('battle.playerAttack');
-        break;
-      case 'escape':
-        dispatch.emit('exit');
-        break;
-    }
+    dispatch.emit('battle.useAbility', { ability });
+
+    // switch (ability)
+    // {
+    //   case 'attack':
+    //     dispatch.emit('battle.useAbility', { ability });
+    //     break;
+    //   case 'escape':
+    //     dispatch.emit('exit');
+    //     break;
+    // }
   });
 }
 
@@ -95,6 +100,14 @@ function BattleUI ()
 BattleUI.prototype.start = function(event)
 {
   this.log.logLines = []; // clear the log
+
+  // Get the player's abilities
+  const player = event.player;
+  const choices = player.abilities.map(ability => {
+    return ability.name;
+  });
+
+  this.list.setItems(choices);
 
   this.update(event);
 }

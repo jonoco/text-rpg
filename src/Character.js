@@ -2,6 +2,8 @@ import inquirer from 'inquirer';
 import { message, getRandomInt, getRandomChoice, clearScreen, debug } from './utility';
 import { CANCEL } from './constants'
 
+import BashAbility from './abilities/BashAbility';
+
 export class Character {
   constructor(name, defaultHealth)
   {
@@ -34,6 +36,10 @@ export class Character {
       ring4:      { item: null, type: ['ring'] },
     };
     this.inventory = [];
+
+    this.abilities = [
+      new BashAbility()
+    ];
 
     this.skillPoints = 0;
   
@@ -177,6 +183,24 @@ export class Character {
     this.health = this.health < 0 ? 0 : this.health;
 
     return damage;
+  }
+
+
+  abilitySuccessful(ability)
+  {
+    //...
+  }
+
+
+  missHit()
+  {
+    //...
+  }
+
+
+  dodgeHit()
+  {
+    //...
   }
 
 
