@@ -15,7 +15,7 @@ function InventoryUI()
     , tags: true
     , label: 'Controls'
     , border: { type: 'line', fg: 'white' }
-    , content: `c to close, arrows to move, enter to select, e to open equipment`
+    , content: `c to close, arrows to move, enter to equip, e to open equipment`
   });
 
   this.inventory = contrib.table({
@@ -104,7 +104,7 @@ InventoryUI.prototype.updateInfo = function()
   let infoContent = 'no information';  
   if (selectedItem)
   {
-    const characterSlots = this.character.getEquipmentSlots(selectedItem);
+    const characterSlots = this.character.getValidEquipmentSlots(selectedItem);
 
     infoContent = `${selectedItem.name}\n`
       + `\n----------\n`

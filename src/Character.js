@@ -106,7 +106,7 @@ export class Character {
   /*
     Returns array of equipment slots which accept a given item
   */
-  getEquipmentSlots(item)
+  getValidEquipmentSlots(item)
   {
     let validSlots = [];
 
@@ -206,7 +206,7 @@ export class Character {
   */
   equipItem(item)
   {
-    if (!item) return;
+    if (!item) return false;
 
     let selectedSlot;
     for (let slot in this.equipment)
@@ -274,6 +274,7 @@ export class Character {
 
   /*
     Prints character status
+    DEPRECATED
   */
   async checkStatus()
   {
@@ -306,7 +307,8 @@ export class Character {
       });
   }
 
-
+  
+  // DEPRECATED
   async checkInventory()
   {
     clearScreen();
@@ -341,6 +343,7 @@ export class Character {
 
   /*
     Ask user to change item in equipment slot
+    DEPRECATED
   */
   async changeEquipment()
   {
@@ -401,6 +404,8 @@ export class Character {
     }
   }
 
+
+  // DEPRECATED
   async selectItem(type = null)
   {
     // Gives a list of items from the inventory matching the type
@@ -459,6 +464,7 @@ export class Character {
 
   /*
     Choose skill points
+    DEPRECATED
   */
   async chooseStats()
   {
