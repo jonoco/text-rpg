@@ -98,6 +98,12 @@ function WorldMapUI ()
     dispatch.emit('inventory.open');
   });
 
+  this.map.key('e', () => {
+    if (this.widget.detached) return;
+
+    dispatch.emit('equipment.open');
+  });
+
   this.updateInfo(this.info, this.map);
 }
 

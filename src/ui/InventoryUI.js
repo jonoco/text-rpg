@@ -15,7 +15,7 @@ function InventoryUI()
     , tags: true
     , label: 'Controls'
     , border: { type: 'line', fg: 'white' }
-    , content: `c to cancel, arrows to move, enter to select`
+    , content: `c to close, arrows to move, enter to select, e to open equipment`
   });
 
   this.inventory = contrib.table({
@@ -54,22 +54,40 @@ function InventoryUI()
       }
   });
 
+  this.message = blessed.message({
+      parent: this.widget
+    , top: '25%'
+    , left: '25%'
+    , width: '50%'
+    , height: '50%'
+    , tags: true
+    , align: 'center'
+    , valign: 'middle'
+    , border: { type: 'line' }
+    , hidden: true
+  });
+
   // events from inside Table widget are not bubbled up
+  // equip item from inventory
   this.inventory.rows.on('select', node => {
     if (this.widget.detached || this.character === 'undefined') return;
 
     const index = this.inventory.rows.selected;
     const item = this.character.inventory[index];
 
-    if (!this.character.equipItem(item))
+    if (item && !this.character.equipItem(item))
     {
-      dispatch.emit('error', {text: 'could not swap item'});
+      const message = 'Cannot swap item, no room to equip\n\nUnequip an item first';
+      this.message.display(message, 0);
     }
     this.updateInventory();
   });
 
   // Update info when scrolling inventory table
   this.inventory.rows.key(['up', 'down'], () => { this.updateInfo() });
+
+  this.inventory.rows.key('e', () => { dispatch.emit('equipment.open') });
+  this.inventory.rows.key('c', () => { dispatch.emit('inventory.close') });
 }
 
 
@@ -82,21 +100,26 @@ InventoryUI.prototype.updateInfo = function()
     
   const index = this.inventory.rows.selected;
   const selectedItem = this.character.inventory[index];
-
-  const characterSlots = this.character.getEquipmentSlots(selectedItem);
-
-  let infoContent = `${selectedItem.name}\n`
-    + `\n----------\n`
-    + `Equipped`
-    + `\n----------\n`
-    ;
   
-  characterSlots.forEach( slot => {
-    infoContent += `slot: ${slot}\n`;
-    let equippedItem = this.character.equipment[slot].item 
-      ? this.character.equipment[slot].item.name : 'empty';
-    infoContent += `item: ${equippedItem}\n`;
-  });
+  let infoContent = 'no information';  
+  if (selectedItem)
+  {
+    const characterSlots = this.character.getEquipmentSlots(selectedItem);
+
+    infoContent = `${selectedItem.name}\n`
+      + `\n----------\n`
+      + `Equipped`
+      + `\n----------\n`
+      ;
+    
+    // display items in equipment slots
+    characterSlots.forEach( slot => {
+      infoContent += `${slot} : `;
+      let equippedItem = this.character.equipment[slot].item 
+        ? this.character.equipment[slot].item.name : 'empty';
+      infoContent += `${equippedItem}\n`;
+    });  
+  }
   
   this.info.setContent(infoContent);
   this.widget.screen.render();
@@ -110,9 +133,14 @@ InventoryUI.prototype.updateInventory = function()
 {
   if (!this.character) return dispatch.emit('error', {text: 'no character selected'});
 
-  const inventoryContent = this.character.inventory.map(item => {
-    return [item.name, item.type];
-  });
+  let inventoryContent = [];
+
+  if (this.character.inventory.length != 0)
+  {
+    inventoryContent = this.character.inventory.map(item => {
+      return [item.name, item.type];
+    });  
+  }
 
   this.inventory.setData({ 
     headers: ['item', 'type'], 

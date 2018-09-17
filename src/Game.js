@@ -14,16 +14,18 @@ import BattleUI from './ui/BattleUI';
 import GameOverUI from './ui/GameOverUI';
 import PostBattleUI from './ui/PostBattleUI';
 import InventoryUI from './ui/InventoryUI';
+import EquipmentUI from './ui/EquipmentUI';
 
 
 const GameState = { 
     world: 0      // world movement
   , battle: 1     // battle screen
   , postBattle: 2 // after battle -> rewards
-  , inventory: 3  // inventory and equipment
-  , stats: 4      // player stats and level up
-  , gameover: 5   // game over
-  , error: 6      // display error
+  , inventory: 3  // inventory
+  , equipment: 4  // equipment
+  , stats: 5      // player stats and level up
+  , gameover: 6   // game over
+  , error: 7      // display error
 };
 
 
@@ -57,27 +59,18 @@ export class Game {
     this.gameoverUI = new GameOverUI();
     this.postBattleUI = new PostBattleUI();
     this.inventoryUI = new InventoryUI();
-
-    // this.errorPrompt = blessed.message({
-    //     parent: this.screen
-    //   , top: 0
-    //   , left: 0
-    //   , width: '100%'
-    //   , height: '100%'
-    //   , tags: true
-    // });
-    // this.errorPrompt.setIndex(0);
+    this.equipmentUI = new EquipmentUI();
 
     // Setup any global input hooks
-    this.screen.key(['e'], (ch, key) => {
+    this.screen.key(['`'], (ch, key) => {
       this.moveState();
     });
 
     // handle 'Cancel' input
-    this.screen.key('c', () => {
-      if (this.gameState == GameState.inventory)
-        this.moveState();
-    });
+    // this.screen.key('c', () => {
+    //   if (this.gameState == GameState.inventory || this.gameState == GameState.equipment)
+    //     this.moveState();
+    // });
 
     this.subscribeEvents();
   }  
@@ -130,6 +123,9 @@ export class Game {
     dispatch.on('inventory.open', () => { this.inventoryState() });
     dispatch.on('inventory.close', () => { this.moveState() });
 
+    dispatch.on('equipment.open', () => { this.equipmentState() });
+    dispatch.on('equipment.close', () => { this.moveState() });
+
     dispatch.on('error', event => {
       this.errorUI.widget.setContent(`error:\n${event.text}`);
       this.switchScreen(GameState.error);
@@ -174,6 +170,10 @@ export class Game {
         break;
       case GameState.error:
         this.screen.append(this.errorUI.widget);
+        break;
+      case GameState.equipment:
+        this.screen.append(this.equipmentUI.widget);
+        this.equipmentUI.equipment.focus();
         break;
       default:
         // load an error screen or menu
@@ -245,6 +245,16 @@ export class Game {
   {
     this.switchScreen(GameState.inventory);
     this.inventoryUI.setCharacter(this.player);
+  }
+
+
+  /*
+    Equipment state
+  */
+  equipmentState()
+  {
+    this.switchScreen(GameState.equipment);
+    this.equipmentUI.setCharacter(this.player);
   }
 
 

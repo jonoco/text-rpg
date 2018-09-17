@@ -109,6 +109,9 @@ export class Character {
   getEquipmentSlots(item)
   {
     let validSlots = [];
+
+    if (!item)
+      return validSlots;
     
     for (let slot in this.equipment)
     {
@@ -198,10 +201,13 @@ export class Character {
 
   /*
     Equip item in first available slot
+    Fails if no slots are empty
     Return true if equip was successful, otherwise false
   */
   equipItem(item)
   {
+    if (!item) return;
+
     let selectedSlot;
     for (let slot in this.equipment)
     {
@@ -231,11 +237,7 @@ export class Character {
     // Check item is valid for equipment slot
     if (!this.equipment[slot].type.includes(item.type)) return false;
   
-    // If slot isn't empty, send item to inventory
-    if (this.equipment[slot].item)
-    {
-      this.inventory.push(this.equipment[slot].item);  
-    }
+    this.unequipItem(slot);
 
     // Move item from inventory to equipment
     this.equipment[slot].item = item;
@@ -245,6 +247,28 @@ export class Character {
     this.checkStatModifiers();
 
     return true;
+  }
+
+  /*
+    Unequip item from a slot and return it to inventory
+  */
+  unequipItem(slot)
+  {
+    // If slot isn't empty, send item to inventory
+    if (this.equipment[slot].item)
+    {
+      this.inventory.push(this.equipment[slot].item);  
+      this.equipment[slot].item = null;
+    }
+  }
+
+
+  /*
+    Get item info from equipment slot, null if slot is empty
+  */
+  getItemFromSlot(slot)
+  {
+    return this.equipment[slot].item;
   }
 
 
