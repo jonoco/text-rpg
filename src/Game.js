@@ -15,6 +15,7 @@ import GameOverUI from './ui/GameOverUI';
 import PostBattleUI from './ui/PostBattleUI';
 import InventoryUI from './ui/InventoryUI';
 import EquipmentUI from './ui/EquipmentUI';
+import AbilityUI from './ui/AbilityUI';
 
 
 const GameState = { 
@@ -26,6 +27,7 @@ const GameState = {
   , stats: 5      // player stats and level up
   , gameover: 6   // game over
   , error: 7      // display error
+  , ability: 8    // abilities screen
 };
 
 
@@ -60,6 +62,7 @@ export class Game {
     this.postBattleUI = new PostBattleUI();
     this.inventoryUI = new InventoryUI();
     this.equipmentUI = new EquipmentUI();
+    this.abilityUI = new AbilityUI();
 
     // Setup any global input hooks
     this.screen.key(['`'], (ch, key) => {
@@ -126,6 +129,9 @@ export class Game {
     dispatch.on('equipment.open', () => { this.equipmentState() });
     dispatch.on('equipment.close', () => { this.moveState() });
 
+    dispatch.on('abilities.open', () => { this.abilitiesState() });
+    dispatch.on('abilities.close', () => { this.moveState() });
+
     dispatch.on('error', event => {
       this.errorUI.widget.setContent(`error:\n${event.text}`);
       this.switchScreen(GameState.error);
@@ -174,6 +180,10 @@ export class Game {
       case GameState.equipment:
         this.screen.append(this.equipmentUI.widget);
         this.equipmentUI.equipment.focus();
+        break;
+      case GameState.ability:
+        this.screen.append(this.abilityUI.widget);
+        this.abilityUI.abilityTable.focus();
         break;
       default:
         // load an error screen or menu
@@ -255,6 +265,16 @@ export class Game {
   {
     this.switchScreen(GameState.equipment);
     this.equipmentUI.setCharacter(this.player);
+  }
+
+
+  /*
+    Abilities state
+  */
+  abilitiesState()
+  {
+    this.switchScreen(GameState.ability);
+    this.abilityUI.setCharacter(this.player);
   }
 
 

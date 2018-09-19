@@ -46,3 +46,4 @@ Using spells improves mana pool and spell power, while using strength-based weap
      + [x] Equipment screen
      + [ ] Stats/upgrade screen
      + [x] Postbattle rewards screen
+     + [ ] Abilities screen

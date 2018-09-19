@@ -1,8 +1,10 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import dispatch from '../dispatch';
+import { AbilityType } from '../abilities/AbilityBase';
 
-function EquipmentUI()
+
+function AbilityUI()
 {
   this.widget = blessed.box();
 
@@ -18,7 +20,7 @@ function EquipmentUI()
     , content: `c to close, arrows to move, enter to unequip, i to open inventory`
   });
 
-  this.equipment = contrib.table({
+  this.abilityTable = contrib.table({
      parent: this.widget
    , top: '10%'
    , left: 0
@@ -31,10 +33,10 @@ function EquipmentUI()
    , selectedFg: 'black'
    , selectedBg: 'white'
    , interactive: true
-   , label: 'Equipment'
+   , label: 'Abilities'
    , border: { type: 'line', fg: 'cyan' }
    , columnSpacing: 10
-   , columnWidth: [10, 30]
+   , columnWidth: [30, 10]
   });
 
   this.info = blessed.text({
@@ -67,39 +69,46 @@ function EquipmentUI()
     , hidden: true
   });
 
-  // unequip item
-  this.equipment.rows.on('select', node => {
+  // TODO equip or unequip ability
+  this.abilityTable.rows.on('select', node => {
     if (this.widget.detached || this.character === 'undefined') return;
 
-    const index = this.equipment.rows.selected;
-    const slot = Object.keys(this.character.equipment)[index];
     
-    this.character.unequipItem(slot);
 
-    this.updateEquipment();
+    this.updateTable();
   });
 
   // Update info when scrolling equipment table
-  this.equipment.rows.key(['up', 'down'], () => { this.updateInfo() });
+  this.abilityTable.rows.key(['up', 'down'], () => { this.updateInfo() });
 
-  this.equipment.rows.key('i', () => { dispatch.emit('inventory.open') });
-  this.equipment.rows.key('a', () => { dispatch.emit('abilities.open') });
-  this.equipment.rows.key('c', () => { dispatch.emit('equipment.close') });
+  this.abilityTable.rows.key('i', () => { dispatch.emit('inventory.open') });
+  this.abilityTable.rows.key('e', () => { dispatch.emit('equipment.open') });
+  this.abilityTable.rows.key('c', () => { dispatch.emit('abilities.close') });
 }
 
 
 /*
-  Update info with highlighted item and currently equipped item
+  Update info with highlighted item
 */
-EquipmentUI.prototype.updateInfo = function()
+AbilityUI.prototype.updateInfo = function()
 {
   if (this.widget.detached || this.character === 'undefined') return;
     
-  const index = this.equipment.rows.selected;
-  const slot = Object.keys(this.character.equipment)[index];
-  const item = this.character.getItemFromSlot(slot);
+  const index = this.abilityTable.rows.selected;
+  const ability = this.character.abilities[index];
 
-  let infoContent = `${item ? item.name : 'no item equipped'}`;
+  let infoContent = 'no ability found';
+  if (ability)
+  {
+    infoContent = `${ability.name}\n\n`
+      + `${ability.description}\n\n`
+      + `damage: ${ability.baseDamage}\n\n`
+      + `cost: ${ability.cost}\n\n`
+      + `level: ${ability.getProficiency()}\n\n`
+      + `uses: ${ability.uses}\n\n`
+      + `next level: ${ability.getRequiredProficiency()}`
+      ;
+  }
   
   this.info.setContent(infoContent);
   this.widget.screen.render();
@@ -107,21 +116,21 @@ EquipmentUI.prototype.updateInfo = function()
 
 
 /*
-  Update equipment list
+  Update abilities table
 */
-EquipmentUI.prototype.updateEquipment = function()
+AbilityUI.prototype.updateTable = function()
 {
   if (!this.character) return dispatch.emit('error', {text: 'no character selected'});
 
-  const equipmentContent = Object.keys(this.character.equipment).map(slot => {
-    const item = this.character.getItemFromSlot(slot);
-    const text = item ? item.name : 'empty';
-    return [slot, text];
+  const abilityContent = this.character.abilities.map(ability => {
+    const text = ability.name;
+    const active = ability.active ? 'active' : 'passive';
+    return [text, active];
   });
 
-  this.equipment.setData({ 
-    headers: ['slot', 'item'], 
-    data: equipmentContent
+  this.abilityTable.setData({ 
+    headers: ['ability', 'type'], 
+    data: abilityContent
   });
 
   this.updateInfo();
@@ -131,11 +140,11 @@ EquipmentUI.prototype.updateEquipment = function()
 /*
   Set referencing character
 */
-EquipmentUI.prototype.setCharacter = function(character)
+AbilityUI.prototype.setCharacter = function(character)
 {
   this.character = character;
   
-  this.updateEquipment();
+  this.updateTable();
 }
 
-export default EquipmentUI;
+export default AbilityUI;

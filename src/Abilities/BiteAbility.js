@@ -5,21 +5,21 @@ export default class BashAbility extends AbilityBase
   constructor()
   {
     super({
-        name: 'Bash'
-      , description: 'Wail on your enemy with your fists, go ahead and do it, you dumb idiot.'
+        name: 'Bite'
+      , description: 'Chew on your enemy like a sausage.'
       , cost: 0
       , active: true
       , type: AbilityType.battle
     });
 
-    this.baseDamage = 5;
+    this.baseDamage = 9;
   }
 
   
   use(user, target)
   {
     // Get user's augmented stats to determine power and accuracy
-    const userAccuracy = 85;
+    const userAccuracy = 45;
   
     // Get target's augment stats to determine defence and evasion
     const targetEvasion = 15;
@@ -47,7 +47,8 @@ export default class BashAbility extends AbilityBase
 
     // Ability succeeded, apply affects
     target.hit(actualDamage);
-
+    
+    this.uses++;
     user.abilitySuccessful(this);
     return `${user.name} hit ${target.name} using ${this.name} for ${actualDamage} damage!`;
   }

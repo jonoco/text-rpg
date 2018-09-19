@@ -23,23 +23,33 @@ function BattleUI ()
     , border: {type: 'line', fg: 'cyan'} 
   });
 
-  this.enemy = blessed.text({
+  this.enemy = blessed.box({
       parent: this.widget
     , label: 'Enemy'
     , left: 0
+    , top: 0
+    , height: 20
+    , width: '30%'
+    , tags: true
+    , border: {type: 'line', fg: 'red'}
+  });
+
+  this.enemyText = blessed.text({
+      parent: this.enemy
+    , left: 0
+    , top: 0
     , height: 10
     , width: 20
     , tags: true
-    , border: {type: 'line', fg: 'red'}
     , content: 'the enemy guy' 
   });
 
   this.player = blessed.text({
       parent: this.widget
     , label: 'Player'
-    , left: 20
+    , left: '30%'
     , height: 10
-    , width: 20
+    , width: '30%'
     , tags: true
     , border: {type: 'line', fg: 'red'}
     , content: 'the player guy' 
@@ -118,10 +128,10 @@ BattleUI.prototype.update = function(event)
   const enemy = event.enemy;
   const player = event.player;
 
-  let enemyInfo = `${enemy.name}\n health: ${enemy.health}`;
-  this.enemy.setContent(enemyInfo);
+  let enemyInfo = `${enemy.name}\n health: ${enemy.health}/${enemy.defaultHealth}`;
+  this.enemyText.setContent(enemyInfo);
 
-  let playerInfo = `${player.name}\n health: ${player.health}`;
+  let playerInfo = `${player.name}\n health: ${player.health}/${player.defaultHealth}`;
   this.player.setContent(playerInfo);
 
   this.log.log(event.text);

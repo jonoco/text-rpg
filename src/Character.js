@@ -3,6 +3,7 @@ import { message, getRandomInt, getRandomChoice, clearScreen, debug } from './ut
 import { CANCEL } from './constants'
 
 import BashAbility from './abilities/BashAbility';
+import BiteAbility from './abilities/BiteAbility';
 
 export class Character {
   constructor(name, defaultHealth)
@@ -38,7 +39,8 @@ export class Character {
     this.inventory = [];
 
     this.abilities = [
-      new BashAbility()
+        new BashAbility()
+      , new BiteAbility()
     ];
 
     this.skillPoints = 0;

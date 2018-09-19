@@ -109,6 +109,7 @@ export class Battle {
 
   /*
     Escape from battle
+    UNUSED
   */
   escape()
   {
@@ -121,6 +122,7 @@ export class Battle {
   
   /*
     Get attack selection from event
+    DEPRECATED
   */
   attackEnemy(event)
   {
@@ -147,6 +149,7 @@ export class Battle {
 
   
   // Enemy attacks player
+  // DEPRECATED
   attackPlayer()
   {
     const damage = this.player.hit(this.enemy.attackPower());

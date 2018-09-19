@@ -104,6 +104,12 @@ function WorldMapUI ()
     dispatch.emit('equipment.open');
   });
 
+  this.map.key('a', () => {
+    if (this.widget.detached) return;
+
+    dispatch.emit('abilities.open');
+  });
+
   this.updateInfo(this.info, this.map);
 }
 
