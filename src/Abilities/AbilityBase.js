@@ -1,22 +1,42 @@
-export const AbilityType = {
-  battle: 'battle',
-  world: 'world'
+export const AbilityEnvironment = {
+    battle: 'battle'
+  , world: 'world'
 };
 
+export const AbilityUse = {
+    passive: 'passive'
+  , active: 'active'
+};
+
+
+/**
+ * @param {object} options
+ * 
+ * name {string} - ability name
+ * description {string} - ability description
+ * cost {number} - resource cost of using ability
+ * environment {AbilityEnvironment} - state which ability can be used
+ * activation {AbilityUse} - whether ability is passive or active
+ * proficiencyLevels {[number]} - determines when ability levels up
+ * accuracy {number} - native accuracy of ability; doesn't affect evasion
+ * baseDamage {number} - only relevant for damage causing ability
+ */
 export class AbilityBase
 {
   constructor(options)
   {
-    this.name = options.name || 'Ability Name';  // Ability name
-    this.description = options.description || 'Description'
-    this.cost = options.cost || 0;               // Resource cost
-    this.type = options.type || AbilityType.battle;
-    this.active = options.active || true;    // active or passive ability
-    this.uses = 0;
-    this.proficiencyLevels = [10, 100, 1000]; // level tiers with use
+    this.name = options.name || 'Ability Name';
+    this.description = options.description || 'Description';
+    this.cost = options.cost || 0;
+    this.environment = options.environment || AbilityEnvironment.battle;
+    this.activation = options.activation || AbilityUse.active;
+    this.proficiencyLevels = options.proficiencyLevels || [10, 100, 1000];
+    this.accuracy = options.accuracy || 100;
+    this.baseDamage = options.baseDamage || 0;
 
-    this.baseDamage = 0;
+    this.uses = 0;
   }
+
 
   /*
     Returns highest proficiency level of ability
@@ -44,8 +64,12 @@ export class AbilityBase
     return level == this.proficiencyLevels.length ? 'mastered' : this.proficiencyLevels[level];
   }
 
-  /*
-    Use ability on target
+
+ /**
+  * Use ability on target
+  * 
+  * @param {Character} user
+  * @param {Character} target
   */
   use(user, target)
   {
@@ -53,8 +77,11 @@ export class AbilityBase
   }
 
 
-  /*
-    Check whether ability can be used
+ /**
+  * Check whether ability can be used
+  * 
+  * @param {Character} user
+  * @param {Character} target
   */
   checkUse(user, target)
   {

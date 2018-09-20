@@ -1,6 +1,7 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import dispatch from '../dispatch';
+import { AbilityUse } from '../abilities/AbilityBase';
 
 function BattleUI ()
 {
@@ -92,17 +93,7 @@ function BattleUI ()
     const ability = cb.content;
     this.log.log(`Using ${ability}.`);
 
-    dispatch.emit('battle.useAbility', { ability });
-
-    // switch (ability)
-    // {
-    //   case 'attack':
-    //     dispatch.emit('battle.useAbility', { ability });
-    //     break;
-    //   case 'escape':
-    //     dispatch.emit('exit');
-    //     break;
-    // }
+    dispatch.emit('battle.useAbility', { ability }); // Uses ability for player
   });
 }
 
@@ -111,9 +102,12 @@ BattleUI.prototype.start = function(event)
 {
   this.log.logLines = []; // clear the log
 
-  // Get the player's abilities
-  const player = event.player;
-  const choices = player.abilities.map(ability => {
+  // Get the player's active abilities
+  const activeAbilities = event.player.abilities.filter(ability => {
+    return ability.activation === AbilityUse.active;
+  });
+
+  const choices = activeAbilities.map(ability => {
     return ability.name;
   });
 

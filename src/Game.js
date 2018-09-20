@@ -46,7 +46,8 @@ export class Game {
 
     this.screen = blessed.screen({
       smartCSR: true,
-      log: 'mylog.log'
+      log: 'mylog.log',
+      dump: 'mydump.log'
     });
 
     // Quit on Escape, q, or Control-C.

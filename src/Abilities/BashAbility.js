@@ -1,5 +1,9 @@
-import { AbilityBase, AbilityType } from './AbilityBase';
+import { AbilityBase, AbilityEnvironment, AbilityUse } from './AbilityBase';
 
+
+/**
+ * Strength based attack with high accuracy
+ */
 export default class BashAbility extends AbilityBase
 {
   constructor()
@@ -8,18 +12,18 @@ export default class BashAbility extends AbilityBase
         name: 'Bash'
       , description: 'Wail on your enemy with your fists, go ahead and do it, you dumb idiot.'
       , cost: 0
-      , active: true
-      , type: AbilityType.battle
+      , activation: AbilityUse.active
+      , environment: AbilityEnvironment.battle
+      , accuracy: 85
+      , baseDamage: 5
     });
-
-    this.baseDamage = 5;
   }
 
   
   use(user, target)
   {
     // Get user's augmented stats to determine power and accuracy
-    const userAccuracy = 85;
+    const userAccuracy = this.accuracy;
   
     // Get target's augment stats to determine defence and evasion
     const targetEvasion = 15;

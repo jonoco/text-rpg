@@ -2,8 +2,10 @@ import inquirer from 'inquirer';
 import { message, getRandomInt, getRandomChoice, clearScreen, debug } from './utility';
 import { CANCEL } from './constants'
 
+import { AbilityUse } from './abilities/AbilityBase';
 import BashAbility from './abilities/BashAbility';
 import BiteAbility from './abilities/BiteAbility';
+import StrengthAbility from './abilities/StrengthAbility';
 
 export class Character {
   constructor(name, defaultHealth)
@@ -41,6 +43,7 @@ export class Character {
     this.abilities = [
         new BashAbility()
       , new BiteAbility()
+      , new StrengthAbility()
     ];
 
     this.skillPoints = 0;
@@ -565,5 +568,22 @@ export class Character {
     };
 
     return enemy;
+  }
+
+  /**
+   * Returns a list of active abilities
+   */
+  getActiveAbilities()
+  {
+    return this.abilities.filter(ability => ability.activation == AbilityUse.active);
+  }
+
+
+  /**
+   * Retrieve an ability by name if it exists
+   */
+  getAbility(name)
+  {
+    return this.abilities.find(ability => ability.name == name);
   }
 }

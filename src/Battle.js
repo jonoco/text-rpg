@@ -52,7 +52,7 @@ export class Battle {
   */
   playerUseAbility(event)
   {
-    const ability = this.player.abilities.find(ability => ability.name == event.ability)
+    const ability = this.player.getActiveAbilities().find(ability => ability.name == event.ability)
 
     this.useAbility(ability, this.player, this.enemy);
     
@@ -76,7 +76,7 @@ export class Battle {
   enemyUseAbility()
   {
     // Get a random valid ability from enemy and use it
-    const ability = getRandomChoice(this.enemy.abilities); // lazy method
+    const ability = getRandomChoice(this.enemy.getActiveAbilities()); // lazy method
 
     this.useAbility(ability, this.enemy, this.player);
 
@@ -95,6 +95,8 @@ export class Battle {
   */
   useAbility(ability, user, target)
   {
+    // dispatch.emit('battle.log', { text: JSON.stringify(ability['use']) });
+
     const result = ability.use(user, target);
     
     dispatch.emit('battle.update', {
@@ -102,8 +104,6 @@ export class Battle {
       player: this.player,
       text: result
     });
-
-    // dispatch.emit('battle.log', { text: result });
   }
 
 

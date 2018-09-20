@@ -1,7 +1,7 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import dispatch from '../dispatch';
-import { AbilityType } from '../abilities/AbilityBase';
+import { AbilityEnvironment, AbilityUse } from '../abilities/AbilityBase';
 
 
 function AbilityUI()
@@ -73,8 +73,6 @@ function AbilityUI()
   this.abilityTable.rows.on('select', node => {
     if (this.widget.detached || this.character === 'undefined') return;
 
-    
-
     this.updateTable();
   });
 
@@ -102,10 +100,10 @@ AbilityUI.prototype.updateInfo = function()
   {
     infoContent = `${ability.name}\n\n`
       + `${ability.description}\n\n`
-      + `damage: ${ability.baseDamage}\n\n`
-      + `cost: ${ability.cost}\n\n`
+      + (ability.baseDamage > 0 ? `damage: ${ability.baseDamage}\n\n` : '')
+      + (ability.activation == AbilityUse.active ? `cost: ${ability.cost}\n\n` : '')
       + `level: ${ability.getProficiency()}\n\n`
-      + `uses: ${ability.uses}\n\n`
+      + `progress: ${ability.uses}\n\n`
       + `next level: ${ability.getRequiredProficiency()}`
       ;
   }
@@ -124,12 +122,12 @@ AbilityUI.prototype.updateTable = function()
 
   const abilityContent = this.character.abilities.map(ability => {
     const text = ability.name;
-    const active = ability.active ? 'active' : 'passive';
-    return [text, active];
+    const use = ability.use;
+    return [text, use];
   });
 
   this.abilityTable.setData({ 
-    headers: ['ability', 'type'], 
+    headers: ['ability', 'use'], 
     data: abilityContent
   });
 
