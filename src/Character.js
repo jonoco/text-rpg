@@ -6,6 +6,8 @@ import { AbilityUse } from './abilities/AbilityBase';
 import BashAbility from './abilities/BashAbility';
 import BiteAbility from './abilities/BiteAbility';
 import StrengthAbility from './abilities/StrengthAbility';
+import EnduranceAbility from './abilities/EnduranceAbility';
+import AgilityAbility from './abilities/AgilityAbility';
 
 export class Character {
   constructor(name, defaultHealth)
@@ -44,6 +46,8 @@ export class Character {
         new BashAbility()
       , new BiteAbility()
       , new StrengthAbility()
+      , new AgilityAbility()
+      , new EnduranceAbility()
     ];
 
     this.skillPoints = 0;
@@ -584,6 +588,6 @@ export class Character {
    */
   getAbility(name)
   {
-    return this.abilities.find(ability => ability.name == name);
+    return this.abilities.find(ability => ability.name.toLowerCase() == name.toLowerCase());
   }
 }

@@ -9,7 +9,7 @@ export default class BashAbility extends AbilityBase
   {
     super({
         name: 'Bite'
-      , description: 'Chew on your enemy like a sausage.'
+      , description: 'Chew on your enemy like a sausage. Yum.'
       , cost: 0
       , activation: AbilityUse.active
       , environment: AbilityEnvironment.battle
@@ -21,32 +21,37 @@ export default class BashAbility extends AbilityBase
   
   use(user, target)
   {
-    const strengthAbility = user.getAbility('Strength');
+    const strength = user.getAbility('Strength');
+
+    // Get target's augment stats to determine defence and evasion
+    const targetEndurance = target.getAbility('Endurance');
+    const targetAgility = target.getAbility('Agility');
+    const targetEvasion = targetAgility.getProficiency();
 
     // Final damage
     let actualDamage = this.baseDamage;
-    actualDamage += strengthAbility ? strengthAbility.getProficiency() : 0;
+    actualDamage += strength ? strength.getProficiency() : 0;
 
     // Get user's augmented stats to determine power and accuracy
     const userAccuracy = this.accuracy;
   
-    // Get target's augment stats to determine defence and evasion
-    const targetEvasion = 15;
-  
     const hitChance = userAccuracy/100;
-    const hitSuccess = Math.random() < hitChance;
+    const hitMiss = Math.random() > hitChance;
 
-    if (!hitSuccess)
+    // User missed attack
+    if (hitMiss)
     {
       user.missHit();
       return `${user.name} missed using ${this.name}!`;
     }
 
     const dodgeChance = targetEvasion/100;
-    const dodgeSuccess = Math.random() < dodgeChance;
+    const dodgeMiss = Math.random() > dodgeChance;
     
-    if (dodgeSuccess)
+    // Target dodged attack
+    if (!dodgeMiss)
     {
+      targetAgility.uses++;
       target.dodgeHit();
       return `${target.name} dodged ${this.name}!`;
     }
@@ -55,6 +60,9 @@ export default class BashAbility extends AbilityBase
     target.hit(actualDamage);
     
     this.uses++;
+    strength.uses++;        // every use improves strength
+    targetEndurance.uses++; // improve target's endurance
+
     user.abilitySuccessful(this);
     return `${user.name} hit ${target.name} using ${this.name} for ${actualDamage} damage!`;
   }

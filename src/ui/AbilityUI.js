@@ -122,8 +122,8 @@ AbilityUI.prototype.updateTable = function()
 
   const abilityContent = this.character.abilities.map(ability => {
     const text = ability.name;
-    const use = ability.use;
-    return [text, use];
+    const activation = ability.activation;
+    return [text, activation];
   });
 
   this.abilityTable.setData({ 
