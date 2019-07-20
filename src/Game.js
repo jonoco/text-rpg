@@ -16,6 +16,7 @@ import PostBattleUI from './ui/PostBattleUI';
 import InventoryUI from './ui/InventoryUI';
 import EquipmentUI from './ui/EquipmentUI';
 import AbilityUI from './ui/AbilityUI';
+import DebugUI from './ui/DebugUI';
 
 
 const GameState = { 
@@ -72,6 +73,7 @@ export class Game {
     this.inventoryUI = new InventoryUI();
     this.equipmentUI = new EquipmentUI();
     this.abilityUI = new AbilityUI();
+    this.debugUI = new DebugUI();
 
     // handle 'Cancel' input
     // this.screen.key('c', () => {
@@ -193,6 +195,8 @@ export class Game {
         // load an error screen or menu
         this.screen.append(this.errorUI.widget);
     }
+
+    this.screen.append(this.debugUI);
 
     this.screen.render();
   }
