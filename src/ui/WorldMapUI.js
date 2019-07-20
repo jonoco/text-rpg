@@ -140,6 +140,8 @@ WorldMapUI.prototype.move = function(direction, minimap, info)
   this.updateInfo(info, minimap);
   minimap.screen.render(); 
 
+  dispatch.emit('debug.log', { text: `move to ${direction}` });
+
   dispatch.emit('move');
 }
 

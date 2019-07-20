@@ -5,7 +5,7 @@ import { GameMap } from './GameMap';
 import { Item } from './Item';
 import { Battle, BattleCondition } from './Battle'
 import { message, clearScreen, debug } from './utility';
-import { CANCEL, CONFIRM } from './constants';
+import { CANCEL, CONFIRM, _DEBUG_ } from './constants';
 import dispatch from './dispatch';
 
 import WorldMapUI from './ui/WorldMapUI';
@@ -196,7 +196,7 @@ export class Game {
         this.screen.append(this.errorUI.widget);
     }
 
-    this.screen.append(this.debugUI);
+    if (_DEBUG_) this.screen.append(this.debugUI.log);
 
     this.screen.render();
   }
