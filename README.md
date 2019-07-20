@@ -1,7 +1,34 @@
 # Text RPG
 Console text-based RPG engine.
 
+## Changelog
+
+
 ## Dev notes
+
+### Lifecycle
+1. main 
+    1. initializes Game object
+    2. calls Game.start()
+2. Game.constructor() 
+    1. initializes Player object
+    2. initializes game parameters
+    3. initializes null GameState 
+    4. initializes Battle object
+    5. initializes blessed.screen object
+    6. setup global input hooks
+    7. initializes UI screen objects
+    8. subscribe all screen event hooks
+3. Game.start()
+    1. give player starting equipment
+    2. start game cycle
+        1. change GameState to move
+4. game cycle
+    1. wait for input from current screen
+    2. Game handles event listening
+    3. call state change from UI widgets
+    4. Game handles logic for state changes
+
 
 ### UI Communication
 The Game object handles primary game logic, delegating down when necessary. Data is passed directly by reference into UI objects, while UI objects pass data back up to the Game object through the event system.

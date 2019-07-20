@@ -37,8 +37,9 @@ export class Game {
     // this.map = new GameMap();
     this.player = new Character(`Player`, 100);
 
+    // Game parameters
     this.battleFrequency = 0.2; // probability to start a fight
-
+    
     this.gameState;
 
     // Current battle object
@@ -50,9 +51,16 @@ export class Game {
       dump: 'mydump.log'
     });
 
+    /** 
+     * Setup any global input hooks
+     */
     // Quit on Escape, q, or Control-C.
     this.screen.key(['escape', 'q', 'C-c'], function(ch, key) {
       return process.exit(0);
+    });
+
+    this.screen.key(['`'], (ch, key) => {
+      this.moveState();
     });
 
     // Create UI screens 
@@ -64,11 +72,6 @@ export class Game {
     this.inventoryUI = new InventoryUI();
     this.equipmentUI = new EquipmentUI();
     this.abilityUI = new AbilityUI();
-
-    // Setup any global input hooks
-    this.screen.key(['`'], (ch, key) => {
-      this.moveState();
-    });
 
     // handle 'Cancel' input
     // this.screen.key('c', () => {
