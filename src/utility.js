@@ -1,4 +1,5 @@
 import { _DEBUG_ } from './constants';
+import { emit } from './dispatch'; 
 
 
 /*
@@ -23,7 +24,9 @@ export function getRandomChoice(array) {
   Prints message if debug flag is on
 */
 export function debug(text) {
-  if (_DEBUG_) console.dir(text);
+  if (_DEBUG_) {
+    emit('debug.log', { text });
+  }
 }
 
 

@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "watch": "webpack --watch",
-    "start": "node dist/main"
+    "start": "node dist/main",
+    "debug": "DEBUG=true node dist/main"
   },
   "author": "Joshua N. Cox <joshua.n.cox@gmail.com> (http://jonoco.me/)",
   "license": "MIT",
