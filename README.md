@@ -75,5 +75,6 @@ Using spells improves mana pool and spell power, while using strength-based weap
      + [x] Postbattle rewards screen
      + [ ] Abilities screen
  - [x] create debug UI widget 
+    + [ ] allow toggling debug widget
 
 

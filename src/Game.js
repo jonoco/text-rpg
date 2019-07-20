@@ -40,7 +40,8 @@ export class Game {
 
     // Game parameters
     this.battleFrequency = 0.2; // probability to start a fight
-    
+    this.debug = false;
+
     this.gameState;
 
     // Current battle object
@@ -62,6 +63,17 @@ export class Game {
 
     this.screen.key(['`'], (ch, key) => {
       this.moveState();
+    });
+
+    this.screen.key(['d'], (ch, key) => {
+      this.debug = !this.debug;
+      if (this.debug) {
+        this.screen.append(this.debugUI.log);
+      } else {
+        this.debugUI.log.detach();
+      }
+
+      this.screen.render();
     });
 
     // Create UI screens 
@@ -195,8 +207,6 @@ export class Game {
         // load an error screen or menu
         this.screen.append(this.errorUI.widget);
     }
-
-    if (_DEBUG_) this.screen.append(this.debugUI.log);
 
     this.screen.render();
   }
