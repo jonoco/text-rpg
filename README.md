@@ -66,7 +66,7 @@ Attributes will exist, but are not modified directly, but indirectly through abi
 Using spells improves mana pool and spell power, while using strength-based weapons, like hammers or swords, improves endurance and attack power, leading to gradual improvements in health. By avoiding physical weapons, spell casters will gradually grow in power while not gaining health, thereby requiring them to rely on magic for protection.
 
 ## Todo
- - build blessed-based screens
+ - [ ] build blessed-based screens
      + [x] World movement screen
      + [x] Battle screen
      + [x] Inventory screen
@@ -74,3 +74,7 @@ Using spells improves mana pool and spell power, while using strength-based weap
      + [ ] Stats/upgrade screen
      + [x] Postbattle rewards screen
      + [ ] Abilities screen
+ - [ ] create debug UI widget
+ - [ ] 
+
+

@@ -11,6 +11,8 @@ function WorldMapUI ()
   const subHeight = 15;
   const mapWidth = ((subWidth * 2) + 1);
   const mapHeight = (subHeight + 2);
+  const infoWidth = 14;
+  const logWidth = 24;
 
   this.map = MiniMap({
     parent: this.widget,
@@ -47,9 +49,9 @@ function WorldMapUI ()
     parent: this.widget,
     top: 0,
     left: mapWidth+1,
-    width: 14,
+    width: infoWidth,
     height: 10,
-    label: 'map',
+    label: 'info',
     content: '',
     tags: true,
     border: {
@@ -66,14 +68,16 @@ function WorldMapUI ()
     }
   });
 
-  this.log = contrib.log({ parent: this.widget
+  this.log = contrib.log({ 
+      parent: this.widget
     , fg: "green"
     , label: 'WorldMap Log'      
-    , right: 0
+    , left: mapWidth + infoWidth + 2
     , height: "100%"
-    , width: "40%"
+    , width: logWidth
     , tags: true      
-    , border: {type: "line", fg: "cyan"} });
+    , border: {type: "line", fg: "cyan"} 
+  });
 
   // input hooks
   this.map.key('up', () => {
