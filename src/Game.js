@@ -1,5 +1,6 @@
 import inquirer from 'inquirer';
 import blessed from 'blessed';
+
 import { Character } from './Character';
 import { GameMap } from './GameMap';
 import { Item } from './Item';
@@ -7,30 +8,8 @@ import { Battle, BattleCondition } from './Battle'
 import { message, clearScreen, debug } from './utility';
 import { CANCEL, CONFIRM, _DEBUG_ } from './constants';
 import dispatch from './dispatch';
-
-import WorldMapUI from './ui/WorldMapUI';
-import ErrorUI from './ui/ErrorUI';
-import BattleUI from './ui/BattleUI';
-import GameOverUI from './ui/GameOverUI';
-import PostBattleUI from './ui/PostBattleUI';
-import InventoryUI from './ui/InventoryUI';
-import EquipmentUI from './ui/EquipmentUI';
-import AbilityUI from './ui/AbilityUI';
-import DebugUI from './ui/DebugUI';
-
-
-const GameState = { 
-    world: 0      // world movement
-  , battle: 1     // battle screen
-  , postBattle: 2 // after battle -> rewards
-  , inventory: 3  // inventory
-  , equipment: 4  // equipment
-  , stats: 5      // player stats and level up
-  , gameover: 6   // game over
-  , error: 7      // display error
-  , ability: 8    // abilities screen
-};
-
+import { Screen } from './ui/Screen';
+import GameState from './GameState';
 
 export class Game {
   constructor() 
@@ -40,52 +19,17 @@ export class Game {
 
     // Game parameters
     this.battleFrequency = 0.2; // probability to start a fight
-    this.debug = false;
-
+    
     this.gameState;
 
     // Current battle object
     this.battle = new Battle();
 
-    this.screen = blessed.screen({
+    this.screen = new Screen({
       smartCSR: true,
       log: 'mylog.log',
       dump: 'mydump.log'
     });
-
-    /** 
-     * Setup any global input hooks
-     */
-    // Quit on Escape, q, or Control-C.
-    this.screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-      return process.exit(0);
-    });
-
-    this.screen.key(['`'], (ch, key) => {
-      this.moveState();
-    });
-
-    this.screen.key(['d'], (ch, key) => {
-      this.debug = !this.debug;
-      if (this.debug) {
-        this.screen.append(this.debugUI.log);
-      } else {
-        this.debugUI.log.detach();
-      }
-
-      this.screen.render();
-    });
-
-    // Create UI screens 
-    this.errorUI = new ErrorUI();
-    this.mapUI = new WorldMapUI();
-    this.battleUI = new BattleUI();
-    this.gameoverUI = new GameOverUI();
-    this.postBattleUI = new PostBattleUI();
-    this.inventoryUI = new InventoryUI();
-    this.equipmentUI = new EquipmentUI();
-    this.abilityUI = new AbilityUI();
-    this.debugUI = new DebugUI();
 
     // handle 'Cancel' input
     // this.screen.key('c', () => {
@@ -104,12 +48,9 @@ export class Game {
   {
     // Check for battle after moving
     dispatch.on('move', () => { 
-      this.mapUI.log.log('moved around');
-
       if (this.checkStartFight())
       {
         // switch to Battle state
-        this.mapUI.log.log('starting fight');
         this.battleState();
       }
     });
@@ -149,66 +90,6 @@ export class Game {
 
     dispatch.on('abilities.open', () => { this.abilitiesState() });
     dispatch.on('abilities.close', () => { this.moveState() });
-
-    dispatch.on('error', event => {
-      this.errorUI.widget.setContent(`error:\n${event.text}`);
-      this.switchScreen(GameState.error);
-    });
-  }
-
-  
-  /*
-    Switch screen based on gameState
-    gs - GameState object
-  */
-  switchScreen(gs)
-  {
-    this.gameState = gs;
-
-    // dump ui widgets
-    this.screen.children.forEach(child => { this.screen.remove(child) });
-
-    switch (gs)
-    {
-      case GameState.world:
-        this.screen.append(this.mapUI.widget);
-        this.mapUI.map.focus();
-        break;
-      case GameState.battle:
-        this.screen.append(this.battleUI.widget);
-        this.battleUI.list.focus();
-        this.battleUI.list.up(10);
-        break;
-      case GameState.postBattle:
-        this.screen.append(this.postBattleUI.widget);
-        break;
-      case GameState.inventory:
-        this.screen.append(this.inventoryUI.widget);
-        this.inventoryUI.inventory.focus();
-        break;
-      case GameState.stats:
-        this.screen.append(this.errorUI.widget);
-        break;
-      case GameState.gameover:
-        this.screen.append(this.gameoverUI.widget);
-        break;
-      case GameState.error:
-        this.screen.append(this.errorUI.widget);
-        break;
-      case GameState.equipment:
-        this.screen.append(this.equipmentUI.widget);
-        this.equipmentUI.equipment.focus();
-        break;
-      case GameState.ability:
-        this.screen.append(this.abilityUI.widget);
-        this.abilityUI.abilityTable.focus();
-        break;
-      default:
-        // load an error screen or menu
-        this.screen.append(this.errorUI.widget);
-    }
-
-    this.screen.render();
   }
 
 
@@ -218,7 +99,8 @@ export class Game {
   */
   moveState()
   {
-    this.switchScreen(GameState.world);
+    this.gameState = GameState.world;
+    this.screen.switchScreen(GameState.world);
   }
 
 
@@ -228,7 +110,8 @@ export class Game {
   */
   battleState()
   {
-    this.switchScreen(GameState.battle);
+    this.gameState = GameState.battle;
+    this.screen.switchScreen(GameState.battle);
 
     // Generate an enemy based on player level and location, then provide it to the battle
     let enemy = Character.createRandomEnemy();
@@ -243,10 +126,8 @@ export class Game {
   */
   postBattleState(battle)
   {
-    this.switchScreen(GameState.postBattle);
-
-    this.postBattleUI.widget.focus();
-    this.mapUI.log.log('won the battle, yippee!');
+    this.gameState = GameState.postBattle;
+    this.screen.switchScreen(GameState.postBattle);
 
     // generate an appropriate reward and emit reward data
     const item = Item.createRandomItem();
@@ -262,7 +143,8 @@ export class Game {
   */
   gameOverState()
   {
-    this.switchScreen(GameState.gameover);
+    this.gameState = GameState.gameover;
+    this.screen.switchScreen(GameState.gameover);
   }
 
 
@@ -271,8 +153,9 @@ export class Game {
   */
   inventoryState()
   {
-    this.switchScreen(GameState.inventory);
-    this.inventoryUI.setCharacter(this.player);
+    this.gameState = GameState.inventory;
+    this.screen.switchScreen(GameState.inventory);
+    this.screen.setInventoryCharacter(this.player);
   }
 
 
@@ -281,8 +164,9 @@ export class Game {
   */
   equipmentState()
   {
-    this.switchScreen(GameState.equipment);
-    this.equipmentUI.setCharacter(this.player);
+    this.gameState = GameState.equipment;
+    this.screen.switchScreen(GameState.equipment);
+    this.screen.setEquipmentCharacter(this.player);
   }
 
 
@@ -291,8 +175,9 @@ export class Game {
   */
   abilitiesState()
   {
-    this.switchScreen(GameState.ability);
-    this.abilityUI.setCharacter(this.player);
+    this.gameState = GameState.ability;
+    this.screen.switchScreen(GameState.ability);
+    this.screen.setAbilityCharacter(this.player);
   }
 
 

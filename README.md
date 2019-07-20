@@ -2,7 +2,9 @@
 Console text-based RPG engine.
 
 ## Changelog
-
+### v0.1
+- Added togglable debug widget
+- Encapsulated ui logic in Screen object, extended from blessed.screen
 
 ## Dev notes
 
@@ -75,6 +77,8 @@ Using spells improves mana pool and spell power, while using strength-based weap
      + [x] Postbattle rewards screen
      + [ ] Abilities screen
  - [x] create debug UI widget 
-    + [ ] allow toggling debug widget
+    + [x] allow toggling debug widget
+ - [x] wrap ui code in Screen object 
+ - [ ]
 
 
