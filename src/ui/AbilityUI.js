@@ -1,7 +1,6 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import dispatch from '../dispatch';
-import { AbilityEnvironment, AbilityUse } from '../abilities/AbilityBase';
 
 
 function AbilityUI()
@@ -100,11 +99,7 @@ AbilityUI.prototype.updateInfo = function()
   {
     infoContent = `${ability.name}\n\n`
       + `${ability.description}\n\n`
-      + (ability.baseDamage > 0 ? `damage: ${ability.baseDamage}\n\n` : '')
-      + (ability.activation == AbilityUse.active ? `cost: ${ability.cost}\n\n` : '')
-      + `level: ${ability.getProficiency()}\n\n`
-      + `progress: ${ability.uses}\n\n`
-      + `next level: ${ability.getRequiredProficiency()}`
+      + `damage: ${ability.damage}\n\n`
       ;
   }
   
@@ -122,12 +117,11 @@ AbilityUI.prototype.updateTable = function()
 
   const abilityContent = this.character.abilities.map(ability => {
     const text = ability.name;
-    const activation = ability.activation;
-    return [text, activation];
+    return [text];
   });
 
   this.abilityTable.setData({ 
-    headers: ['ability', 'use'], 
+    headers: ['ability'], 
     data: abilityContent
   });
 
