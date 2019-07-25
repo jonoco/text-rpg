@@ -1,6 +1,7 @@
 import blessed from 'blessed';
 
-import dispatch from '../dispatch';
+import { emit, on } from '../dispatch';
+import { debug } from '../utility';
 import GameState from '../GameState';
 
 import WorldMapUI from './WorldMapUI';
@@ -11,6 +12,7 @@ import PostBattleUI from './PostBattleUI';
 import InventoryUI from './InventoryUI';
 import EquipmentUI from './EquipmentUI';
 import AbilityUI from './AbilityUI';
+import SkillUI from './SkillUI';
 import DebugUI from './DebugUI';
 
 export class Screen extends blessed.screen {
@@ -19,6 +21,8 @@ export class Screen extends blessed.screen {
     super(props);
 
     this.debug = false;
+
+    this.game = props.game;
 
     /** 
      * Setup any global input hooks
@@ -30,7 +34,7 @@ export class Screen extends blessed.screen {
 
     // Force out to world map
     this.key(['`'], (ch, key) => {
-      this.moveState();
+      return process.exit(0);
     });
 
     // Debug toggling
@@ -38,6 +42,14 @@ export class Screen extends blessed.screen {
       this.debug = !this.debug;
       this.toggleDebug(this.debug);
     });
+
+    this.key(['s'], () => {
+      debug('open skills');
+      if (this.battleUI.attached) {
+        debug('cannot open skills');
+      }
+      emit('skills');
+  });
 
 
     // Create UI screens 
@@ -49,6 +61,7 @@ export class Screen extends blessed.screen {
     this.inventoryUI = new InventoryUI();
     this.equipmentUI = new EquipmentUI();
     this.abilityUI = new AbilityUI();
+    this.skillUI = new SkillUI();
     this.debugUI = new DebugUI();
 
     this.subscribeEvents();
@@ -70,18 +83,20 @@ export class Screen extends blessed.screen {
   subscribeEvents()
   {
     // Check for battle after moving
-    dispatch.on('move', () => { 
+    on('move', () => { 
       this.mapUI.log.log('moved around');
     });
 
-    dispatch.on('battle.start', () => {
+    on('battle.start', () => {
       this.mapUI.log.log('starting fight');
     });
 
-    dispatch.on('error', event => {
+    on('error', event => {
       this.errorUI.widget.setContent(`error:\n${event.text}`);
       this.switchScreen(GameState.error);
     });
+
+    on('skills', () => { this.switchScreen(GameState.skills) });
   }
 
 
@@ -105,6 +120,7 @@ export class Screen extends blessed.screen {
 
   switchScreen(gs)
   {
+    debug(`switch screen to ${gs}`);
     // dump ui widgets
     this.children.forEach(child => { this.remove(child) });
 
@@ -144,6 +160,11 @@ export class Screen extends blessed.screen {
       case GameState.ability:
         this.append(this.abilityUI.widget);
         this.abilityUI.abilityTable.focus();
+        break;
+      case GameState.skills:
+        this.append(this.skillUI);
+        emit('skills.open', { character: this.game.player });
+        
         break;
       default:
         // load an error or menu

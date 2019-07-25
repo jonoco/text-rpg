@@ -1,16 +1,15 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
-import dispatch from '../dispatch';
-import { AbilityUse } from '../abilities/AbilityBase';
+import { emit, on } from '../dispatch';
+import { debug } from '../utility';
 
 function BattleUI ()
 {
-  dispatch.on('battle.start', this.start.bind(this));
-  dispatch.on('battle.update', this.update.bind(this));
-  dispatch.on('battle.log', event => {
-    this.log.log(event.text);
-  });
-
+  on('battle.start', this.start.bind(this));
+  on('battle.update', this.update.bind(this));
+  on('battle.player.start', this.enableControl.bind(this));
+  on('battle.player.finish', this.disableControl.bind(this));
+  
   this.widget = blessed.box();
 
   this.log = contrib.log({ 
@@ -56,11 +55,6 @@ function BattleUI ()
     , content: 'the player guy' 
   });
 
-  // const choices = {
-  //   attack: { name: 'first things first' },
-  //   escape: { name: 'escape' }
-  // };
-
   this.list = blessed.list({
       parent: this.widget
     , bottom: 0
@@ -93,34 +87,52 @@ function BattleUI ()
     const ability = cb.content;
     this.log.log(`Using ${ability}.`);
 
-    dispatch.emit('battle.useAbility', { ability }); // Uses ability for player
+    emit('battle.player.finish', { ability }); // Uses ability for player
   });
 }
 
 
-BattleUI.prototype.start = function(event)
+BattleUI.prototype.enableControl = function()
+{
+  this.list.interactive = true;
+}
+
+
+BattleUI.prototype.disableControl = function() 
+{
+  this.list.interactive = false;
+}
+
+
+BattleUI.prototype.start = function(params)
 {
   this.log.logLines = []; // clear the log
 
-  // Get the player's active abilities
-  const activeAbilities = event.player.abilities.filter(ability => {
-    return ability.activation === AbilityUse.active;
-  });
+  const player = params.player;
+  const enemy = params.enemy;
 
-  const choices = activeAbilities.map(ability => {
+  const abilities = player.abilities;
+
+  const choices = abilities.map(ability => {
     return ability.name;
   });
 
   this.list.setItems(choices);
 
-  this.update(event);
+  this.update({
+    player: player,
+    enemy: enemy,
+    text: `you encountered a ${enemy.name}!`
+  });
 }
 
 
-BattleUI.prototype.update = function(event)
+BattleUI.prototype.update = function(params)
 {
-  const enemy = event.enemy;
-  const player = event.player;
+  debug('BattleUI: update');
+
+  const player = params.player;
+  const enemy = params.enemy;
 
   let enemyInfo = `${enemy.name}\n health: ${enemy.health}/${enemy.defaultHealth}`;
   this.enemyText.setContent(enemyInfo);
@@ -128,7 +140,7 @@ BattleUI.prototype.update = function(event)
   let playerInfo = `${player.name}\n health: ${player.health}/${player.defaultHealth}`;
   this.player.setContent(playerInfo);
 
-  this.log.log(event.text);
+  this.log.log(params.text);
 }
 
 export default BattleUI;

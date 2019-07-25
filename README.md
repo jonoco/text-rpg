@@ -5,6 +5,9 @@ Console text-based RPG engine.
 - Added togglable debug widget
 - Encapsulated ui logic in Screen object, extended from blessed.screen
 
+## Bugs
+- reference to combatants not updating state during combat
+
 ## Dev notes
 
 ### Lifecycle

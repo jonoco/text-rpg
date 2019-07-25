@@ -8,6 +8,8 @@ const GameState = {
   , gameover: 6   // game over
   , error: 7      // display error
   , ability: 8    // abilities screen
+  , skills: 9
+  , menu: 10
 };
 
 export default GameState;

@@ -16,7 +16,7 @@ function DebugUI ()
     , label: 'DEBUG'      
     , right: 0
     , height: "100%"
-    , width: 30
+    , width: "50%"
     , tags: true      
     , border: {type: "line", fg: "yellow"} 
   });

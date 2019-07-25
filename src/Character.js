@@ -1,20 +1,23 @@
 import inquirer from 'inquirer';
 import { message, getRandomInt, getRandomChoice, clearScreen, debug } from './utility';
-import { CANCEL } from './constants'
+import { CANCEL } from './constants';
+import { emit, on } from './dispatch';
 
-import { AbilityUse } from './abilities/AbilityBase';
-import BashAbility from './abilities/BashAbility';
-import BiteAbility from './abilities/BiteAbility';
-import StrengthAbility from './abilities/StrengthAbility';
-import EnduranceAbility from './abilities/EnduranceAbility';
-import AgilityAbility from './abilities/AgilityAbility';
+import Bash from './abilities/Bash';
+
+import Strength from './skills/Strength';
+import Endurance from './skills/Endurance';
+import Agility from './skills/Agility';
 
 export class Character {
-  constructor(name, defaultHealth)
+  constructor(name, defaultHealth, playable = false)
   {
+    this.id = getRandomInt(0, 10000000);
     this.name = name;
     this.defaultHealth = defaultHealth;
     this.health = this.defaultHealth;
+
+    this.playable = playable;
 
     this.statusEffects = {
       poisoned: false,
@@ -43,11 +46,13 @@ export class Character {
     this.inventory = [];
 
     this.abilities = [
-        new BashAbility()
-      , new BiteAbility()
-      , new StrengthAbility()
-      , new AgilityAbility()
-      , new EnduranceAbility()
+        new Bash()
+    ];
+
+    this.skills = [
+        new Agility()
+      , new Strength()
+      , new Endurance()
     ];
 
     this.skillPoints = 0;
@@ -184,14 +189,22 @@ export class Character {
   }
 
 
-  hit(damage)
+  // DEPRECATED - use Battle implementation
+  hit(result)
   {
-    debug(`${this.name} was hit for ${damage}`);
+    const ability = result.ability;
+    const combatant = result.combatant;
+    const target = result.target;
+    const damage = result.damage;
 
-    this.health -= damage;
-    this.health = this.health < 0 ? 0 : this.health;
+    debug(`Character: ${combatant.name} hit ${target.name} for ${damage}`);
 
-    return damage;
+    this.hurt(damage);
+
+    emit('battle.update', { 
+      combatants: [combatant, target], 
+      text: `${combatant.name} hit ${target.name} for ${damage}` 
+    });    
   }
 
 
@@ -213,8 +226,19 @@ export class Character {
   }
 
 
+  hurt(damage)
+  {
+    debug(`${this.name} hurt for ${damage}`);
+
+    this.healh -= damage;
+    this.health = this.health < 0 ? 0 : this.health;
+  }
+
+
   heal(hp)
   {
+    debug(`${this.name} healed for ${hp}`);
+
     this.health += hp;
     this.health = this.health > this.defaultHealth ? this.defaultHealth : this.health;
   }
@@ -306,243 +330,6 @@ export class Character {
 
 
   /*
-    Prints character status
-    DEPRECATED
-  */
-  async checkStatus()
-  {
-    clearScreen();
-    message(`---------=---------\nStats\n---------=---------`);
-    message(`health: ${this.health}`);
-
-    for (let stat in this.baseStats)
-    {
-      message(`${stat}: ${this.baseStats[stat] + this.statModifiers[stat]}`);
-    }
-
-    message(`---------=---------\nStatus effects\n---------=---------`);
-    for (let effect in this.statusEffects)
-    {
-      if (this.statusEffects[effect]) message(effect);
-    }
-
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'choice',
-        message: 'Finished?',
-        choices: [
-          {name: CANCEL},
-        ] 
-      }])
-      .then(answers => {
-        //...
-      });
-  }
-
-  
-  // DEPRECATED
-  async checkInventory()
-  {
-    clearScreen();
-    message(`---------=---------\nInventory\n---------=---------`);
-    
-    if (this.inventory.length == 0)
-    {
-      message('Inventory empty.')
-    }
-    else
-    {
-      this.inventory.forEach(item => {
-        message(`${item.name} - ${item.type}`);
-        debug(`${item.itemID}`);
-      });  
-    }
-    
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'choice',
-        message: 'Finished?',
-        choices: [
-          {name: CANCEL},
-        ] 
-      }])
-      .then(answers => {
-        //...
-      });
-  }
-
-
-  /*
-    Ask user to change item in equipment slot
-    DEPRECATED
-  */
-  async changeEquipment()
-  {
-    clearScreen();
-    message(`---------=---------\nEquipment\n---------=---------`);
-
-    let choices = [];
-    for (let slot in this.equipment) {
-      let choice = {
-        name: `${slot}: ${this.equipment[slot].item ? this.equipment[slot].item.name : 'empty'}`,
-        value: slot
-      };
-      choices.push(choice);
-    };
-  
-    // Get slot to swap out
-    let slotSelected;
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'slot',
-        message: 'Which slot do you want to change?',
-        choices: [
-          ...choices,
-          {name: CANCEL},
-        ] 
-      }])
-      .then(answers => {
-        slotSelected = answers.slot;
-        debug(`Item type selected: ${slotSelected}`);
-      });
-    if (slotSelected === CANCEL) return;
-    
-    // Ask for item from inventory to swap in
-    let item = await this.selectItem(this.equipment[slotSelected].type);
-    
-    // Swap item in equipment
-    if (item != CANCEL)
-    {
-        debug(`Swapping ${item.name} ${item.itemID}.`);
-
-        // If slot isn't empty, send item to inventory
-        if (this.equipment[slotSelected].item)
-        {
-          this.inventory.push(this.equipment[slotSelected].item);  
-        }
-
-        // Move item from invnetory to equipment
-        this.equipment[slotSelected].item = item;
-        this.removeItemFromInventory(item);
-
-        // Update stat modifiers
-        this.checkStatModifiers();
-    }
-    else // Try again
-    {
-      await this.changeEquipment();
-    }
-  }
-
-
-  // DEPRECATED
-  async selectItem(type = null)
-  {
-    // Gives a list of items from the inventory matching the type
-    // Show all items if type is null
-    // Returns selected item
-
-    debug(`Showing items of type ${type}`);
-
-    let choices = [];
-    this.inventory.forEach(item => {
-      if (type && item.type != type)
-      {
-        debug(`${item.name} does not match type specified`);
-      }
-      else
-      {
-        let damage = '';
-        if (item.type === 'weapon')
-          damage = `\ndamage: ${item.damage}`;
-
-        let modifiers = '';
-        for (let stat in item.statModifiers)
-        {
-          if (item.statModifiers[stat] > 0)
-            modifiers += `\n\t${stat}: ${item.statModifiers[stat]}`;
-        }
-
-        let choice = {
-          name: `${item.name}${damage}${modifiers}`,
-          value: item,
-          paginated: true
-        };
-        choices.push(choice);
-      }  
-    }); 
-    
-    let itemSelected;
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'item',
-        message: 'Select item',
-        choices: [
-          ...choices,
-          {name: CANCEL},
-        ] 
-      }])
-      .then(answers => {
-        itemSelected = answers.item;
-        debug(`Item selected: ${itemSelected.name}`);
-      });
-    
-    return itemSelected;
-  }
-
-
-  /*
-    Choose skill points
-    DEPRECATED
-  */
-  async chooseStats()
-  {
-    let itemSelected;
-    let choices = [];
-    for (let stat in this.baseStats)
-    {
-      let choice = { name: `${stat} - ${this.baseStats[stat]}`, value: stat };
-      
-      if (this.skillPoints == 0)
-        choice['disabled'] = 'not enough skill points'
-      
-      choices.push(choice);
-    }
-
-    clearScreen();
-    message(`---------=---------\nStats\n---------=---------`);
-    message(`skill points available: ${this.skillPoints}`);
-
-    await inquirer
-      .prompt([{ 
-        type: 'list',
-        name: 'item',
-        message: 'Choose stat to upgrade',
-        choices: [
-          ...choices,
-          {name: CANCEL},
-        ] 
-      }])
-      .then(answers => {
-        itemSelected = answers.item;
-        debug(`Item selected: ${itemSelected.name}`);
-      });
-      
-    if (itemSelected != CANCEL && this.skillPoints > 0)
-    {
-      this.skillPoints--;
-      this.baseStats[itemSelected]++;
-
-      await this.chooseStats();
-    }
-  }
-
-
-  /*
     Delete item from invnetory
   */
   removeItemFromInventory(itemToRemove)
@@ -580,6 +367,16 @@ export class Character {
   getActiveAbilities()
   {
     return this.abilities.filter(ability => ability.activation == AbilityUse.active);
+  }
+
+  getAbilities()
+  {
+    return this.abilities;
+  }
+
+  getSkills()
+  {
+    return this.skills;
   }
 
 

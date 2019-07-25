@@ -7,7 +7,7 @@ import { Item } from './Item';
 import { Battle, BattleCondition } from './Battle'
 import { message, clearScreen, debug } from './utility';
 import { CANCEL, CONFIRM, _DEBUG_ } from './constants';
-import dispatch from './dispatch';
+import { on, emit } from './dispatch';
 import { Screen } from './ui/Screen';
 import GameState from './GameState';
 
@@ -15,7 +15,7 @@ export class Game {
   constructor() 
   {
     // this.map = new GameMap();
-    this.player = new Character(`Player`, 100);
+    this.player = new Character(`Player`, 100, true);
 
     // Game parameters
     this.battleFrequency = 0.2; // probability to start a fight
@@ -23,12 +23,13 @@ export class Game {
     this.gameState;
 
     // Current battle object
-    this.battle = new Battle();
+    this.battle = new Battle({ game: this });
 
     this.screen = new Screen({
       smartCSR: true,
       log: 'mylog.log',
-      dump: 'mydump.log'
+      dump: 'mydump.log',
+      game: this
     });
 
     // handle 'Cancel' input
@@ -47,7 +48,7 @@ export class Game {
   subscribeEvents()
   {
     // Check for battle after moving
-    dispatch.on('move', () => { 
+    on('move', () => { 
       if (this.checkStartFight())
       {
         // switch to Battle state
@@ -56,12 +57,12 @@ export class Game {
     });
 
     // Exit BatleUI
-    dispatch.on('exit', () => {
+    on('exit', () => {
       this.moveState();
     });
 
     // Handle the end of a battle
-    dispatch.on('battle.end', event => {
+    on('battle.end', event => {
       const condition = event.condition;
       const battle = event.battle;
 
@@ -80,16 +81,21 @@ export class Game {
     });
 
     // Handle postbattle event; go to world screen after postbattle screen
-    dispatch.on('battle.postend', () => { this.moveState() });
+    on('battle.postend', () => { this.moveState() });
 
-    dispatch.on('inventory.open', () => { this.inventoryState() });
-    dispatch.on('inventory.close', () => { this.moveState() });
+    on('inventory.open', () => { this.inventoryState() });
+    on('inventory.close', () => { this.moveState() });
 
-    dispatch.on('equipment.open', () => { this.equipmentState() });
-    dispatch.on('equipment.close', () => { this.moveState() });
+    on('equipment.open', () => { this.equipmentState() });
+    on('equipment.close', () => { this.moveState() });
 
-    dispatch.on('abilities.open', () => { this.abilitiesState() });
-    dispatch.on('abilities.close', () => { this.moveState() });
+    on('abilities.open', () => { this.abilitiesState() });
+    on('abilities.close', () => { this.moveState() });
+
+    on('skills.close', () => { this.moveState() });
+
+    on('battle.over.win', () => { this.postBattleState() });
+    on('battle.over.lose', () => { this.gameOverState() });
   }
 
 
@@ -101,6 +107,14 @@ export class Game {
   {
     this.gameState = GameState.world;
     this.screen.switchScreen(GameState.world);
+  }
+
+
+  skillsState()
+  {
+    this.gameState = GameState.skills;
+    this.screen.switchScreen(GameState.skills);
+    emit('skills.open', this.player);
   }
 
 
@@ -116,7 +130,7 @@ export class Game {
     // Generate an enemy based on player level and location, then provide it to the battle
     let enemy = Character.createRandomEnemy();
 
-    this.battle.initialize(this.player, enemy);
+    emit('battle.initialize', { player: this.player, enemy });
   }
 
 
@@ -134,7 +148,7 @@ export class Game {
     this.player.receiveItem(item);
     this.player.experience += battle.enemy.getExperienceValue();
 
-    dispatch.emit('battle.poststart', { item, battle });
+    emit('battle.poststart', { item, battle });
   }
 
 

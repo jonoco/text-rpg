@@ -6,6 +6,7 @@ export default class Bash
   {
     this.name = 'Bash';
     this.description = 'Wail on your enemy with your fists, go ahead and do it, you dumb idiot.';
+    this.damage = 10;
   }
 
   use(combatant, target)
@@ -14,7 +15,7 @@ export default class Bash
         ability: this
       , combatant
       , target
-      , damage: 10 
+      , damage: this.damage 
     };
   }
 }

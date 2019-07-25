@@ -1,6 +1,6 @@
 import { Character } from './Character';
-import dispatch from './dispatch';
-import { getRandomChoice } from './utility';
+import { on, emit } from './dispatch';
+import { getRandomChoice, getRandomInt, debug } from './utility';
 
 export const BattleCondition = {
   Escape: 0,
@@ -20,90 +20,139 @@ const BattleState = {
   Handles battle logic
 */
 export class Battle {
-  constructor(player, enemy)
+  constructor(props)
   {
-    // deprecated
-    dispatch.on('battle.playerAttack', this.attackEnemy.bind(this));
-    // deprecated
-    dispatch.on('battle.escape', this.escape.bind(this));
+    this.game = props.game;
     
-    dispatch.on('battle.useAbility', this.playerUseAbility.bind(this));
+    // all battling characters
+    this.player;
+    this.enemy;
+
+    this.isPlayerTurn;
+
+    on('battle.initialize', this.initialize.bind(this));
+
+    on('battle.player.finish', this.playerCombatant.bind(this));
   }
 
   
   /*
     Initialize a new battle
   */
-  initialize(player, enemy)
+  initialize(params)
   {
-    this.enemy = enemy || Character.createRandomEnemy();
+    // setup battle conditions
+    this.player = params.player;
+    this.enemy = params.enemy;
+    this.isPlayerTurn = true;
+
+    // start the battle
+    emit('battle.start', { player: this.player, enemy: this.enemy });
+    this.combatantTurnStart();
+  }
+
+
+  combatantTurnStart()
+  {
+    if (this.isPlayerTurn) {
+      // allow ui control
+      emit('battle.player.start');
+    } else {
+      // use ai control
+      this.autoCombatant();
+    }
+  }
+
+  /**
+   * Playable combat routine
+   */
+  playerCombatant(params)
+  {
+    const abilityName = params.ability;
+    const ability = this.player.abilities.find(a => abilityName == a.name);
+    
+    emit('battle.update', { 
+      player: this.player,
+      enemy: this.enemy,
+      text: `${this.player.name} targets ${this.enemy.name} with ${ability.name}`
+    });
+    debug(`${this.player.name} targets ${this.enemy.name} with ${ability.name}`);
+
+    const result = ability.use(this.player, this.enemy);
+    this.hit(result);
+
+    this.checkBattleState();
+  }
+
+  /**
+   * AI combat routine
+   */
+  autoCombatant()
+  {
+   
+    // Get combatant abilities and use 
+    const ability = getRandomChoice(this.enemy.getAbilities());
+
+    emit('battle.update', { 
+      player: this.player,
+      enemy: this.enemy,
+      text: `${this.enemy.name} targets ${this.player.name} with ${ability.name}`
+    });
+    debug(`${this.enemy.name} targets ${this.player.name} with ${ability.name}`);
+
+    const result = ability.use(this.enemy, this.player);
+    this.hit(result);
+
+    this.checkBattleState();
+  }
+
+
+  checkBattleState()
+  {
+    if (!this.enemy.isAlive()) {
+      // player won battle
+      emit('battle.over.win', { battle: this });
+    } else if (!this.player.isAlive()) {
+      // player lost battle
+      emit('battle.over.lose', { battle: this });
+    } else {
+      // battle continues
+      this.getNextCombatant();
+    }
+
+  }
+
+
+  getNextCombatant()
+  {
+    this.isPlayerTurn = !this.isPlayerTurn;
+    this.combatantTurnStart();
+  }
+
+
+  hit(params)
+  {
+    const combatant = params.combatant;
+    const target = params.target;
+    const ability = params.ability;    
+    const damage = params.damage; 
+
+    target.healh -= damage;
+    target.health = target.health < 0 ? 0 : target.health;
+
+    debug(`Battle: ${combatant.name} hit ${target.name} for ${damage}`);
+
+    const player = combatant.playable ? combatant : target;
+    const enemy = combatant.playable ? target : combatant;
+
     this.player = player;
+    this.enemy = enemy;
 
-    dispatch.emit('battle.start', {
-      enemy: this.enemy,
-      player: this.player,
-      text: `Encountered a ${this.enemy.name}!`
-    });
-  }
-
-
-  /*
-    Use an ability by the player
-  */
-  playerUseAbility(event)
-  {
-    const ability = this.player.getActiveAbilities().find(ability => ability.name == event.ability)
-
-    this.useAbility(ability, this.player, this.enemy);
-    
-    if (!this.enemy.isAlive())
-    {
-      dispatch.emit('battle.end', {
-        battle: this,
-        condition: BattleCondition.Victory
-      });
-    }
-    else
-    {
-      this.enemyUseAbility();
-    }
-  }
-
-
-  /*
-    Use an ability by the enemy
-  */
-  enemyUseAbility()
-  {
-    // Get a random valid ability from enemy and use it
-    const ability = getRandomChoice(this.enemy.getActiveAbilities()); // lazy method
-
-    this.useAbility(ability, this.enemy, this.player);
-
-    if (!this.player.isAlive())
-    {
-      dispatch.emit('battle.end', {
-        battle: this,
-        condition: BattleCondition.Lose
-      });
-    }
-  }
-
-
-  /*
-    Use a character ability
-  */
-  useAbility(ability, user, target)
-  {
-    // dispatch.emit('battle.log', { text: JSON.stringify(ability['use']) });
-
-    const result = ability.use(user, target);
-    
-    dispatch.emit('battle.update', {
-      enemy: this.enemy,
-      player: this.player,
-      text: result
-    });
+    emit('battle.update', { 
+      player: combatant.playable ? combatant : target,
+      enemy: combatant.playable ? target : combatant,
+      text: `${combatant.name} hit ${target.name} for ${damage}` 
+    });    
   }
 
 
@@ -117,55 +166,5 @@ export class Battle {
       battle: this,
       condition: BattleCondition.Escape
     });
-  }
-
-  
-  /*
-    Get attack selection from event
-    DEPRECATED
-  */
-  attackEnemy(event)
-  {
-    const damage = this.enemy.hit(this.player.attackPower());
-
-    dispatch.emit('battle.update', {
-      enemy: this.enemy,
-      player: this.player,
-      text: `${this.enemy.name} hit for ${damage}`
-    });
-
-    if (!this.enemy.isAlive())
-    {
-      dispatch.emit('battle.end', {
-        battle: this,
-        condition: BattleCondition.Victory
-      });
-    }
-    else
-    {
-      this.attackPlayer();
-    }
-  }
-
-  
-  // Enemy attacks player
-  // DEPRECATED
-  attackPlayer()
-  {
-    const damage = this.player.hit(this.enemy.attackPower());
-
-    dispatch.emit('battle.update', {
-      enemy: this.enemy,
-      player: this.player,
-      text: `${this.player.name} hit for ${damage}`
-    });
-
-    if (!this.player.isAlive())
-    {
-      dispatch.emit('battle.end', {
-        battle: this,
-        condition: BattleCondition.Lose
-      });
-    }
   }
 }
