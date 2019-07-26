@@ -4,7 +4,6 @@ var blessed = require('blessed')
   ;
 var seedrandom = require('seedrandom');
 
-
 function MiniMap(options)
 {
   if (!(this instanceof Node)) {
@@ -246,4 +245,4 @@ MiniMap.prototype.__proto__ = Text.prototype;
 
 MiniMap.prototype.type = 'minimap';
 
-module.exports = MiniMap;
+export default MiniMap;

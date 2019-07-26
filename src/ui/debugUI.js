@@ -4,9 +4,7 @@ import dispatch from '../dispatch';
 
 function DebugUI () 
 {  
-  dispatch.on('debug.log', event => {
-    this.log.log(event.text);
-  });
+  
 
   this.widget = blessed.box();
 
@@ -15,10 +13,16 @@ function DebugUI ()
     , fg: "green"
     , label: 'DEBUG'      
     , right: 0
-    , height: "100%"
-    , width: "50%"
+    , height: "90%"
+    , width: "100%"
     , tags: true      
     , border: {type: "line", fg: "yellow"} 
+  });
+  
+  dispatch.on('debug.log', event => {
+    event.text.split('\n').forEach(str => {
+      this.log.log(str);  
+    });
   });
 }
 
