@@ -4,22 +4,24 @@ import blessed from 'blessed';
 import { Character } from './Character';
 import { GameMap } from './GameMap';
 import { Item } from './Item';
-import { Battle, BattleCondition } from './Battle'
+import { Battle } from './Battle'
 import { message, clearScreen, debug } from './utility';
 import { CANCEL, CONFIRM, _DEBUG_ } from './constants';
 import { on, emit } from './dispatch';
 import { Screen } from './ui/Screen';
 import GameState from './GameState';
+import { store } from './main';
+import Bash from  './abilities/Bash';
+import { newCharacter, receiveAbility } from './actions/actions';
+import { receiveItem } from './actions/inventoryActions';
 
 export class Game {
   constructor() 
   {
-    // this.map = new GameMap();
-    this.player = new Character(`Player`, 100, true);
+    store.dispatch(newCharacter('player', 'Inigio', 100));
+    const bash = new Bash();
+    store.dispatch(receiveAbility('player', bash));
 
-    // Game parameters
-    this.battleFrequency = 0.2; // probability to start a fight
-    
     this.gameState;
 
     // Current battle object
@@ -128,9 +130,12 @@ export class Game {
     this.screen.switchScreen(GameState.battle);
 
     // Generate an enemy based on player level and location, then provide it to the battle
-    let enemy = Character.createRandomEnemy();
+    // let enemy = Character.createRandomEnemy();
+    store.dispatch(newCharacter('enemy', 'Random Foe!', 25));
+    const bash = new Bash();
+    store.dispatch(receiveAbility('enemy', bash));
 
-    emit('battle.initialize', { player: this.player, enemy });
+    emit('battle.initialize');
   }
 
 
@@ -145,8 +150,7 @@ export class Game {
 
     // generate an appropriate reward and emit reward data
     const item = Item.createRandomItem();
-    this.player.receiveItem(item);
-    this.player.experience += battle.enemy.getExperienceValue();
+    store.dispatch(receiveItem('player', item));
 
     emit('battle.poststart', { item, battle });
   }
@@ -202,9 +206,10 @@ export class Game {
   {
     // show introduction, character creation screen, etc.
 
+    // TODO
     // starting equipment
-    for (let i = 0; i < 4; i++)
-      this.player.receiveItem(Item.createRandomItem());
+    // for (let i = 0; i < 4; i++)
+      // this.player.receiveItem(Item.createRandomItem());
 
     // just start world movement for now
     this.moveState();
@@ -264,6 +269,7 @@ export class Game {
 
   /*
     Let player regenerate health, risking battle
+    UNUSED
   */
   rest() 
   {
@@ -278,7 +284,7 @@ export class Game {
   */
   checkStartFight()
   {
-    const shouldStartFight = Math.random() < this.battleFrequency;
+    const shouldStartFight = Math.random() < store.getState().game.battleFrequency;
 
     debug(`Start a fight? ${shouldStartFight}`);
 

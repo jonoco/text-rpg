@@ -8,7 +8,6 @@
  * right_hand: Item
  * inventory : [Item]
  */
-
 const DefaultState = {
     head: null
   , chest: null
@@ -20,28 +19,18 @@ const DefaultState = {
   , inventory: []
 }
 
-function InventoryReducer(state, action) {
-  switch(action.type) {
-    case 'RECEIVE_ITEM':
-      break;
-    case 'REMOVE_ITEM':
-      break;
-    case 'EQUIP':
-      break;
-    case 'UNEQUIP':
-      break;
-    default:
-  }
-}
 
-export default function createInventoryReducer(characterName = '') {
+export default function createInventoryReducer(characterType = '') {
   return function reducer(state = DefaultState, action) {
-    const { name } = action;
-    if (characterName !== name) return state;
+    const { character, payload, type } = action;
+    if (characterType !== character) return state;
 
-    switch (action.type) {
+    switch (type) {
       case 'RECEIVE_ITEM':
-        break;
+        return {
+            ...state
+          , inventory: [ ...state.inventory, payload.item ]
+        }
       case 'REMOVE_ITEM':
         break;
       case 'EQUIP':

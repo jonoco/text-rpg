@@ -1,6 +1,8 @@
 import { Character } from './Character';
 import { on, emit } from './dispatch';
 import { getRandomChoice, getRandomInt, debug } from './utility';
+import { store } from './main';
+import { hurt, heal, nextTurn } from './actions/actions';
 
 /*
   Handles battle logic
@@ -10,14 +12,7 @@ export class Battle {
   {
     this.game = props.game;
     
-    // all battling characters
-    this.player;
-    this.enemy;
-
-    this.isPlayerTurn;
-
     on('battle.initialize', this.initialize.bind(this));
-
     on('battle.player.finish', this.playerCombatant.bind(this));
   }
 
@@ -25,22 +20,18 @@ export class Battle {
   /*
     Initialize a new battle
   */
-  initialize(params)
+  initialize()
   {
-    // setup battle conditions
-    this.player = params.player;
-    this.enemy = params.enemy;
-    this.isPlayerTurn = true;
-
     // start the battle
-    emit('battle.start', { player: this.player, enemy: this.enemy });
+    emit('battle.start');
     this.combatantTurnStart();
   }
 
 
   combatantTurnStart()
   {
-    if (this.isPlayerTurn) {
+    const isPlayerTurn = store.getState().battle.isPlayerTurn;
+    if (isPlayerTurn) {
       // allow ui control
       emit('battle.player.start');
     } else {
@@ -54,18 +45,19 @@ export class Battle {
    */
   playerCombatant(params)
   {
+    const player = store.getState().player;
+    const enemy = store.getState().enemy;
+
     const abilityName = params.ability;
-    const ability = this.player.abilities.find(a => abilityName == a.name);
+    const ability = player.abilities.find(a => abilityName == a.name);
     
     emit('battle.update', { 
-      player: this.player,
-      enemy: this.enemy,
-      text: `${this.player.name} targets ${this.enemy.name} with ${ability.name}`
+      text: `${player.name} targets ${enemy.name} with ${ability.name}`
     });
-    debug(`${this.player.name} targets ${this.enemy.name} with ${ability.name}`);
+    debug(`${player.name} targets ${enemy.name} with ${ability.name}`);
 
-    const result = ability.use(this.player, this.enemy);
-    this.hit(result);
+    const result = ability.use(player, enemy);
+    store.dispatch(hurt('enemy', result.damage));
 
     this.checkBattleState();
   }
@@ -75,19 +67,31 @@ export class Battle {
    */
   autoCombatant()
   {
-   
+    const player = store.getState().player;
+    const enemy = store.getState().enemy;
+
+    if (!player) {
+      emit('error', 'Error|Battle: no player found')
+    }
+
+    if (!enemy) {
+      emit('error', 'Error|Battle: no enemy found')
+    }
+
     // Get combatant abilities and use 
-    const ability = getRandomChoice(this.enemy.getAbilities());
+    const ability = getRandomChoice(enemy.abilities);
+
+    if (!ability) {
+      emit('error', 'Error|Battle: no abilities found')
+    }
 
     emit('battle.update', { 
-      player: this.player,
-      enemy: this.enemy,
-      text: `${this.enemy.name} targets ${this.player.name} with ${ability.name}`
+      text: `${enemy.name} targets ${player.name} with ${ability.name}`
     });
-    debug(`${this.enemy.name} targets ${this.player.name} with ${ability.name}`);
+    debug(`${enemy.name} targets ${player.name} with ${ability.name}`);
 
-    const result = ability.use(this.enemy, this.player);
-    this.hit(result);
+    const result = ability.use(enemy, player);
+    store.dispatch(hurt('player', result.damage));
 
     this.checkBattleState();
   }
@@ -95,10 +99,13 @@ export class Battle {
 
   checkBattleState()
   {
-    if (!this.enemy.isAlive()) {
+    const player = store.getState().player;
+    const enemy = store.getState().enemy;
+
+    if (enemy.health <= 0) {
       // player won battle
       emit('battle.over.win', { battle: this });
-    } else if (!this.player.isAlive()) {
+    } else if (player.health <= 0) {
       // player lost battle
       emit('battle.over.lose', { battle: this });
     } else {
@@ -111,11 +118,12 @@ export class Battle {
 
   getNextCombatant()
   {
-    this.isPlayerTurn = !this.isPlayerTurn;
+    store.dispatch(nextTurn());
     this.combatantTurnStart();
   }
 
 
+  // UNUSED
   hit(params)
   {
     const combatant = params.combatant;
@@ -150,7 +158,7 @@ export class Battle {
   {
     dispatch.emit('battle.end', {
       battle: this,
-      condition: BattleCondition.Escape
+      condition: 'escape'
     });
   }
 }

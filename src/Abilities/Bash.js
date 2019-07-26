@@ -1,14 +1,13 @@
 import { emit } from '../utility';
 
-export default class Bash 
-{
+class Bash {  
   constructor()
   {
     this.name = 'Bash';
     this.description = 'Wail on your enemy with your fists, go ahead and do it, you dumb idiot.';
-    this.damage = 10;
+    this.damage = 10;  
   }
-
+  
   use(combatant, target)
   {
     return { 
@@ -19,3 +18,5 @@ export default class Bash
     };
   }
 }
+
+export default Bash;

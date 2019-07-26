@@ -2,6 +2,7 @@ import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import { emit, on } from '../dispatch';
 import { debug } from '../utility';
+import { store } from '../main';
 
 function BattleUI ()
 {
@@ -104,12 +105,12 @@ BattleUI.prototype.disableControl = function()
 }
 
 
-BattleUI.prototype.start = function(params)
+BattleUI.prototype.start = function()
 {
   this.log.logLines = []; // clear the log
 
-  const player = params.player;
-  const enemy = params.enemy;
+  const player = store.getState().player;
+  const enemy = store.getState().enemy;
 
   const abilities = player.abilities;
 
@@ -120,8 +121,6 @@ BattleUI.prototype.start = function(params)
   this.list.setItems(choices);
 
   this.update({
-    player: player,
-    enemy: enemy,
     text: `you encountered a ${enemy.name}!`
   });
 }
@@ -131,8 +130,8 @@ BattleUI.prototype.update = function(params)
 {
   debug('BattleUI: update');
 
-  const player = params.player;
-  const enemy = params.enemy;
+  const player = store.getState().player;
+  const enemy = store.getState().enemy;
 
   let enemyInfo = `${enemy.name}\n health: ${enemy.health}/${enemy.defaultHealth}`;
   this.enemyText.setContent(enemyInfo);

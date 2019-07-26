@@ -1,19 +1,29 @@
 import { applyMiddleware, createStore, combineReducers } from 'redux';
-import logger from 'redux-logger';
+import createCLILogger from 'redux-cli-logger'
 
 import game from './reducers/GameReducer';
 import battle from './reducers/BattleReducer';
-import { player, enemy } from './reducers/CharacterReducer';
+import { PlayerReducer, EnemyReducer } from './reducers/CharacterReducer';
 
+import { debug } from './utility';
 import { Game } from './Game';
+
+const middleware = [];
+
+const loggerOptions = {
+  log: debug
+};
+const logger = createCLILogger(loggerOptions);
+middleware.push(logger);
+
 
 const reducer = combineReducers({
     game
   , battle
-  , player
-  , enemy
-})
-const store = createStore(reducer, applyMiddleware(logger));
+  , player: PlayerReducer
+  , enemy: EnemyReducer
+});
+export const store = createStore(reducer, applyMiddleware(...middleware));
 
 
 const main = () => {

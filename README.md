@@ -122,16 +122,21 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
      + [x] Equipment screen
      + [ ] Stats/upgrade screen
      + [x] Postbattle rewards screen
-     + [ ] Abilities screen
+     + [x] Abilities screen
  - [x] create debug UI widget 
     + [x] allow toggling debug widget
  - [x] wrap ui code in Screen object 
  - [x] revise Abilities and Skills system
     + [x] implement Skills system
     + [x] adjust Abilities system
-    + [ ] display Skills and Abilites in AbilityUI
+    + [x] display Skills and Abilites in AbilityUI
  - [ ] revise Battle system
     + [ ] create turn-based mechanic
  - [ ] convert to message passing model for module communiction
+ - [ ] implement Redux for state management
+    - [ ] game state
+    - [ ] battle state
+    - [ ] inventory state
+    - [ ] character state
 
 

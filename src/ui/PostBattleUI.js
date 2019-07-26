@@ -1,5 +1,6 @@
 import blessed from 'blessed';
 import dispatch from '../dispatch';
+import { store } from '../main';
 
 function PostBattleUI () 
 {
@@ -37,10 +38,12 @@ function PostBattleUI ()
 
 PostBattleUI.prototype.update = function(event)
 {
+  const enemy = store.getState().enemy;
+
   let text = ``
     + `Victory!\n\n\n`
-    + `You beat a ${event.battle.enemy.name}\n\n\n`
-    + `You earned ${event.battle.enemy.getExperienceValue()} experience\n\n`
+    + `You beat a ${enemy.name}\n\n\n`
+    + `You earned some experience\n\n`
     + `You received a ${event.item.name}!\n\n\n`
     + `press space to continue`
     ;

@@ -3,12 +3,6 @@ import { message, getRandomInt, getRandomChoice, clearScreen, debug } from './ut
 import { CANCEL } from './constants';
 import { emit, on } from './dispatch';
 
-import Bash from './abilities/Bash';
-
-import Strength from './skills/Strength';
-import Endurance from './skills/Endurance';
-import Agility from './skills/Agility';
-
 export class Character {
   constructor(name, defaultHealth, playable = false)
   {
@@ -44,16 +38,6 @@ export class Character {
       ring4:      { item: null, type: ['ring'] },
     };
     this.inventory = [];
-
-    this.abilities = [
-        new Bash()
-    ];
-
-    this.skills = [
-        new Agility()
-      , new Strength()
-      , new Endurance()
-    ];
 
     this.skillPoints = 0;
   
