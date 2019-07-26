@@ -2,20 +2,6 @@ import { Character } from './Character';
 import { on, emit } from './dispatch';
 import { getRandomChoice, getRandomInt, debug } from './utility';
 
-export const BattleCondition = {
-  Escape: 0,
-  Victory: 1,
-  Lose: 2
-};
-
-
-const BattleState = {
-  PlayerTurn: 0,
-  EnemyTurn: 1,
-  BattleOver: 2
-};
-
-
 /*
   Handles battle logic
 */

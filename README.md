@@ -10,6 +10,30 @@ Console text-based RPG engine.
 
 ## Dev notes
 
+### State
+
+App
+ - game     : GameReducer
+ - player   : CharacterReducer
+ - enemy    : CharacterReducer
+ - battle   : BattleReducer
+
+Game
+ - location : array
+
+Character
+ * name: string
+ * health : int
+ * defaultHealth : int
+ * inventory : InventoryReducer - combined inventory and equipment handling
+ * skills : [Skill]
+ * abilities : [Ability]
+
+Battle
+ - turnCount : int
+ - isPlayerTurn : bool
+
+
 ### Lifecycle
 1. main 
     1. initializes Game object
