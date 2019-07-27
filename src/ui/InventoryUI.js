@@ -1,6 +1,7 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import dispatch from '../dispatch';
+import { store } from '../main';
 
 function InventoryUI()
 {
@@ -97,30 +98,32 @@ function InventoryUI()
 */
 InventoryUI.prototype.updateInfo = function()
 {
-  if (this.widget.detached || this.character === 'undefined') return;
+  if (this.widget.detached) return;
+
+  const character = store.getState().player;
     
   const index = this.inventory.rows.selected;
-  const selectedItem = this.character.inventory[index];
+  const selectedItem = character.inventory.items[index];
   
   let infoContent = 'no information';  
-  if (selectedItem)
-  {
-    const characterSlots = this.character.getValidEquipmentSlots(selectedItem);
+  // if (selectedItem)
+  // {
+  //   const characterSlots = Character.getValidEquipmentSlots(selectedItem);
 
-    infoContent = `${selectedItem.name}\n`
-      + `\n----------\n`
-      + `Equipped`
-      + `\n----------\n`
-      ;
+  //   infoContent = `${selectedItem.name}\n`
+  //     + `\n----------\n`
+  //     + `Equipped`
+  //     + `\n----------\n`
+  //     ;
     
-    // display items in equipment slots
-    characterSlots.forEach( slot => {
-      infoContent += `${slot} : `;
-      let equippedItem = this.character.equipment[slot].item 
-        ? this.character.equipment[slot].item.name : 'empty';
-      infoContent += `${equippedItem}\n`;
-    });  
-  }
+  //   // display items in equipment slots
+  //   characterSlots.forEach( slot => {
+  //     infoContent += `${slot} : `;
+  //     let equippedItem = this.character.equipment[slot].item 
+  //       ? this.character.equipment[slot].item.name : 'empty';
+  //     infoContent += `${equippedItem}\n`;
+  //   });  
+  // }
   
   this.info.setContent(infoContent);
   this.widget.screen.render();
@@ -132,13 +135,13 @@ InventoryUI.prototype.updateInfo = function()
 */
 InventoryUI.prototype.updateInventory = function()
 {
-  if (!this.character) return dispatch.emit('error', {text: 'no character selected'});
+  const character = store.getState().player;
 
   let inventoryContent = [];
 
-  if (this.character.inventory.length != 0)
+  if (character.inventory.items.length != 0)
   {
-    inventoryContent = this.character.inventory.map(item => {
+    inventoryContent = character.inventory.items.map(item => {
       return [item.name, item.type];
     });  
   }
@@ -149,17 +152,6 @@ InventoryUI.prototype.updateInventory = function()
   });
 
   this.updateInfo();
-}
-
-
-/*
-  Set referencing character
-*/
-InventoryUI.prototype.setCharacter = function(character)
-{
-  this.character = character;
-  
-  this.updateInventory();
 }
 
 export default InventoryUI;

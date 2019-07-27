@@ -6,7 +6,7 @@
  * hands: Item
  * left_hand: Item
  * right_hand: Item
- * inventory : [Item]
+ * items : [Item]
  */
 const DefaultState = {
     head: null
@@ -16,7 +16,7 @@ const DefaultState = {
   , hands: null
   , left_hand: null
   , right_hand: null
-  , inventory: []
+  , items: []
 }
 
 
@@ -29,7 +29,7 @@ export default function createInventoryReducer(characterType = '') {
       case 'RECEIVE_ITEM':
         return {
             ...state
-          , inventory: [ ...state.inventory, payload.item ]
+          , items: [ ...state.items, payload.item ]
         }
       case 'REMOVE_ITEM':
         break;
