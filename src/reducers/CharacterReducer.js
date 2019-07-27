@@ -5,7 +5,6 @@ import createInventoryReducer from './InventoryReducer';
  * name: string
  * health : int
  * defaultHealth : int
- * inventory : InventoryReducer - combined inventory and equipment handling
  * skills : [Skill]
  * abilities ; [Ability]
  * experience : int

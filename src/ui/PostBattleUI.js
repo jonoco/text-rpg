@@ -31,7 +31,7 @@ function PostBattleUI ()
   this.widget.key('space', () => {
     if (this.widget.detached) return;
 
-    dispatch.emit('battle.postend');
+    dispatch.emit('map');
   });
 }
 

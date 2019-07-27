@@ -96,19 +96,22 @@ export class Screen extends blessed.screen {
       this.switchScreen(GameState.error);
     });
 
+    on('map', () => { this.switchScreen(GameState.world) });
+
     on('skills', () => { this.switchScreen(GameState.skills) });
-  }
+    on('skills.close', () => { this.switchScreen(GameState.world) });
 
+    on('inventory.open', () => { this.switchScreen(GameState.inventory)});
+    on('inventory.close', () => { this.switchScreen(GameState.world) });
+    
+    on('equipment.open', () => { this.switchScreen(GameState.equipment) });
+    on('equipment.close', () => { this.switchScreen(GameState.world) });
 
-  setEquipmentCharacter(character)
-  {
-    this.equipmentUI.setCharacter(character);
-  }
+    on('abilities.open', () => { this.switchScreen(GameState.ability) });
+    on('abilities.close', () => { this.switchScreen(GameState.world) });
 
-
-  setAbilityCharacter(character)
-  {
-    this.abilityUI.setCharacter(character);
+    on('battle.over.lose', () => { this.switchScreen(GameState.gameover) });
+    on('gameover', () => { this.switchScreen(GameState.gameover) });
   }
 
 

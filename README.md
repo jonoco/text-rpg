@@ -132,8 +132,8 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
     + [x] display Skills and Abilites in AbilityUI
  - [ ] revise Battle system
     + [ ] create turn-based mechanic
- - [ ] convert to message passing model for module communiction
- - [ ] implement Redux for state management
+ - [x] convert to message passing model for module communication
+ - [x] implement Redux for state management
     - [x] game state
     - [x] battle state
     - [x] inventory state
