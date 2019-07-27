@@ -76,7 +76,7 @@ class SkillUI extends blessed.box
     this.skillTable.rows.on('select', node => {
       if (this.detached || this.character === 'undefined') return;
 
-      this.updateTable();
+      this.update();
     });
 
     // Update info when scrolling equipment table

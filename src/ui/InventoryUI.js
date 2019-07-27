@@ -74,16 +74,18 @@ class InventoryUI extends blessed.box
     // events from inside Table widget are not bubbled up
     // equip item from inventory
     this.inventory.rows.on('select', node => {
-      if (this.detached || this.character === 'undefined') return;
+      if (this.detached) return;
+
+      const player = store.getState().player;
 
       const index = this.inventory.rows.selected;
-      const item = this.character.inventory[index];
+      const item = player.inventory.items[index];
 
-      if (item && !this.character.equipItem(item))
-      {
-        const message = 'Cannot swap item, no room to equip\n\nUnequip an item first';
-        this.message.display(message, 0);
-      }
+      // if (item && !this.character.equipItem(item))
+      // {
+      //   const message = 'Cannot swap item, no room to equip\n\nUnequip an item first';
+      //   this.message.display(message, 0);
+      // }
       this.updateInventory();
     });
 
