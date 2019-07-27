@@ -134,9 +134,9 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
     + [ ] create turn-based mechanic
  - [ ] convert to message passing model for module communiction
  - [ ] implement Redux for state management
-    - [ ] game state
-    - [ ] battle state
-    - [ ] inventory state
-    - [ ] character state
+    - [x] game state
+    - [x] battle state
+    - [x] inventory state
+    - [x] character state
 
 

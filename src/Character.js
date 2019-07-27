@@ -4,22 +4,6 @@ import { CANCEL } from './constants';
 import { emit, on } from './dispatch';
 
 export class Character {
-  equipment = {
-    head:       { item: null, type: ['head'] },
-    shoulders:  { item: null, type: ['shoulders'] },
-    hands:      { item: null, type: ['hands'] },
-    torso:      { item: null, type: ['torso'] },
-    legs:       { item: null, type: ['legs'] },
-    feet:       { item: null, type: ['feet'] },
-    leftHand:   { item: null, type: ['weapon', 'shield'] },
-    rightHand:  { item: null, type: ['weapon', 'shield'] },
-    neck:       { item: null, type: ['necklace'] },
-    ring1:      { item: null, type: ['ring'] },
-    ring2:      { item: null, type: ['ring'] },
-    ring3:      { item: null, type: ['ring'] },
-    ring4:      { item: null, type: ['ring'] },
-  };
-
   constructor(name, defaultHealth, playable = false)
   {
     this.id = getRandomInt(0, 10000000);

@@ -18,10 +18,6 @@ import { receiveItem } from './actions/inventoryActions';
 export class Game {
   constructor() 
   {
-    store.dispatch(newCharacter('player', 'Inigio', 100));
-    const bash = new Bash();
-    store.dispatch(receiveAbility('player', bash));
-
     this.gameState;
 
     // Current battle object
@@ -173,7 +169,6 @@ export class Game {
   {
     this.gameState = GameState.inventory;
     this.screen.switchScreen(GameState.inventory);
-    this.screen.setInventoryCharacter(this.player);
   }
 
 
@@ -184,7 +179,6 @@ export class Game {
   {
     this.gameState = GameState.equipment;
     this.screen.switchScreen(GameState.equipment);
-    this.screen.setEquipmentCharacter(this.player);
   }
 
 
@@ -195,7 +189,6 @@ export class Game {
   {
     this.gameState = GameState.ability;
     this.screen.switchScreen(GameState.ability);
-    this.screen.setAbilityCharacter(this.player);
   }
 
 
@@ -206,10 +199,12 @@ export class Game {
   {
     // show introduction, character creation screen, etc.
 
-    // TODO
+    store.dispatch(newCharacter('player', 'Inigio', 100));
+    const bash = new Bash();
+    store.dispatch(receiveAbility('player', bash));
     // starting equipment
-    // for (let i = 0; i < 4; i++)
-      // this.player.receiveItem(Item.createRandomItem());
+    for (let i = 0; i < 4; i++)
+      store.dispatch(receiveItem('player', Item.createRandomItem()));
 
     // just start world movement for now
     this.moveState();

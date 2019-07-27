@@ -100,12 +100,6 @@ export class Screen extends blessed.screen {
   }
 
 
-  setInventoryCharacter(character)
-  {
-    this.inventoryUI.setCharacter(character);
-  }
-
-
   setEquipmentCharacter(character)
   {
     this.equipmentUI.setCharacter(character);
@@ -141,8 +135,10 @@ export class Screen extends blessed.screen {
         this.mapUI.log.log('won the battle, yippee!');
         break;
       case GameState.inventory:
-        this.append(this.inventoryUI.widget);
+        this.append(this.inventoryUI);
         this.inventoryUI.inventory.focus();
+        emit('inventory.update');
+        this.render();
         break;
       case GameState.stats:
         this.append(this.errorUI.widget);
@@ -154,12 +150,13 @@ export class Screen extends blessed.screen {
         this.append(this.errorUI.widget);
         break;
       case GameState.equipment:
-        this.append(this.equipmentUI.widget);
+        this.append(this.equipmentUI);
         this.equipmentUI.equipment.focus();
         break;
       case GameState.ability:
-        this.append(this.abilityUI.widget);
+        this.append(this.abilityUI);
         this.abilityUI.abilityTable.focus();
+        emit('abilities.update');
         break;
       case GameState.skills:
         this.append(this.skillUI);

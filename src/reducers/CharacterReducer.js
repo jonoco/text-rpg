@@ -1,5 +1,5 @@
+import { combineReducers } from 'redux';
 import createInventoryReducer from './InventoryReducer';
-
 
 /**
  * name: string
@@ -15,12 +15,14 @@ function createCharacterReducer(characterType = '') {
       name: null
     , health: 0
     , defaultHealth: 0
-    , inventory: createInventoryReducer(characterType)
     , skills: []
     , abilities: []
     , experience: 0
   };
 
+  // TODO
+  // create character reducer, then combine with inventory reducer slice
+  
   return function reducer(state = DefaultState, action) {
     const { character, payload, type } = action;
     if (character !== characterType) return state;
@@ -79,6 +81,12 @@ const heal = (state, payload) =>
   }
 }
 
+export const player = combineReducers({
+  character: createCharacterReducer('player'),
+  inventory: createInventoryReducer('player')
+});
 
-export const PlayerReducer = createCharacterReducer('player');
-export const EnemyReducer = createCharacterReducer('enemy');
+export const enemy = combineReducers({
+  character: createCharacterReducer('enemy'),
+  inventory: createInventoryReducer('enemy')
+});

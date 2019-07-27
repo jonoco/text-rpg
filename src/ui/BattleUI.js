@@ -109,8 +109,8 @@ BattleUI.prototype.start = function()
 {
   this.log.logLines = []; // clear the log
 
-  const player = store.getState().player;
-  const enemy = store.getState().enemy;
+  const player = store.getState().player.character;
+  const enemy = store.getState().enemy.character;
 
   const abilities = player.abilities;
 
@@ -130,8 +130,8 @@ BattleUI.prototype.update = function(params)
 {
   debug('BattleUI: update');
 
-  const player = store.getState().player;
-  const enemy = store.getState().enemy;
+  const player = store.getState().player.character;
+  const enemy = store.getState().enemy.character;
 
   let enemyInfo = `${enemy.name}\n health: ${enemy.health}/${enemy.defaultHealth}`;
   this.enemyText.setContent(enemyInfo);

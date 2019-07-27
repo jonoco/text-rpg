@@ -3,7 +3,7 @@ import createCLILogger from 'redux-cli-logger'
 
 import game from './reducers/GameReducer';
 import battle from './reducers/BattleReducer';
-import { PlayerReducer, EnemyReducer } from './reducers/CharacterReducer';
+import { player, enemy } from './reducers/CharacterReducer';
 
 import { debug } from './utility';
 import { Game } from './Game';
@@ -20,8 +20,8 @@ middleware.push(logger);
 const reducer = combineReducers({
     game
   , battle
-  , player: PlayerReducer
-  , enemy: EnemyReducer
+  , player
+  , enemy
 });
 export const store = createStore(reducer, applyMiddleware(...middleware));
 

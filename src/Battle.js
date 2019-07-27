@@ -45,8 +45,8 @@ export class Battle {
    */
   playerCombatant(params)
   {
-    const player = store.getState().player;
-    const enemy = store.getState().enemy;
+    const player = store.getState().player.character;
+    const enemy = store.getState().enemy.character;
 
     const abilityName = params.ability;
     const ability = player.abilities.find(a => abilityName == a.name);
@@ -67,8 +67,8 @@ export class Battle {
    */
   autoCombatant()
   {
-    const player = store.getState().player;
-    const enemy = store.getState().enemy;
+    const player = store.getState().player.character;
+    const enemy = store.getState().enemy.character;
 
     if (!player) {
       emit('error', 'Error|Battle: no player found')
@@ -99,8 +99,8 @@ export class Battle {
 
   checkBattleState()
   {
-    const player = store.getState().player;
-    const enemy = store.getState().enemy;
+    const player = store.getState().player.character;
+    const enemy = store.getState().enemy.character;
 
     if (enemy.health <= 0) {
       // player won battle

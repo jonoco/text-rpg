@@ -38,7 +38,7 @@ function PostBattleUI ()
 
 PostBattleUI.prototype.update = function(event)
 {
-  const enemy = store.getState().enemy;
+  const enemy = store.getState().enemy.character;
 
   let text = ``
     + `Victory!\n\n\n`
