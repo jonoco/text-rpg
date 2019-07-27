@@ -11,8 +11,13 @@ import { on, emit } from './dispatch';
 import { Screen } from './ui/Screen';
 import GameState from './GameState';
 import { store } from './main';
+
 import Bash from  './abilities/Bash';
-import { newCharacter, receiveAbility } from './actions/actions';
+import Strength from './skills/Strength';
+import Endurance from './skills/Endurance';
+import Agility from './skills/Agility';
+
+import { newCharacter, receiveAbility, receiveSkill } from './actions/actions';
 import { receiveItem } from './actions/inventoryActions';
 
 export class Game {
@@ -205,6 +210,9 @@ export class Game {
     // starting equipment
     for (let i = 0; i < 4; i++)
       store.dispatch(receiveItem('player', Item.createRandomItem()));
+    store.dispatch(receiveSkill('player', new Strength()));
+    store.dispatch(receiveSkill('player', new Endurance()));
+    store.dispatch(receiveSkill('player', new Agility()));
 
     // just start world movement for now
     this.moveState();

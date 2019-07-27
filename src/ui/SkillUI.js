@@ -1,6 +1,7 @@
 import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import { emit, on } from '../dispatch';
+import { store } from '../main';
 
 class SkillUI extends blessed.box
 {
@@ -86,24 +87,21 @@ class SkillUI extends blessed.box
     this.skillTable.rows.key('c', () => { emit('skills.close') });
   }
 
-  open(props)
+  open()
   {
-    if (!props.character) return emit('error', {text: 'SkillUI - no character selected'});
-
-    this.character = props.character;
     this.update();
     this.skillTable.focus();
   }
 
   update()
   {
-    if (!this.character) return emit('error', {text: 'SkillUI - no character selected'});
-    
-    if (!this.character.skills) return emit('error', {
-      text: `SkillUI - no skills found for ${this.character.name}`
+    const character = store.getState().player.character;
+
+    if (!character.skills) return emit('error', {
+      text: `SkillUI - no skills found for ${character.name}`
     });
 
-    const skillContent = this.character.skills.map(skill => {
+    const skillContent = character.skills.map(skill => {
       const text = skill.name;
       return [text];
     });
@@ -120,10 +118,12 @@ class SkillUI extends blessed.box
   */
   updateInfo ()
   {
-    if (this.detached || this.character === 'undefined') return;
+    if (this.detached) return;
       
+    const character = store.getState().player.character;
+
     const index = this.skillTable.rows.selected;
-    const skill = this.character.skills[index];
+    const skill = character.skills[index];
 
     let infoContent = 'no skill found';
     if (skill)

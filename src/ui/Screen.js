@@ -160,7 +160,7 @@ export class Screen extends blessed.screen {
         break;
       case GameState.skills:
         this.append(this.skillUI);
-        emit('skills.open', { character: this.game.player });
+        emit('skills.open');
         
         break;
       default:
