@@ -22,31 +22,9 @@ export class Screen extends blessed.screen {
     super(props);
 
     this.debug = false;
-
     this.game = props.game;
-
-    /** 
-     * Setup any global input hooks
-     */
-    // Quit on Escape, q, or Control-C.
-    this.key(['escape', 'q', 'C-c'], function(ch, key) {
-      return process.exit(0);
-    });
-
-    // Debug toggling
-    this.key(['d'], (ch, key) => {
-      this.debug = !this.debug;
-      this.toggleDebug(this.debug);
-    });
-
-    this.key(['s'], () => {
-      debug('open skills');
-      if (this.battleUI.attached) {
-        debug('cannot open skills');
-      }
-      emit('skills');
-  });
-
+    this.currentScreen = null;
+    this.lastScreen = null;
 
     // Create UI screens 
     this.errorUI = new ErrorUI();
@@ -88,6 +66,26 @@ export class Screen extends blessed.screen {
       this.switchScreen(GameState.world);
     });
 
+    // Quit on Escape, q, or Control-C.
+    this.key(['escape', 'q', 'C-c'], function(ch, key) {
+      return process.exit(0);
+    });
+
+    // Debug toggling
+    this.key(['d'], (ch, key) => {
+      this.debug = !this.debug;
+      this.toggleDebug(this.debug);
+    });
+
+    this.key(['s'], () => {
+      debug('open skills');
+      if (this.battleUI.attached) {
+        debug('cannot open skills');
+      }
+      emit('skills');
+    });
+
+
     // Check for battle after moving
     on('move', () => { 
       this.mapUI.log.log('moved around');
@@ -118,12 +116,18 @@ export class Screen extends blessed.screen {
 
     on('battle.over.lose', () => { this.switchScreen(GameState.gameover) });
     on('gameover', () => { this.switchScreen(GameState.gameover) });
+
+    on('cancel', () => { this.switchScreen(this.lastScreen) });
   }
 
 
   switchScreen(gs)
   {
     debug(`switch screen to ${gs}`);
+  
+    this.lastScreen = this.currentScreen;
+    this.currentScreen = gs;
+
     // dump ui widgets
     this.children.forEach(child => { this.remove(child) });
 
