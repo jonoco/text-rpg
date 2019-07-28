@@ -13,6 +13,7 @@ import InventoryUI from './InventoryUI';
 import EquipmentUI from './EquipmentUI';
 import AbilityUI from './AbilityUI';
 import SkillUI from './SkillUI';
+import StateUI from './StateUI';
 import DebugUI from './DebugUI';
 
 export class Screen extends blessed.screen {
@@ -29,11 +30,6 @@ export class Screen extends blessed.screen {
      */
     // Quit on Escape, q, or Control-C.
     this.key(['escape', 'q', 'C-c'], function(ch, key) {
-      return process.exit(0);
-    });
-
-    // Force out to world map
-    this.key(['`'], (ch, key) => {
       return process.exit(0);
     });
 
@@ -63,6 +59,7 @@ export class Screen extends blessed.screen {
     this.abilityUI = new AbilityUI();
     this.skillUI = new SkillUI();
     this.debugUI = new DebugUI();
+    this.stateUI = new StateUI();
 
     this.subscribeEvents();
   }
@@ -82,6 +79,15 @@ export class Screen extends blessed.screen {
 
   subscribeEvents()
   {
+    this.key(['/'], (ch, key) => {
+      this.switchScreen(GameState.state);
+    });
+
+    // Force out to world map
+    this.key(['`'], (ch, key) => {
+      this.switchScreen(GameState.world);
+    });
+
     // Check for battle after moving
     on('move', () => { 
       this.mapUI.log.log('moved around');
@@ -164,7 +170,10 @@ export class Screen extends blessed.screen {
       case GameState.skills:
         this.append(this.skillUI);
         emit('skills.open');
-        
+        break;
+      case GameState.state:
+        this.append(this.stateUI);
+        emit('state.open');
         break;
       default:
         // load an error or menu

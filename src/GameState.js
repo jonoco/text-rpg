@@ -10,6 +10,7 @@ const GameState = {
   , ability: 8    // abilities screen
   , skills: 9
   , menu: 10
+  , state: 11
 };
 
 export default GameState;
