@@ -82,10 +82,6 @@ class AbilityUI extends blessed.box
 
     // Update info when scrolling equipment table
     this.abilityTable.rows.key(['up', 'down'], () => { this.updateInfo() });
-
-    this.abilityTable.rows.key('i', () => { dispatch.emit('inventory.open') });
-    this.abilityTable.rows.key('e', () => { dispatch.emit('equipment.open') });
-    this.abilityTable.rows.key('c', () => { dispatch.emit('abilities.close') });
   }
   
 

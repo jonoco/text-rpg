@@ -81,10 +81,6 @@ function EquipmentUI()
 
   // Update info when scrolling equipment table
   this.equipment.rows.key(['up', 'down'], () => { this.updateInfo() });
-
-  this.equipment.rows.key('i', () => { dispatch.emit('inventory.open') });
-  this.equipment.rows.key('a', () => { dispatch.emit('abilities.open') });
-  this.equipment.rows.key('c', () => { dispatch.emit('equipment.close') });
 }
 
 

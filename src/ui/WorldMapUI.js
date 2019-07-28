@@ -96,24 +96,6 @@ function WorldMapUI ()
     this.move('right', this.map, this.info);
   });
 
-  this.map.key('i', () => {
-    if (this.widget.detached) return;
-
-    dispatch.emit('inventory.open');
-  });
-
-  this.map.key('e', () => {
-    if (this.widget.detached) return;
-
-    dispatch.emit('equipment.open');
-  });
-
-  this.map.key('a', () => {
-    if (this.widget.detached) return;
-
-    dispatch.emit('abilities.open');
-  });
-
   this.updateInfo(this.info, this.map);
 }
 

@@ -81,10 +81,6 @@ class SkillUI extends blessed.box
 
     // Update info when scrolling equipment table
     this.skillTable.rows.key(['up', 'down'], () => { this.updateInfo() });
-
-    this.skillTable.rows.key('i', () => { emit('inventory.open') });
-    this.skillTable.rows.key('e', () => { emit('equipment.open') });
-    this.skillTable.rows.key('c', () => { emit('skills.close') });
   }
 
   open()

@@ -91,10 +91,6 @@ class InventoryUI extends blessed.box
 
     // Update info when scrolling inventory table
     this.inventory.rows.key(['up', 'down'], () => { this.updateInfo() });
-
-    this.inventory.rows.key('e', () => { dispatch.emit('equipment.open') });
-    this.inventory.rows.key('a', () => { dispatch.emit('abilities.open') });
-    this.inventory.rows.key('c', () => { dispatch.emit('inventory.close') });
   }
 
 

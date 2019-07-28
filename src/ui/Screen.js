@@ -77,14 +77,31 @@ export class Screen extends blessed.screen {
       this.toggleDebug(this.debug);
     });
 
-    this.key(['s'], () => {
-      debug('open skills');
-      if (this.battleUI.attached) {
-        debug('cannot open skills');
-      }
-      emit('skills');
+    this.key(['i'], (ch, key) => {
+      this.switchScreen(GameState.inventory);
     });
 
+    this.key(['a'], (ch, key) => {
+      this.switchScreen(GameState.ability);
+    });
+
+    this.key(['e'], (ch, key) => {
+      this.switchScreen(GameState.equipment);
+    });
+
+    this.key(['s'], () => {
+      if (this.battleUI.attached) {
+        debug('cannot open skills during battle');
+      }
+      this.switchScreen(GameState.skills);
+    });
+
+    this.key(['c'], () => {
+      if (this.battleUI.attached) {
+        debug('cannot close battle screen');
+      }
+      this.switchScreen(GameState.world);
+    });
 
     // Check for battle after moving
     on('move', () => { 
@@ -103,16 +120,18 @@ export class Screen extends blessed.screen {
     on('map', () => { this.switchScreen(GameState.world) });
 
     on('skills', () => { this.switchScreen(GameState.skills) });
-    on('skills.close', () => { this.switchScreen(GameState.world) });
+    on([
+      'skills.close', 'inventory.close', 'equipment.close', 'abilities.close'
+      ], () => { this.switchScreen(GameState.world) });
 
     on('inventory.open', () => { this.switchScreen(GameState.inventory)});
-    on('inventory.close', () => { this.switchScreen(GameState.world) });
+    // on('inventory.close', () => { this.switchScreen(GameState.world) });
     
     on('equipment.open', () => { this.switchScreen(GameState.equipment) });
-    on('equipment.close', () => { this.switchScreen(GameState.world) });
+    // on('equipment.close', () => { this.switchScreen(GameState.world) });
 
     on('abilities.open', () => { this.switchScreen(GameState.ability) });
-    on('abilities.close', () => { this.switchScreen(GameState.world) });
+    // on('abilities.close', () => { this.switchScreen(GameState.world) });
 
     on('battle.over.lose', () => { this.switchScreen(GameState.gameover) });
     on('gameover', () => { this.switchScreen(GameState.gameover) });
