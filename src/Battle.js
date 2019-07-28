@@ -121,44 +121,4 @@ export class Battle {
     store.dispatch(nextTurn());
     this.combatantTurnStart();
   }
-
-
-  // UNUSED
-  hit(params)
-  {
-    const combatant = params.combatant;
-    const target = params.target;
-    const ability = params.ability;    
-    const damage = params.damage; 
-
-    target.healh -= damage;
-    target.health = target.health < 0 ? 0 : target.health;
-
-    debug(`Battle: ${combatant.name} hit ${target.name} for ${damage}`);
-
-    const player = combatant.playable ? combatant : target;
-    const enemy = combatant.playable ? target : combatant;
-
-    this.player = player;
-    this.enemy = enemy;
-
-    emit('battle.update', { 
-      player: combatant.playable ? combatant : target,
-      enemy: combatant.playable ? target : combatant,
-      text: `${combatant.name} hit ${target.name} for ${damage}` 
-    });    
-  }
-
-
-  /*
-    Escape from battle
-    UNUSED
-  */
-  escape()
-  {
-    dispatch.emit('battle.end', {
-      battle: this,
-      condition: 'escape'
-    });
-  }
 }

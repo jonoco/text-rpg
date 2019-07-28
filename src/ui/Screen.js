@@ -16,7 +16,11 @@ import SkillUI from './SkillUI';
 import StateUI from './StateUI';
 import DebugUI from './DebugUI';
 
+
 export class Screen extends blessed.screen {
+  /**
+   * Handles UI management
+   */
   constructor(props) 
   {
     super(props);
