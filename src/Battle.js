@@ -50,15 +50,24 @@ export class Battle {
 
     const abilityName = params.ability;
     const ability = player.abilities.find(a => abilityName == a.name);
-    
+    if (!ability) {
+      emit('error', 'Error|Battle: no abilities found')
+    }
+
     emit('battle.update', { 
       text: `${player.name} targets ${enemy.name} with ${ability.name}`
     });
     debug(`${player.name} targets ${enemy.name} with ${ability.name}`);
 
-    const result = ability.use(player, enemy);
-    store.dispatch(hurt('enemy', result.damage));
+    // Influence chain
+    const skills = player.skills;
+    let abilityParameters = { ability, skills, augments: [] };
+    skills.forEach(skill => {
+      abilityParameters = skill.augment(abilityParameters)
+    });
 
+    const result = ability.use(player, enemy, abilityParameters);
+    
     this.checkBattleState();
   }
 
@@ -80,7 +89,6 @@ export class Battle {
 
     // Get combatant abilities and use 
     const ability = getRandomChoice(enemy.abilities);
-
     if (!ability) {
       emit('error', 'Error|Battle: no abilities found')
     }
@@ -89,9 +97,15 @@ export class Battle {
       text: `${enemy.name} targets ${player.name} with ${ability.name}`
     });
     debug(`${enemy.name} targets ${player.name} with ${ability.name}`);
+    
+    // Influence chain
+    const skills = enemy.skills;
+    let abilityParameters = { ability, skills, augments: [] }
+    skills.forEach(skill => {
+      abilityParameters = skill.augment(abilityParameters)
+    });
 
-    const result = ability.use(enemy, player);
-    store.dispatch(hurt('player', result.damage));
+    const result = ability.use(enemy, player, abilityParameters);
 
     this.checkBattleState();
   }

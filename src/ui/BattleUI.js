@@ -62,7 +62,7 @@ function BattleUI ()
     , left: 0
     , width: '50%'
     , height: 6
-    , label: 'list'
+    , label: 'abilities'
     , keys: true
     , items: []
     , border: {

@@ -1,7 +1,11 @@
-class Endurance
+import Skill from './Skill';
+
+class Endurance extends Skill
 {
-  constructor()
+  constructor(props)
   {
+    super(props);
+    
     this.name = 'Endurance';
     this.description = 'Controls stamina and capacity to withstand attacks.';
     this.level = 0;

@@ -4,23 +4,23 @@ import { emit } from '../dispatch';
 import { hurt } from '../actions/actions';
 import Ability from './Ability';
 
-class Bash extends Ability
+class Bite extends Ability
 {  
   constructor(props)
   {
     super(props);
-
-    this.name = 'Bash';
-    this.description = 'Wail on your enemy with your fists, go ahead and do it, you dumb idiot.';
+    
+    this.name = 'Bite';
+    this.description = 'Chew your enemy with your teeth like a sack of meat.';
     this.type = Ability.Types.physical;
   }
   
   use(combatant, target, abilityParameters)
   {
-    let baseDamage = [5,10]; 
+    let baseDamage = [2,12]; 
     let damage = getRandomInt(baseDamage[0], baseDamage[1]);
 
-    // Influence chain
+    // Inlfuence chain
     abilityParameters.augments.forEach(augment => {
       damage += augment.damage;  
       damage *= augment.damageRatio;
@@ -38,4 +38,4 @@ class Bash extends Ability
   }
 }
 
-export default Bash;
+export default Bite;

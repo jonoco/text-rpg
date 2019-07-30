@@ -11,7 +11,8 @@ import createInventoryReducer from './InventoryReducer';
  */
 function createCharacterReducer(characterType = '') {
   const DefaultState = {
-      name: null
+      character: null
+    , name: null
     , health: 0
     , defaultHealth: 0
     , skills: []
@@ -19,8 +20,6 @@ function createCharacterReducer(characterType = '') {
     , experience: 0
   };
 
-  // TODO
-  // create character reducer, then combine with inventory reducer slice
   
   return function reducer(state = DefaultState, action) {
     const { character, payload, type } = action;
@@ -30,6 +29,7 @@ function createCharacterReducer(characterType = '') {
       case 'NEW_CHARACTER':
         return {
             ...state
+          , character
           , name: payload.name
           , health: payload.health
           , defaultHealth: payload.health

@@ -13,12 +13,13 @@ import GameState from './GameState';
 import { store } from './main';
 
 import Bash from  './abilities/Bash';
+import Bite from  './abilities/Bite';
 import Strength from './skills/Strength';
 import Endurance from './skills/Endurance';
 import Agility from './skills/Agility';
 
-import { newCharacter, receiveAbility, receiveSkill } from './actions/actions';
-import { receiveItem } from './actions/inventoryActions';
+import { newCharacter, receiveAbility, receiveSkill, heal } from './actions/actions';
+import { receiveItem, equipItem } from './actions/inventoryActions';
 
 export class Game {
   constructor() 
@@ -42,6 +43,10 @@ export class Game {
   */
   subscribeEvents()
   {
+    on('debug.log', event => {
+      this.screen.log(event.text);
+    });
+
     // Check for battle after moving
     on('move', () => { 
       if (this.checkStartFight())
@@ -67,8 +72,8 @@ export class Game {
     // Generate an enemy based on player level and location, then provide it to the battle
     // let enemy = Character.createRandomEnemy();
     store.dispatch(newCharacter('enemy', 'Random Foe!', 25));
-    const bash = new Bash();
-    store.dispatch(receiveAbility('enemy', bash));
+    store.dispatch(receiveAbility('enemy', new Bash()));
+    store.dispatch(receiveAbility('enemy', new Bite()));
 
     emit('battle.initialize');
   }
@@ -85,6 +90,7 @@ export class Game {
     // generate an appropriate reward and emit reward data
     const item = Item.createRandomItem();
     store.dispatch(receiveItem('player', item));
+    store.dispatch(heal('player', 1000));
 
     emit('battle.poststart', { item, battle });
   }
@@ -93,23 +99,32 @@ export class Game {
   /*
     Main game entry point
   */
-  async start()
+  start()
   {
     // show introduction, character creation screen, etc.
+    this.createStarterPlayer();
 
-    store.dispatch(newCharacter('player', 'Inigio', 100));
-    const bash = new Bash();
-    store.dispatch(receiveAbility('player', bash));
-    // starting equipment
-    for (let i = 0; i < 4; i++)
-      store.dispatch(receiveItem('player', Item.createRandomItem()));
+    // just start world movement for now
+    emit('map');
+  }
 
+
+  createStarterPlayer()
+  {
+    store.dispatch(newCharacter('player', 'Inigio', 100));    
+
+    store.dispatch(receiveAbility('player', new Bash()));
+    store.dispatch(receiveAbility('player', new Bite()));
     store.dispatch(receiveSkill('player', new Strength()));
     store.dispatch(receiveSkill('player', new Endurance()));
     store.dispatch(receiveSkill('player', new Agility()));
 
-    // just start world movement for now
-    emit('map');
+    // starting equipment
+    for (let i = 0; i < 4; i++) {
+      let item = Item.createRandomItem();
+      store.dispatch(receiveItem('player', item));
+      store.dispatch(equipItem('player', item));
+    }
   }
   
 

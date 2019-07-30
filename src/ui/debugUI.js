@@ -2,28 +2,38 @@ import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import dispatch from '../dispatch';
 
-function DebugUI () 
+export default class DebugUI extends blessed.box
 {  
-  
+  constructor(props)
+  {
+    super(props);
 
-  this.widget = blessed.box();
-
-  this.log = contrib.log({ 
-      parent: this.widget
-    , fg: "green"
-    , label: 'DEBUG'      
-    , right: 0
-    , height: "90%"
-    , width: "100%"
-    , tags: true      
-    , border: {type: "line", fg: "yellow"} 
-  });
-  
-  dispatch.on('debug.log', event => {
-    event.text.split('\n').forEach(str => {
-      this.log.log(str);  
+    this.log = blessed.box({
+      parent: this,
+      scrollable: true,
+      left: 'center',
+      top: 'center',
+      width: '90%',
+      height: '90%',
+      style: {
+        bg: 'black'
+      },
+      border: 'line',
+      content: '',
+      keys: true,
+      mouse: true,
+      vi: true,
+      alwaysScroll: true,
+      scrollbar: {
+        ch: ' ',
+        inverse: true
+      }
     });
-  });
+    
+    dispatch.on('debug.log', event => {
+      event.text.split('\n').forEach(str => {
+        this.log.setContent(`${this.log.content}\n${str}`);
+      });
+    });
+  }
 }
-
-export default DebugUI;
