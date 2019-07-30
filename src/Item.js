@@ -1,52 +1,49 @@
 import { debug, getRandomInt } from './utility';
 
-export const ItemType = { head: 0, shoulders: 1, hands: 2, torso: 3, legs: 4, 
-      feet: 5, weapon: 6, shield: 7, necklace: 8, ring: 9 };
 
 export class Item {
-  constructor(name) 
+  constructor(name, slot) 
   {
     this.name = name;
-    this.type = null;
-    this.itemID = Math.floor(Math.random()*100000);
+    this.id = Math.floor(Math.random()*10000000);
+    this.slot = slot;
+  }
 
-    // Only applicable for weapons
-    this.damage = 1;
-
-    this.statModifiers = {
-      strength: 0,
-      dexterity: 0,
-      agility: 0,
-      endurance: 0,
-      intelligence: 0
-    };
+  /**
+   * Array of valid item slot types
+   */
+  static get ItemSlots()
+  {
+    return [
+        'head'
+      , 'shoulders'
+      , 'hands'
+      , 'torso'
+      , 'legs'
+      , 'feet'
+      , 'weapon'
+      , 'offhand'
+      , 'necklace'
+      , 'ring'
+    ]
   }
 
 
-  static isValidItemType(type)
+  static isValidItemSlot(type)
   {
-    return ItemType.includes(type);
+    return this.ItemSlots.includes(type);
   }
 
 
   static createRandomItem()
   {
-    let type = Object.keys(ItemType)[getRandomInt(0, Object.keys(ItemType).length)];
-    
-    debug(type);
+    let slot = this.ItemSlots[getRandomInt(0, this.ItemSlots.length)];
 
     let name;
     let defence = 0;
     let damage = 1;
-    let statModifiers = {
-      strength: 0,
-      dexterity: 0,
-      agility: 0,
-      endurance: 0,
-      intelligence: 0
-    };
-
-    switch (type)
+    
+    switch (slot)
     {
       case 'head':
         defence = getRandomInt(1, 7);
@@ -76,7 +73,7 @@ export class Item {
         damage = getRandomInt(2, 8);
         name = 'Sword';
         break;
-      case 'shield':
+      case 'offhand':
         defence = getRandomInt(5, 10);
         name = 'Buckler';
         break;
@@ -96,17 +93,9 @@ export class Item {
 
     debug(`Generated item name: ${name}`);
 
-    let item = new Item(name);
-    item.type = type;
-    item.statModifiers = {
-      strength: getRandomInt(0,5),
-      dexterity: getRandomInt(0,5),
-      agility: getRandomInt(0,5),
-      endurance: getRandomInt(0,5),
-      intelligence: getRandomInt(0,5)
-    };
+    let item = new Item(name, slot);
     
-    if (type === 'weapon')
+    if (slot === 'weapon')
     {
       item.damage = damage;
       item.defence = defence;

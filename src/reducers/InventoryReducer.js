@@ -1,21 +1,26 @@
+import produce from 'immer';
+
 /**
- * head: Item
- * chest: Item
- * shoulders: Item
- * legs: Item
- * hands: Item
- * left_hand: Item
- * right_hand: Item
+ * head: number - id of Item
+ * chest: number
+ * shoulders: number
+ * legs: number
+ * hands: number
+ * left_hand: number
+ * right_hand: number
  * items : [Item]
  */
 const DefaultState = {
     head: null
-  , chest: null
   , shoulders: null
-  , legs: null
   , hands: null
-  , left_hand: null
-  , right_hand: null
+  , torso: null
+  , legs: null
+  , feet: null
+  , weapon: null
+  , offhand: null
+  , necklace: null
+  , ring: null
   , items: []
 }
 
@@ -33,12 +38,28 @@ export default function createInventoryReducer(characterType = '') {
         }
       case 'REMOVE_ITEM':
         break;
-      case 'EQUIP':
-        break;
-      case 'UNEQUIP':
-        break;
+      case 'EQUIP_ITEM':
+        return equip(state, payload);
+      case 'UNEQUIP_ITEM':
+        return unequip(state, payload);
       default:
         return state;
     }
+  }
+}
+
+
+const equip = (state, payload) => {
+  return {
+    ...state,
+    [payload.item.slot]: payload.item.id
+  }
+}
+
+
+const unequip = (state, payload) => {
+  return {
+    ...state,
+    [payload.slot]: null
   }
 }

@@ -104,9 +104,9 @@ class InventoryUI extends blessed.box
     const player = store.getState().player;
       
     const index = this.inventory.rows.selected;
-    const selectedItem = player.inventory.items[index];
+    const item = player.inventory.items[index];
     
-    let infoContent = 'no information';  
+    let infoContent = `name: ${item.name}`;  
     
     this.info.setContent(infoContent);
     this.screen.render();
@@ -123,19 +123,16 @@ class InventoryUI extends blessed.box
     const player = store.getState().player;
     if (!player) emit('error', {text: 'Error|InventoryUI: no player found'});
 
-    // console.dir(player.inventory.items);
-
     let inventoryContent = [];
-
     if (player.inventory.items.length != 0)
     {
       inventoryContent = player.inventory.items.map(item => {
-        return [item.name, item.type];
+        return [item.name, item.slot];
       });  
     }
 
     this.inventory.setData({ 
-      headers: ['item', 'type'], 
+      headers: ['item', 'slot'], 
       data: inventoryContent
     });
 

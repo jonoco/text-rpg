@@ -122,24 +122,12 @@ export class Screen extends blessed.screen {
     });
 
     on('map', () => { this.switchScreen(GameState.world) });
-
-    on('skills', () => { this.switchScreen(GameState.skills) });
     on([
       'skills.close', 'inventory.close', 'equipment.close', 'abilities.close'
       ], () => { this.switchScreen(GameState.world) });
 
-    on('inventory.open', () => { this.switchScreen(GameState.inventory)});
-    // on('inventory.close', () => { this.switchScreen(GameState.world) });
-    
-    on('equipment.open', () => { this.switchScreen(GameState.equipment) });
-    // on('equipment.close', () => { this.switchScreen(GameState.world) });
-
-    on('abilities.open', () => { this.switchScreen(GameState.ability) });
-    // on('abilities.close', () => { this.switchScreen(GameState.world) });
-
     on('battle.over.lose', () => { this.switchScreen(GameState.gameover) });
     on('gameover', () => { this.switchScreen(GameState.gameover) });
-
     on('cancel', () => { this.switchScreen(this.lastScreen) });
   }
 
@@ -187,7 +175,7 @@ export class Screen extends blessed.screen {
         break;
       case GameState.equipment:
         this.append(this.equipmentUI);
-        this.equipmentUI.equipment.focus();
+        emit('equipment.open');
         break;
       case GameState.ability:
         this.append(this.abilityUI);

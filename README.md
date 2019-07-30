@@ -4,6 +4,8 @@ Console text-based RPG engine.
 ## Changelog
 - Added togglable debug widget
 - Encapsulated ui logic in Screen object, extended from blessed.screen
+- Implemented Redux for state handling
+- Added equipment system with ui
 
 ## Bugs
 - reference to combatants not updating state during combat
@@ -130,13 +132,24 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
     + [x] implement Skills system
     + [x] adjust Abilities system
     + [x] display Skills and Abilites in AbilityUI
- - [ ] revise Battle system
-    + [ ] create turn-based mechanic
+ - [x] revise Battle system
+    + [x] create turn-based mechanic
  - [x] convert to message passing model for module communication
  - [x] implement Redux for state management
     - [x] game state
     - [x] battle state
     - [x] inventory state
     - [x] character state
+- [ ] make debug ui scrollable
+- [ ] revise item system
+    - [x] revise equipment screen
+    - [x] fix item equiping
+    - [ ] allow equipped items to affect ability and skills
+- [ ] implement skill system
+    - [ ] allow skills to modify abilities
+- [ ] 
+
+
+
 
 

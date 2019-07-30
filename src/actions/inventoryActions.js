@@ -5,3 +5,11 @@ export const receiveItem = (character, item) => {
     payload: { item }
   }
 }
+
+export const equipItem = (character, item) => {
+  return {
+    type: 'EQUIP_ITEM',
+    character,
+    payload: { item }
+  }
+}
