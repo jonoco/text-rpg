@@ -18,6 +18,7 @@ export default class DebugUI extends blessed.box
       style: {
         bg: 'black'
       },
+      label: 'DEBUG',
       border: 'line',
       content: '',
       keys: true,
@@ -26,7 +27,10 @@ export default class DebugUI extends blessed.box
       alwaysScroll: true,
       scrollbar: {
         ch: ' ',
-        inverse: true
+        inverse: true,
+        style: {
+          bg: 'blue'
+        }
       }
     });
     

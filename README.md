@@ -141,7 +141,7 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
     - [x] battle state
     - [x] inventory state
     - [x] character state
-- [ ] make debug ui scrollable
+- [x] make debug ui scrollable
 - [ ] revise item system
     - [x] revise equipment screen
     - [x] fix item equiping
