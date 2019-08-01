@@ -15,6 +15,7 @@ import AbilityUI from './AbilityUI';
 import SkillUI from './SkillUI';
 import StateUI from './StateUI';
 import DebugUI from './DebugUI';
+import HelpUI from './HelpUI';
 
 
 export class Screen extends blessed.screen {
@@ -42,6 +43,7 @@ export class Screen extends blessed.screen {
     this.skillUI = new SkillUI();
     this.debugUI = new DebugUI();
     this.stateUI = new StateUI();
+    this.helpUI = new HelpUI();
 
     this.subscribeEvents();
   }
@@ -83,29 +85,42 @@ export class Screen extends blessed.screen {
     });
 
     this.key(['i'], (ch, key) => {
-      this.switchScreen(GameState.inventory);
+      if (this.currentScreen === GameState.battle)
+        debug('cannot open inventory during battle');
+      else
+        this.switchScreen(GameState.inventory);
     });
 
     this.key(['a'], (ch, key) => {
-      this.switchScreen(GameState.ability);
+      if (this.currentScreen === GameState.battle)
+        debug('cannot open abilities during battle');
+      else
+        this.switchScreen(GameState.ability);
     });
 
     this.key(['e'], (ch, key) => {
-      this.switchScreen(GameState.equipment);
+      if (this.currentScreen === GameState.battle)
+        debug('cannot open equipment during battle');
+      else
+        this.switchScreen(GameState.equipment);
     });
 
     this.key(['s'], () => {
-      if (this.battleUI.attached) {
+      if (this.currentScreen === GameState.battle)
         debug('cannot open skills during battle');
-      }
-      this.switchScreen(GameState.skills);
+      else
+        this.switchScreen(GameState.skills);
     });
 
     this.key(['c'], () => {
-      if (this.battleUI.attached) {
+      if (this.currentScreen === GameState.battle)
         debug('cannot close battle screen');
-      }
-      this.switchScreen(GameState.world);
+      else
+        this.switchScreen(GameState.world);
+    });
+
+    this.key(['h'], () => {
+      this.switchScreen(GameState.help);
     });
 
     // Check for battle after moving
@@ -190,6 +205,9 @@ export class Screen extends blessed.screen {
       case GameState.state:
         this.append(this.stateUI);
         emit('state.open');
+        break;
+      case GameState.help:
+        this.append(this.helpUI);
         break;
       default:
         // load an error or menu

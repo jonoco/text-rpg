@@ -11,6 +11,7 @@ const GameState = {
   , skills: 9
   , menu: 10
   , state: 11
+  , help: 12
 };
 
 export default GameState;

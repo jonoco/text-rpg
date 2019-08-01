@@ -7,8 +7,8 @@ function WorldMapUI ()
 {
   this.widget = blessed.box();
 
-  const subWidth = 15;
-  const subHeight = 15;
+  const subWidth = 25;
+  const subHeight = 25;
   const mapWidth = ((subWidth * 2) + 1);
   const mapHeight = (subHeight + 2);
   const infoWidth = 14;
@@ -16,11 +16,11 @@ function WorldMapUI ()
 
   this.map = MiniMap({
     parent: this.widget,
-    superWidth: 50,   // size of full map
+    superWidth: 50,         // size of full map
     superHeight: 50,
     subWidth: subWidth,     // size of minimap
     subHeight: subHeight,
-    seed: 0,          // randomization seed
+    seed: 0,                // randomization seed
     currentLocation: {x: 0, y: 0},  // starting location within map
     top: 0,
     left: 0,
