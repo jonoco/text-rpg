@@ -165,7 +165,7 @@ export class Screen extends blessed.screen {
         this.mapUI.map.focus();
         break;
       case GameState.battle:
-        this.append(this.battleUI.widget);
+        this.append(this.battleUI);
         this.battleUI.list.focus();
         this.battleUI.list.up(10);
         break;

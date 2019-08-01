@@ -55,7 +55,7 @@ export class Battle {
     }
 
     emit('battle.update', { 
-      text: `${player.name} targets ${enemy.name} with ${ability.name}`
+      text: `{cyan-fg}${player.name}{/} targets {red-fg}${enemy.name}{/} with ${ability.name}`
     });
     debug(`${player.name} targets ${enemy.name} with ${ability.name}`);
 
@@ -94,7 +94,7 @@ export class Battle {
     }
 
     emit('battle.update', { 
-      text: `${enemy.name} targets ${player.name} with ${ability.name}`
+      text: `{red-fg}${enemy.name}{/} targets {cyan-fg}${player.name}{/} with ${ability.name}`
     });
     debug(`${enemy.name} targets ${player.name} with ${ability.name}`);
     

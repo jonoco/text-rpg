@@ -31,7 +31,7 @@ class Bash extends Ability
     store.dispatch(hurt(target.character, damage));
 
     emit('battle.update', { 
-      text: `${this.name} hit for ${damage} damage`
+      text: `${this.name} hit for {white-fg}${damage}{/} damage`
     });
 
     return abilityParameters;
