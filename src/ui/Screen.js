@@ -124,8 +124,8 @@ export class Screen extends blessed.screen {
     });
 
     // Check for battle after moving
-    on('move', () => { 
-      this.mapUI.log.log('moved around');
+    on('move', event => { 
+      this.mapUI.log.log(`moved ${event.text}`);
     });
 
     on('battle.start', () => {
@@ -161,7 +161,7 @@ export class Screen extends blessed.screen {
     switch (gs)
     {
       case GameState.world:
-        this.append(this.mapUI.widget);
+        this.append(this.mapUI);
         this.mapUI.map.focus();
         break;
       case GameState.battle:
