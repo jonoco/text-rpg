@@ -9,12 +9,13 @@ function BattleUI ()
   on('battle.start', this.start.bind(this));
   on('battle.update', this.update.bind(this));
   on('battle.player.start', this.enableControl.bind(this));
-  on('battle.player.finish', this.disableControl.bind(this));
   
   this.widget = blessed.box();
+  this.enabled = false;
 
   this.log = contrib.log({ 
       parent: this.widget
+    , interactive: false
     , fg: "green"
     , label: 'Battle Log'      
     , right: 0
@@ -26,6 +27,7 @@ function BattleUI ()
 
   this.enemy = blessed.box({
       parent: this.widget
+    , interactive: false
     , label: 'Enemy'
     , left: 0
     , top: 0
@@ -37,6 +39,7 @@ function BattleUI ()
 
   this.enemyText = blessed.text({
       parent: this.enemy
+    , interactive: false
     , left: 0
     , top: 0
     , height: 10
@@ -48,6 +51,7 @@ function BattleUI ()
   this.player = blessed.text({
       parent: this.widget
     , label: 'Player'
+    , interactive: false
     , left: '30%'
     , height: 10
     , width: '30%'
@@ -74,20 +78,23 @@ function BattleUI ()
           fg: '#ffffff'
         },
         selected: {
-          fg: 'blue'
+          fg: 'black',
+          bg: 'white'
         },
         item: {
           fg: '#ffffff'
         }
       }
-    , mouse: true
   });
 
   // Handle input selection
-  this.list.on( 'select', cb => {
+  this.list.on('select', cb => {
+    if (!this.enabled) return;
+    
     const ability = cb.content;
     this.log.log(`Using ${ability}.`);
-
+    
+    this.disableControl();
     emit('battle.player.finish', { ability }); // Uses ability for player
   });
 }
@@ -95,13 +102,13 @@ function BattleUI ()
 
 BattleUI.prototype.enableControl = function()
 {
-  this.list.interactive = true;
+  this.enabled = true;
 }
 
 
 BattleUI.prototype.disableControl = function() 
 {
-  this.list.interactive = false;
+  this.enabled = false;
 }
 
 

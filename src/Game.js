@@ -67,14 +67,11 @@ export class Game {
   */
   battleState()
   {
+    // Generate an enemy based on player level and location
+    Character.createRandomEnemy();
+
     this.screen.switchScreen(GameState.battle);
-
-    // Generate an enemy based on player level and location, then provide it to the battle
-    // let enemy = Character.createRandomEnemy();
-    store.dispatch(newCharacter('enemy', 'Random Foe!', 25));
-    store.dispatch(receiveAbility('enemy', new Bash()));
-    store.dispatch(receiveAbility('enemy', new Bite()));
-
+    
     emit('battle.initialize');
   }
 

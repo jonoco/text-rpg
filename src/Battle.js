@@ -36,7 +36,7 @@ export class Battle {
       emit('battle.player.start');
     } else {
       // use ai control
-      this.autoCombatant();
+      setTimeout(this.autoCombatant.bind(this), 1000);
     }
   }
 
@@ -80,17 +80,17 @@ export class Battle {
     const enemy = store.getState().enemy.character;
 
     if (!player) {
-      emit('error', 'Error|Battle: no player found')
+      return emit('error', 'Error|Battle: no player found')
     }
 
     if (!enemy) {
-      emit('error', 'Error|Battle: no enemy found')
+      return emit('error', 'Error|Battle: no enemy found')
     }
 
     // Get combatant abilities and use 
     const ability = getRandomChoice(enemy.abilities);
     if (!ability) {
-      emit('error', 'Error|Battle: no abilities found')
+      return emit('error', 'Error|Battle: no abilities found')
     }
 
     emit('battle.update', { 
@@ -106,7 +106,7 @@ export class Battle {
     });
 
     const result = ability.use(enemy, player, abilityParameters);
-
+    
     this.checkBattleState();
   }
 
@@ -126,7 +126,6 @@ export class Battle {
       // battle continues
       this.getNextCombatant();
     }
-
   }
 
 
