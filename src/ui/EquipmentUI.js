@@ -165,6 +165,10 @@ class EquipmentUI extends blessed.box
     let infoContent = '';
     if (item) {
       infoContent = `name: ${item.name}`;  
+      Object.keys(item.attributes).forEach(attr => {
+        if (item.attributes[attr])
+          infoContent += `\n${attr}: ${item.attributes[attr]}`;
+      });
     }
     
     this.info.setContent(infoContent);

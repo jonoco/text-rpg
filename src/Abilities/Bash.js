@@ -3,6 +3,7 @@ import { store } from '../main';
 import { emit } from '../dispatch';
 import { hurt } from '../actions/actions';
 import Ability from './Ability';
+import { getCharacterEquippedItems } from '../selectors';
 
 class Bash extends Ability
 {  
@@ -17,8 +18,15 @@ class Bash extends Ability
   
   use(combatant, target, abilityParameters)
   {
+    // Get attack attributes
+    const items = getCharacterEquippedItems(store.getState(), combatant.character);
+    const itemAttack = items.reduce((acc, item) => acc + item.attributes.attack, 0);
+
     let baseDamage = [5,10]; 
     let damage = getRandomInt(baseDamage[0], baseDamage[1]);
+
+    // Scale damage by attack power
+    damage += itemAttack;
 
     // Influence chain
     abilityParameters.augments.forEach(augment => {

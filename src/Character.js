@@ -33,7 +33,7 @@ export class Character {
           ]
       },
       {
-          name: 'Rogue'
+          name: 'Idiot'
         , health: { min: 40, max: 60 }
         , skills: [
             new Strength()

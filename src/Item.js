@@ -1,5 +1,13 @@
 import { debug, getRandomInt } from './utility';
 
+/**
+ * All attributes of an item
+ * @type {object}
+ */
+const itemAttributes = {
+    attack: null
+  , defence: null
+}
 
 export class Item {
   constructor(name, slot) 
@@ -7,6 +15,17 @@ export class Item {
     this.name = name;
     this.id = Math.floor(Math.random()*10000000);
     this.slot = slot;
+    this.attributes = itemAttributes;
+  }
+
+  setAttributes(attr)
+  {
+    this.attributes = { ...this.attributes, ...attr };
+  }
+
+  static get itemAttributes ()
+  {
+    return itemAttributes;
   }
 
   /**
@@ -41,7 +60,7 @@ export class Item {
 
     let name;
     let defence = 0;
-    let damage = 1;
+    let attack = 0;
     
     switch (slot)
     {
@@ -70,7 +89,7 @@ export class Item {
         name = 'Boots';
         break;
       case 'weapon':
-        damage = getRandomInt(2, 8);
+        attack = getRandomInt(2, 8);
         name = 'Sword';
         break;
       case 'offhand':
@@ -78,28 +97,30 @@ export class Item {
         name = 'Buckler';
         break;
       case 'necklace':
+        defence = getRandomInt(2, 5);
+        attack = getRandomInt(2, 5);
         name = 'Chain';
         break;
       case 'ring':
+        defence = getRandomInt(2, 5);
+        attack = getRandomInt(2, 5);
         name = 'Band';
         break;
     }
 
     const modifiers = [
       'Dazzlement', 'Frogliness', 'Pointiness', 'Vajayjays', 'Befuddlement',
-      'Neatness', 'Okayity', 'Sinfulness', 'Something', 'Itemness',
+      'Neatness', 'Okayity', 'Sinfulness', 'Somethingy', 'Itemness',
     ];
     name += ` of ${modifiers[getRandomInt(0, modifiers.length)]}`;
 
     debug(`Generated item name: ${name}`);
 
     let item = new Item(name, slot);
-    
-    if (slot === 'weapon')
-    {
-      item.damage = damage;
-      item.defence = defence;
-    }
+    item.setAttributes({
+      attack,
+      defence
+    });
 
     return item;
   }
