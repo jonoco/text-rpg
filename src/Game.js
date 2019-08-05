@@ -12,12 +12,6 @@ import { Screen } from './ui/Screen';
 import GameState from './GameState';
 import { store } from './main';
 
-import Bash from  './abilities/Bash';
-import Bite from  './abilities/Bite';
-import Strength from './skills/Strength';
-import Endurance from './skills/Endurance';
-import Agility from './skills/Agility';
-
 import { newCharacter, receiveAbility, receiveSkill, heal } from './actions/actions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 
@@ -99,29 +93,10 @@ export class Game {
   start()
   {
     // show introduction, character creation screen, etc.
-    this.createStarterPlayer();
+    Character.createPlayer();
 
     // just start world movement for now
     emit('map');
-  }
-
-
-  createStarterPlayer()
-  {
-    store.dispatch(newCharacter('player', 'Inigio', 100));    
-
-    store.dispatch(receiveAbility('player', new Bash()));
-    store.dispatch(receiveAbility('player', new Bite()));
-    store.dispatch(receiveSkill('player', new Strength()));
-    store.dispatch(receiveSkill('player', new Endurance()));
-    store.dispatch(receiveSkill('player', new Agility()));
-
-    // starting equipment
-    for (let i = 0; i < 4; i++) {
-      let item = Item.createRandomItem();
-      store.dispatch(receiveItem('player', item));
-      store.dispatch(equipItem('player', item));
-    }
   }
   
 

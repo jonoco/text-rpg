@@ -2,8 +2,9 @@ import { getRandomInt, getRandomChoice, debug } from './utility';
 import { emit, on } from './dispatch';
 import { store } from './main';
 import { receiveAbility, receiveSkill, newCharacter } from './actions/actions';
-
-import { Strength } from './skills';
+import { receiveItem, equipItem } from './actions/inventoryActions';
+import { Item } from './Item';
+import { Strength, Endurance, Agility } from './skills';
 import { Bite, Bash } from './abilities';
 
 export class Character {
@@ -53,6 +54,27 @@ export class Character {
       }
     ]
   }
+
+
+  static createPlayer()
+  {
+    store.dispatch(newCharacter('player', 'Inigio', 100));    
+
+    store.dispatch(receiveAbility('player', new Bash()));
+    store.dispatch(receiveAbility('player', new Bite()));
+    store.dispatch(receiveSkill('player', new Strength()));
+    store.dispatch(receiveSkill('player', new Endurance()));
+    store.dispatch(receiveSkill('player', new Agility()));
+
+    // starting equipment
+    for (let i = 0; i < 4; i++) {
+      let item = Item.createRandomItem();
+      store.dispatch(receiveItem('player', item));
+      store.dispatch(equipItem('player', item));
+    }
+  }
+
+
   /*
     Create a random character
   */
