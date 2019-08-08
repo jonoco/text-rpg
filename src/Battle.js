@@ -2,7 +2,8 @@ import { Character } from './Character';
 import { on, emit } from './dispatch';
 import { getRandomChoice, getRandomInt, debug } from './utility';
 import { store } from './main';
-import { hurt, heal, nextTurn } from './actions/actions';
+import { nextTurn } from './actions/gameActions';
+import { hurt, heal } from './actions/characterActions';
 import { getCharacterActiveAbilities } from './selectors';
 
 /*

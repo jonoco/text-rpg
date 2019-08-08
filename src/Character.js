@@ -1,7 +1,7 @@
 import { getRandomInt, getRandomChoice, debug } from './utility';
 import { emit, on } from './dispatch';
 import { store } from './main';
-import { receiveAbility, receiveSkill, newCharacter } from './actions/actions';
+import { receiveAbility, receiveSkill, newCharacter } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
 import { Strength, Endurance, Agility } from './skills';

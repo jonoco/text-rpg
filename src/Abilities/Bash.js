@@ -1,10 +1,9 @@
 import { getRandomInt } from '../utility';
 import { store } from '../main';
 import { emit } from '../dispatch';
-import { hurt } from '../actions/actions';
 import Ability from './Ability';
 import { getCharacterEquippedItems } from '../selectors';
-import { useAbility } from '../actions/actions';
+import { useAbility, hurt } from '../actions/characterActions';
 
 class Bash extends Ability
 {  

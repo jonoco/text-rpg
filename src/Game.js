@@ -12,7 +12,7 @@ import { Screen } from './ui/Screen';
 import GameState from './GameState';
 import { store } from './main';
 
-import { newCharacter, receiveAbility, receiveSkill, heal } from './actions/actions';
+import { newCharacter, receiveAbility, receiveSkill, heal } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 
 export class Game {

@@ -63,10 +63,3 @@ export const useAbility = (character, ability) => {
     payload: { ability }
   }
 }
-
-
-export const nextTurn = () => {
-  return {
-    type: 'NEXT_TURN'
-  }
-}
