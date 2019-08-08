@@ -12,7 +12,7 @@ class Bite extends Ability
     
     this.name = 'Bite';
     this.description = 'Chew your enemy with your teeth like a sack of meat.';
-    this.type = Ability.Types.physical;
+    this.type = Ability.type.physical;
   }
   
   use(combatant, target, abilityParameters)

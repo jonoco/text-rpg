@@ -9,18 +9,31 @@ const itemAttributes = {
   , defence: null
 }
 
+const itemType = {
+    slash: 'slash'
+  , blunt: 'blunt'
+  , shield: 'shield'
+  , armor: 'armor'
+  , jewelery: 'jewelery'
+}
+
 export class Item {
-  constructor(name, slot) 
+  constructor() 
   {
-    this.name = name;
+    this.name = '';
     this.id = Math.floor(Math.random()*10000000);
-    this.slot = slot;
+    this.slot = '';
     this.attributes = itemAttributes;
+    this.type = null;
   }
 
   setAttributes(attr)
   {
     this.attributes = { ...this.attributes, ...attr };
+  }
+
+  static get type() {
+    return itemType;
   }
 
   static get itemAttributes ()
@@ -61,47 +74,60 @@ export class Item {
     let name;
     let defence = 0;
     let attack = 0;
-    
+
+    let item = new Item();
+    item.slot = slot;
+
     switch (slot)
     {
       case 'head':
+        item.type = Item.type.armor;
         defence = getRandomInt(1, 7);
         name = 'Helm';
         break;
       case 'shoulders':
+        item.type = Item.type.armor;
         defence = getRandomInt(1, 7);
         name = 'Paldrons';
         break;
       case 'hands':
+        item.type = Item.type.armor;
         defence = getRandomInt(1, 7);
         name = 'Gloves';
         break;
       case 'torso':
+        item.type = Item.type.armor;
         defence = getRandomInt(1, 7);
         name = 'Breastplate';
         break;
       case 'legs':
+        item.type = Item.type.armor;
         defence = getRandomInt(1, 7);
         name = 'Leggings';
         break;
       case 'feet':
+        item.type = Item.type.armor;
         defence = getRandomInt(1, 7);
         name = 'Boots';
         break;
       case 'weapon':
+        item.type = Item.type.slash;
         attack = getRandomInt(2, 8);
         name = 'Sword';
         break;
       case 'offhand':
+        item.type = Item.type.shield;
         defence = getRandomInt(5, 10);
         name = 'Buckler';
         break;
       case 'necklace':
+        item.type = Item.type.jewelery;
         defence = getRandomInt(2, 5);
         attack = getRandomInt(2, 5);
         name = 'Chain';
         break;
       case 'ring':
+        item.type = Item.type.jewelery;
         defence = getRandomInt(2, 5);
         attack = getRandomInt(2, 5);
         name = 'Band';
@@ -116,7 +142,8 @@ export class Item {
 
     debug(`Generated item name: ${name}`);
 
-    let item = new Item(name, slot);
+    item.name = name;
+
     item.setAttributes({
       attack,
       defence

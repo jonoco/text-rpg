@@ -4,16 +4,19 @@ import { emit } from '../dispatch';
 import { hurt } from '../actions/actions';
 import Ability from './Ability';
 import { getCharacterEquippedItems } from '../selectors';
+import { Item } from '../Item';
 
-class Bash extends Ability
+class Slash extends Ability
 {  
   constructor(props)
   {
     super(props);
 
-    this.name = 'Bash';
-    this.description = 'Wail on your enemy with your fists, go ahead and do it, you dumb idiot.';
+    this.name = 'Slash';
+    this.description = `Swing a flat object, try not to hurt yourself.`;
     this.type = Ability.type.physical;
+
+    this.addItemRequirement(Item.type.slash);
   }
 
   
@@ -23,7 +26,7 @@ class Bash extends Ability
     const items = getCharacterEquippedItems(store.getState(), combatant.character);
     const itemAttack = items.reduce((acc, item) => acc + item.attributes.attack, 0);
 
-    let baseDamage = [5,10]; 
+    let baseDamage = [8,12]; 
     let damage = getRandomInt(baseDamage[0], baseDamage[1]);
 
     // Scale damage by attack power
@@ -47,4 +50,4 @@ class Bash extends Ability
   }
 }
 
-export default Bash;
+export default Slash;

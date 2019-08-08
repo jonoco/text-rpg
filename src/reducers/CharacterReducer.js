@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import createInventoryReducer from './InventoryReducer';
 
+
 /**
  * name: string
  * health : int
@@ -41,11 +42,19 @@ function createCharacterReducer(characterType = '') {
       case 'HEAL':
         return heal(state, payload);
       case 'RECEIVE_ABILITY':
+        // Ignore duplicate ability
+        if (state.abilities.find(ability => {ability.name === payload.ability.name}))
+          return state;
+
         return {
             ...state
           , abilities: [...state.abilities, payload.ability]
         }
       case 'RECEIVE_SKILL':
+        // Ignore duplicate skill
+        if (state.skills.find(skill => {skill.name === payload.skill.name}))
+          return state;
+
         return {
             ...state
           , skills: [...state.skills, payload.skill]

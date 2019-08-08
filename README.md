@@ -7,6 +7,7 @@ Console text-based RPG engine.
 - Implemented Redux for state handling
 - Added equipment system with ui
 - Skills can augment abilities via an influence chain
+- Items can augment abilities via attributes
 
 ## Dev notes
 
@@ -77,7 +78,7 @@ Battle abilities are displayed in the battle screen. Every action signifies an a
 
 Abilities may deplete or recover resources, such as health or stamina.
 
-##### Domain of concern
+##### Domain of concern - outdated
 When abilities are used, they first poll the user's stats, augmenting the ability stats for damage or efficacy, etc., then it polls the target's stats, where it's augmented again for resistance, dodging, etc. The final affect is passed to the user and target.
 
 This focuses the domain of concern on the ability, rather than the character to manage a variety of abilities, allocating the logic handling to individual abilities, but improving extensibility of abilities. 
@@ -92,7 +93,7 @@ Abilities can cause temporary status affects, e.g., poison, curse, berzerk, craz
 ### Leveling up stats
 Rather than use a tradition attribute-based upgrade system, the game uses an abilities-based system, where behavior alters abilities, which improves abilities over time, e.g., using a sword improves strength and sword abilities, using spells improves spell casting.
 
-#### Attributes 
+#### Attributes - outdated
 Attributes are now covered under Skills.
 ~~Attributes will exist, but are not modified directly, but indirectly through abilities and behavior, e.g., swinging a sword improves strength, being hit improves endurance, using speed-based abilties improves agility.~~
 
@@ -102,7 +103,7 @@ Using spells improves mana pool and spell power, while using strength-based weap
 ### Battle
 Battles cycle through combatants in a simple turn-based cyclic system, e.g., one combatant acts, then another, regardless of speed.
 
-#### Battle Lifecycle
+#### Battle Lifecycle - outdated
 1. Combatant turn start
     - Check status -> e.g., poison, stun, paralysis, abilities expiration
     - Check skills -> e.g., regeneration
@@ -118,12 +119,11 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
 - [x] reference to combatants not updating state during combat
 
 ## Todo
- - [ ] build blessed-based screens
+ - [x] build blessed-based screens
      + [x] World movement screen
      + [x] Battle screen
      + [x] Inventory screen
      + [x] Equipment screen
-     + [ ] Stats/upgrade screen
      + [x] Postbattle rewards screen
      + [x] Abilities screen
  - [x] create debug UI widget 
@@ -145,7 +145,8 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
 - [ ] revise item system
     - [x] revise equipment screen
     - [x] fix item equiping
-    - [ ] allow equipped items to affect ability and skills
+    - [x] allow equipped items to affect ability and skills
+    - [ ] allow items to grant skills and abilities while equipped
 - [x] implement skill system
     - [x] allow skills to modify abilities
 - [ ] 

@@ -3,6 +3,7 @@ import contrib from 'blessed-contrib';
 import { emit, on } from '../dispatch';
 import { debug } from '../utility';
 import { store } from '../main';
+import { getCharacterActiveAbilities } from '../selectors';
 
 export default class BattleUI extends blessed.box
 {
@@ -122,7 +123,7 @@ export default class BattleUI extends blessed.box
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
 
-    const abilities = player.abilities;
+    const abilities = getCharacterActiveAbilities(store.getState(), player.character);
 
     const choices = abilities.map(ability => {
       return ability.name;

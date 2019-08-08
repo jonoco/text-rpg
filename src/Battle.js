@@ -3,6 +3,7 @@ import { on, emit } from './dispatch';
 import { getRandomChoice, getRandomInt, debug } from './utility';
 import { store } from './main';
 import { hurt, heal, nextTurn } from './actions/actions';
+import { getCharacterActiveAbilities } from './selectors';
 
 /*
   Handles battle logic
@@ -88,7 +89,8 @@ export class Battle {
     }
 
     // Get combatant abilities and use 
-    const ability = getRandomChoice(enemy.abilities);
+    const abilities = getCharacterActiveAbilities(store.getState(), enemy.character);
+    const ability = getRandomChoice(abilities);
     if (!ability) {
       return emit('error', 'Error|Battle: no abilities found')
     }
