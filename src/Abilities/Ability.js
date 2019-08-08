@@ -28,7 +28,7 @@ export default class Ability
   constructor(props)
   {
     this.name = '';
-    this.description = '';
+    this.description;
     this.type = '';
     this.uses = 0;
     this.itemRequirements = [];
@@ -45,6 +45,11 @@ export default class Ability
       physical: 'physical',
       magic: 'magic'
     }
+  }
+
+  set description(text)
+  {
+    this.description = text;
   }
 
   addItemRequirement(itemType)

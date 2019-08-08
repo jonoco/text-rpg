@@ -102,7 +102,7 @@ class AbilityUI extends blessed.box
     {
       infoContent = `${ability.name}\n\n`
         + `${ability.description}\n\n`
-        + `damage: ${ability.damage}\n\n`
+        + `uses: ${ability.uses}\n\n`
         ;
     }
     

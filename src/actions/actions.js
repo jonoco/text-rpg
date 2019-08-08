@@ -56,6 +56,15 @@ export const receiveSkill = (character, skill) => {
 }
 
 
+export const useAbility = (character, ability) => {
+  return {
+    type: 'USE_ABILITY',
+    character,
+    payload: { ability }
+  }
+}
+
+
 export const nextTurn = () => {
   return {
     type: 'NEXT_TURN'

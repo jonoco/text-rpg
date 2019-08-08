@@ -59,6 +59,16 @@ function createCharacterReducer(characterType = '') {
             ...state
           , skills: [...state.skills, payload.skill]
         }
+      case 'USE_ABILITY':
+        return {
+          ...state,
+          abilities: state.abilities.map(ability => {
+            if (ability.name === payload.ability.name)
+              ability.uses += 1;
+
+            return ability;
+          })
+        }
       default:
         return state;
     }

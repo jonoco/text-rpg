@@ -149,7 +149,7 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
     - [ ] allow items to grant skills and abilities while equipped
 - [x] implement skill system
     - [x] allow skills to modify abilities
-- [ ] 
+- [ ] create accounting module
 
 
 

@@ -5,6 +5,7 @@ import { hurt } from '../actions/actions';
 import Ability from './Ability';
 import { getCharacterEquippedItems } from '../selectors';
 import { Item } from '../Item';
+import { useAbility } from '../actions/actions';
 
 class Slash extends Ability
 {  
@@ -13,10 +14,26 @@ class Slash extends Ability
     super(props);
 
     this.name = 'Slash';
-    this.description = `Swing a flat object, try not to hurt yourself.`;
     this.type = Ability.type.physical;
 
     this.addItemRequirement(Item.type.slash);
+  }
+
+
+  get description()
+  {
+    const damage = this.getBaseDamage();
+    return `Swing a flat object and try not to hurt yourself buttercup.
+      \ndamage: ${damage.min} - ${damage.max}
+    `
+  }
+
+
+  getBaseDamage()
+  {
+    const min = Math.floor(8 + this.uses * 0.25);
+    const max = Math.floor(12 + this.uses * 0.25);
+    return { min, max }; 
   }
 
   
@@ -26,8 +43,8 @@ class Slash extends Ability
     const items = getCharacterEquippedItems(store.getState(), combatant.character);
     const itemAttack = items.reduce((acc, item) => acc + item.attributes.attack, 0);
 
-    let baseDamage = [8,12]; 
-    let damage = getRandomInt(baseDamage[0], baseDamage[1]);
+    let baseDamage = this.getBaseDamage(); 
+    let damage = getRandomInt(baseDamage.min, baseDamage.max);
 
     // Scale damage by attack power
     damage += itemAttack;
@@ -41,6 +58,7 @@ class Slash extends Ability
     damage = Math.floor(damage);
 
     store.dispatch(hurt(target.character, damage));
+    store.dispatch(useAbility(combatant.character, this));
 
     emit('battle.update', { 
       text: `${this.name} hit for {white-fg}${damage}{/} damage`
