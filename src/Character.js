@@ -5,7 +5,7 @@ import { receiveAbility, receiveSkill, newCharacter } from './actions/actions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
 import { Strength, Endurance, Agility } from './skills';
-import { Bite, Bash, Slash } from './abilities';
+import { Bite, Bash, Slash, DoubleSlash } from './abilities';
 
 export class Character {
   static get enemyList()
@@ -63,6 +63,7 @@ export class Character {
     store.dispatch(receiveAbility('player', new Bash()));
     store.dispatch(receiveAbility('player', new Bite()));
     store.dispatch(receiveAbility('player', new Slash()));
+    store.dispatch(receiveAbility('player', new DoubleSlash()));
 
     store.dispatch(receiveSkill('player', new Strength()));
     store.dispatch(receiveSkill('player', new Endurance()));

@@ -23,12 +23,12 @@ export const getCharacterActiveAbilities = createSelector(
           itemRequirements = true;
 
       ability.skillRequirements.forEach(req => {
-        if (!character.skills.find(skill => skill.name === req.name && skill.level >= req.level))
+        if (!character.character.skills.find(skill => skill.name === req.name && skill.level >= req.level))
           skillRequirements = false;
       });
 
       ability.abilityRequirements.forEach(req => {
-        if (!character.abilities.find(ability => ability.name === req.name && ability.uses >= req.uses))
+        if (!character.character.abilities.find(ability => ability.name === req.name && ability.uses >= req.uses))
           abilityRequirements = false;
       });
       

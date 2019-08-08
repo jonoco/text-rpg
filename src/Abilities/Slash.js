@@ -17,6 +17,7 @@ class Slash extends Ability
     this.type = Ability.type.physical;
 
     this.addItemRequirement(Item.type.slash);
+    this.addSkillRequirement('Strength', 0);
   }
 
 
