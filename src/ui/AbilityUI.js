@@ -102,8 +102,20 @@ class AbilityUI extends blessed.box
     {
       infoContent = `${ability.name}\n\n`
         + `${ability.description}\n\n`
-        + `uses: ${ability.uses}\n\n`
-        ;
+        + `uses: ${ability.uses}\n\n`;
+      
+      infoContent += '-- requirements --'
+      ability.itemRequirements.forEach(req => {
+        infoContent += `\n equipped: ${req.type}`
+      });
+      
+      ability.skillRequirements.forEach(req => {
+        infoContent += `\n ${req.name} | ${req.level}`
+      });
+      
+      ability.abilityRequirements.forEach(req => {
+        infoContent += `\n ${req.name} | ${req.uses}`
+      });
     }
     
     this.info.setContent(infoContent);
