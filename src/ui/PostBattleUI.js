@@ -43,7 +43,7 @@ PostBattleUI.prototype.update = function(event)
   let text = ``
     + `Victory!\n\n\n`
     + `You beat a ${enemy.name}\n\n\n`
-    + `You earned some experience\n\n`
+    + `You earned ${event.experience} experience!\n\n`
     + `You received a ${event.item.name}!\n\n\n`
     + `press space to continue`
     ;

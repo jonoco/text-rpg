@@ -124,7 +124,8 @@ class SkillUI extends blessed.box
     let infoContent = 'no skill found';
     if (skill)
     {
-      infoContent = `${skill.name}\n\n`
+      infoContent = `experience: ${character.experience}\n\n`
+        + `${skill.name}\n\n`
         + `${skill.description}\n\n`
         + `level: ${skill.level}\n\n`
         ;

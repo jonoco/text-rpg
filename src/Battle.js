@@ -121,10 +121,10 @@ export class Battle {
 
     if (enemy.health <= 0) {
       // player won battle
-      emit('battle.over.win', { battle: this });
+      emit('battle.over.win', { battle: this, enemy });
     } else if (player.health <= 0) {
       // player lost battle
-      emit('battle.over.lose', { battle: this });
+      emit('battle.over.lose', { battle: this, enemy });
     } else {
       // battle continues
       this.getNextCombatant();

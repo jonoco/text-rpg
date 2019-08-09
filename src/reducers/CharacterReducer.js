@@ -29,18 +29,21 @@ function createCharacterReducer(characterType = '') {
     switch (type) {
       case 'NEW_CHARACTER':
         return {
-            ...state
+            ...DefaultState
           , character
           , name: payload.name
           , health: payload.health
           , defaultHealth: payload.health
-          , skills: []
-          , abilities: []
         }
       case 'HURT':
         return hurt(state, payload);
       case 'HEAL':
         return heal(state, payload);
+      case 'RECEIVE_EXPERIENCE':
+        return {
+          ...state
+         , experience: state.experience + payload.experience
+        }
       case 'RECEIVE_ABILITY':
         // Ignore duplicate ability
         if (state.abilities.find(ability => {ability.name === payload.ability.name}))

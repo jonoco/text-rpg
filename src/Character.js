@@ -1,7 +1,7 @@
 import { getRandomInt, getRandomChoice, debug } from './utility';
 import { emit, on } from './dispatch';
 import { store } from './main';
-import { receiveAbility, receiveSkill, newCharacter } from './actions/characterActions';
+import { receiveAbility, receiveSkill, receiveExperience, newCharacter } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
 import { Strength, Endurance, Agility } from './skills';
@@ -21,6 +21,7 @@ export class Character {
             new Bash()
           , new Bite()
           ]
+        , experience: 25
       },
       {
           name: 'Slime'
@@ -31,6 +32,7 @@ export class Character {
         , abilities: [
             new Bash()
           ]
+        , experience: 20
       },
       {
           name: 'Idiot'
@@ -41,6 +43,7 @@ export class Character {
         , abilities: [
             new Bash()
           ]
+        , experience: 20
       },
       {
           name: 'Wolf'
@@ -51,6 +54,7 @@ export class Character {
         , abilities: [
             new Bite()
           ]
+        , experience: 30
       }
     ]
   }
@@ -97,6 +101,8 @@ export class Character {
     enemy.abilities.forEach(a => {
       store.dispatch(receiveAbility('enemy', a));
     });
+
+    store.dispatch(receiveExperience('enemy', enemy.experience));
   }
 
 }

@@ -12,7 +12,7 @@ import { Screen } from './ui/Screen';
 import GameState from './GameState';
 import { store } from './main';
 
-import { newCharacter, receiveAbility, receiveSkill, heal } from './actions/characterActions';
+import { newCharacter, receiveAbility, receiveSkill, heal, receiveExperience } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 
 export class Game {
@@ -51,7 +51,7 @@ export class Game {
     });
 
     // Handle postbattle event; go to world screen after postbattle screen
-    on('battle.over.win', () => { this.postBattleState() });
+    on('battle.over.win', args => { this.postBattleState(args) });
   }
 
 
@@ -74,16 +74,20 @@ export class Game {
     Post-battle check
     Give rewards, experience, etc.
   */
-  postBattleState(battle)
+  postBattleState(params)
   {
+    const { battle, enemy } = params;
     this.screen.switchScreen(GameState.postBattle);
+
+    const experience = enemy.experience;
+    store.dispatch(receiveExperience('player', experience));
 
     // generate an appropriate reward and emit reward data
     const item = Item.createRandomItem();
     store.dispatch(receiveItem('player', item));
     store.dispatch(heal('player', 1000));
 
-    emit('battle.poststart', { item, battle });
+    emit('battle.poststart', { item, battle, experience });
   }
 
 

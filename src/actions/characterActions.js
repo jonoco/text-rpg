@@ -63,3 +63,12 @@ export const useAbility = (character, ability) => {
     payload: { ability }
   }
 }
+
+
+export const receiveExperience = (character, experience) => {
+  return {
+    type: 'RECEIVE_EXPERIENCE',
+    character,
+    payload: { experience }
+  }
+}
