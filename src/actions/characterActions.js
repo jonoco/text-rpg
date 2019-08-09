@@ -72,3 +72,12 @@ export const receiveExperience = (character, experience) => {
     payload: { experience }
   }
 }
+
+
+export const levelupSkill = (character, skill) => {
+  return {
+    type: 'LEVELUP_SKILL',
+    character,
+    payload: { skill }
+  }
+}

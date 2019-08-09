@@ -8,6 +8,12 @@ export default class Skill
   }
 
 
+  requiredExperience()
+  {
+    return 25 + this.level*25;
+  }
+
+
   augment(params)
   {
     return params;

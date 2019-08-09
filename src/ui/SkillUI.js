@@ -2,6 +2,7 @@ import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import { emit, on } from '../dispatch';
 import { store } from '../main';
+import { levelupSkill } from '../actions/characterActions';
 
 class SkillUI extends blessed.box
 {
@@ -72,10 +73,14 @@ class SkillUI extends blessed.box
 
     on('skills.open', event => { this.open(event) });
 
-    // TODO equip or unequip skill
+    // Upgrade skill on select
     this.skillTable.rows.on('select', node => {
-      if (this.detached || this.character === 'undefined') return;
+      if (this.detached) return;
 
+      const index = this.skillTable.rows.selected;
+      const skill = store.getState().player.character.skills[index];
+
+      store.dispatch(levelupSkill('player', skill))
       this.update();
     });
 
@@ -97,13 +102,10 @@ class SkillUI extends blessed.box
       text: `SkillUI - no skills found for ${character.name}`
     });
 
-    const skillContent = character.skills.map(skill => {
-      const text = skill.name;
-      return [text];
-    });
+    const skillContent = character.skills.map(skill => [skill.name, skill.level]);
 
     this.skillTable.setData({ 
-      headers: ['skill'], 
+      headers: ['skill', 'level'], 
       data: skillContent
     });
 
@@ -128,6 +130,7 @@ class SkillUI extends blessed.box
         + `${skill.name}\n\n`
         + `${skill.description}\n\n`
         + `level: ${skill.level}\n\n`
+        + `required experience: ${skill.requiredExperience()}`
         ;
     }
     

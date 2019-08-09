@@ -72,6 +72,19 @@ function createCharacterReducer(characterType = '') {
             return ability;
           })
         }
+      case 'LEVELUP_SKILL':
+        if (payload.skill.requiredExperience() > state.experience)
+          return state;
+
+        return {
+          ...state,
+          skills: state.skills.map(skill => {
+            if (skill.name === payload.skill.name) 
+              skill.level += 1;
+            return skill;
+          }),
+          experience: state.experience - payload.skill.requiredExperience()
+        }
       default:
         return state;
     }
