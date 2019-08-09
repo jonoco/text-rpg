@@ -11,6 +11,7 @@ import { on, emit } from './dispatch';
 import { Screen } from './ui/Screen';
 import GameState from './GameState';
 import { store } from './main';
+import { getCharacterDefaultHealth } from './selectors';
 
 import { newCharacter, receiveAbility, receiveSkill, heal, receiveExperience } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
@@ -85,7 +86,9 @@ export class Game {
     // generate an appropriate reward and emit reward data
     const item = Item.createRandomItem();
     store.dispatch(receiveItem('player', item));
-    store.dispatch(heal('player', 1000));
+
+    const defaultHealth = getCharacterDefaultHealth(store.getState(), 'player');
+    store.dispatch(heal('player', 1000, defaultHealth));
 
     emit('battle.poststart', { item, battle, experience });
   }

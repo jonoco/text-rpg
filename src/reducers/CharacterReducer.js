@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux';
 import createInventoryReducer from './InventoryReducer';
+import { getCharacterDefaultHealth } from '../selectors';
+import { store } from '../main';
 
 
 /**
@@ -78,12 +80,12 @@ function createCharacterReducer(characterType = '') {
 
         return {
           ...state,
+          experience: state.experience - payload.skill.requiredExperience(),
           skills: state.skills.map(skill => {
             if (skill.name === payload.skill.name) 
               skill.level += 1;
             return skill;
-          }),
-          experience: state.experience - payload.skill.requiredExperience()
+          })
         }
       default:
         return state;
@@ -106,8 +108,10 @@ const hurt = (state, payload) =>
 
 const heal = (state, payload) =>
 {
-  let health = state.health + payload.heal;
-  health = health > state.defaultHealth ? state.defaultHealth : health;
+  const { defaultHealth, heal} = payload;
+
+  let health = state.health + heal;
+  health = health > defaultHealth ? defaultHealth : health;
 
   return {
       ...state

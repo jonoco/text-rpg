@@ -4,7 +4,7 @@ import { store } from './main';
 import { receiveAbility, receiveSkill, receiveExperience, newCharacter } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
-import { Strength, Endurance, Agility } from './skills';
+import { Strength, Endurance, Agility, Vitality } from './skills';
 import { Bite, Bash, Slash, DoubleSlash } from './abilities';
 
 export class Character {
@@ -72,6 +72,7 @@ export class Character {
     store.dispatch(receiveSkill('player', new Strength()));
     store.dispatch(receiveSkill('player', new Endurance()));
     store.dispatch(receiveSkill('player', new Agility()));
+    store.dispatch(receiveSkill('player', new Vitality()));
 
     // starting equipment
     for (let i = 0; i < 4; i++) {

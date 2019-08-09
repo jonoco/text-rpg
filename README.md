@@ -150,6 +150,7 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
 - [x] implement skill system
     - [x] allow skills to modify abilities
 - [ ] create accounting module
+- [ ] allow filtering the debug ui
 
 
 

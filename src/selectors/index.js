@@ -13,6 +13,24 @@ export const getCharacterEquippedItems = createSelector(
 )
 
 
+export const getCharacterDefaultHealth = createSelector(
+  characterSelector,
+  (character) => {
+    let health = character.character.defaultHealth;
+    
+    const endurance = character.character.skills.find(skill => skill.name === 'Endurance');
+    if (endurance)
+      health += endurance.level * 10;
+
+    const vitality = character.character.skills.find(skill => skill.name === 'Vitality');
+    if (vitality)
+      health += vitality.level * 15;
+
+    return health;
+  }
+)
+
+
 export const getCharacterActiveAbilities = createSelector(
   characterSelector,
   getCharacterEquippedItems,

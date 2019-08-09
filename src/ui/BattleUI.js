@@ -3,7 +3,7 @@ import contrib from 'blessed-contrib';
 import { emit, on } from '../dispatch';
 import { debug } from '../utility';
 import { store } from '../main';
-import { getCharacterActiveAbilities } from '../selectors';
+import { getCharacterActiveAbilities, getCharacterDefaultHealth } from '../selectors';
 
 export default class BattleUI extends blessed.box
 {
@@ -143,11 +143,13 @@ export default class BattleUI extends blessed.box
 
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
+    const enemyDefaultHealth = getCharacterDefaultHealth(store.getState(), 'enemy');
+    const playerDefaultHealth = getCharacterDefaultHealth(store.getState(), 'player');
 
-    let enemyInfo = `${enemy.name}\n health: {white-fg}${enemy.health}{/}/{white-fg}${enemy.defaultHealth}{/}`;
+    let enemyInfo = `${enemy.name}\n health: {white-fg}${enemy.health}{/}/{white-fg}${enemyDefaultHealth}{/}`;
     this.enemyText.setContent(enemyInfo);
 
-    let playerInfo = `${player.name}\n health: {white-fg}${player.health}{/}/{white-fg}${player.defaultHealth}{/}`;
+    let playerInfo = `${player.name}\n health: {white-fg}${player.health}{/}/{white-fg}${playerDefaultHealth}{/}`;
     this.player.setContent(playerInfo);
 
     this.log.log(params.text);

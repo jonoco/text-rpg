@@ -1,5 +1,9 @@
 # Notes
 
+## 8/8
+Skills were initially planned to scale with use -e.g., attacking would improve strength, getting hit improved endurance- but the complexity of informing which abilities improve which skills seems unnecessesary at this stage, so a simpler experience-leveling system was implemented instead. 
+Abilities are now scaled with use, causing their effect to be a combination of use and leveling choices.
+
 ## 8/5
 Continuing with the design of allowing abilities to hold maximum flexibility, they can individually modify the influence of item attributes.
 

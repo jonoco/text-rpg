@@ -23,8 +23,8 @@ class Strength extends Skill
     debug(`augmenting ${ability.name} with ${this.name}`);
 
     if (ability.type == Ability.type.physical) {
-        augment.damage = 2
-      , augment.damageRatio = 1.1
+        augment.damage = Math.floor(2 + this.level * 1.75)
+      , augment.damageRatio = 1 + this.level * 0.1
     }
 
     augments.push(augment);

@@ -29,11 +29,11 @@ export const hurt = (character, damage) => {
 }
 
 
-export const heal = (character, heal) => {
+export const heal = (character, heal, defaultHealth) => {
   return {
     type: 'HEAL',
     character,
-    payload: { heal }
+    payload: { heal, defaultHealth }
   }
 }
 
