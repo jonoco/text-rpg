@@ -107,12 +107,14 @@ export default class BattleUI extends blessed.box
   enableControl()
   {
     this.enabled = true;
+    this.update();
   }
 
 
   disableControl() 
   {
     this.enabled = false;
+    this.update();
   }
 
 
@@ -146,12 +148,19 @@ export default class BattleUI extends blessed.box
     const enemyDefaultHealth = getCharacterDefaultHealth(store.getState(), 'enemy');
     const playerDefaultHealth = getCharacterDefaultHealth(store.getState(), 'player');
 
-    let enemyInfo = `${enemy.name}\n health: {white-fg}${enemy.health}{/}/{white-fg}${enemyDefaultHealth}{/}`;
+    let enemyInfo = `${enemy.name} {cyan-fg}${!this.enabled ? '<' : ''}{/}
+      \n health: {white-fg}${enemy.health}{/}/{white-fg}${enemyDefaultHealth}{/}
+      `;
     this.enemyText.setContent(enemyInfo);
 
-    let playerInfo = `${player.name}\n health: {white-fg}${player.health}{/}/{white-fg}${playerDefaultHealth}{/}`;
+    let playerInfo = `${player.name} {cyan-fg}${this.enabled ? '<' : ''}{/}
+      \n health: {white-fg}${player.health}{/}/{white-fg}${playerDefaultHealth}{/}
+      `;
     this.player.setContent(playerInfo);
 
-    this.log.log(params.text);
+    if (params)
+      this.log.log(params.text);
+
+    this.screen.render();
   }
 }
