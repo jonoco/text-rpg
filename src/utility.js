@@ -20,12 +20,14 @@ export function getRandomChoice(array) {
 }
 
 
-/*
-  Prints message if debug flag is on
-*/
-export function debug(text) {
+/**
+ * Prints debug message to DebugUI
+ * @param  {string} text  Text to print
+ * @param  {string} level Level to log message to - default is log
+ */
+export function debug(text, level) {
   if (_DEBUG_) {
-    emit('debug.log', { text });
+    emit('debug.log', { text, level });
   }
 }
 

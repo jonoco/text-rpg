@@ -8,6 +8,9 @@ export default class DebugUI extends blessed.box
   {
     super(props);
 
+    this.content = {};
+    this.index = 0;
+
     this.log = blessed.box({
       parent: this,
       scrollable: true,
@@ -24,6 +27,7 @@ export default class DebugUI extends blessed.box
       keys: true,
       mouse: true,
       vi: true,
+      interactive: true,
       alwaysScroll: true,
       scrollbar: {
         ch: ' ',
@@ -33,11 +37,43 @@ export default class DebugUI extends blessed.box
         }
       }
     });
+
+    this.log.key(['right'], () => { 
+      this.index++;
+      this.index = this.index >= Object.keys(this.content).length ? 0 : this.index;
+
+      this.update();
+    });
+
+    this.log.key(['left'], () => { 
+      this.index--;
+      this.index = this.index < 0 ? Object.keys(this.content).length - 1 : this.index;
+
+      this.update();
+    });
     
     dispatch.on('debug.log', event => {
-      event.text.split('\n').forEach(str => {
-        this.log.setContent(`${this.log.content}\n${str}`);
+      let { level, text } = event;
+      level = level || 'log';
+
+      if (!this.content[level])
+        this.content[level] = '';
+
+      let content = this.content[level];
+      text.split('\n').forEach(str => {
+        content += `\n${str}`;
       });
+      this.content[level] = content;
     });
+  }
+
+
+  update()
+  {
+    const level = Object.keys(this.content)[this.index];
+    this.log.setContent(this.content[level]);
+    this.log.setLabel(`DEBUG - ${level}`);
+
+    this.log.screen.render();
   }
 }

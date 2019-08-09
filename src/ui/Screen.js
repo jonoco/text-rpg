@@ -54,6 +54,7 @@ export class Screen extends blessed.screen {
     if (debug) {
       this.append(this.debugUI.log);
       this.debugUI.log.focus();
+      this.debugUI.update();
     } else {
       this.debugUI.log.detach();
     }

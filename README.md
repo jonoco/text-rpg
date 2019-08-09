@@ -8,6 +8,7 @@ Console text-based RPG engine.
 - Added equipment system with ui
 - Skills can augment abilities via an influence chain
 - Items can augment abilities via attributes
+- Added levels to debugging logs
 
 ## Dev notes
 
@@ -150,7 +151,7 @@ Battles cycle through combatants in a simple turn-based cyclic system, e.g., one
 - [x] implement skill system
     - [x] allow skills to modify abilities
 - [ ] create accounting module
-- [ ] allow filtering the debug ui
+- [x] allow filtering the debug ui
 
 
 

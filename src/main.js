@@ -11,7 +11,7 @@ import { Game } from './Game';
 const middleware = [];
 
 const loggerOptions = {
-  log: debug
+  log: text => debug(text, 'action')
 };
 const logger = createCLILogger(loggerOptions);
 middleware.push(logger);
