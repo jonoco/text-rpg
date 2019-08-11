@@ -4,7 +4,7 @@
  */
 const DefaultState = {
   location: null,
-  battleFrequency: 0.2
+  battleFrequency: 0.05
 };
 
 

@@ -4,6 +4,7 @@ import createCLILogger from 'redux-cli-logger'
 import game from './reducers/GameReducer';
 import battle from './reducers/BattleReducer';
 import { player, enemy } from './reducers/CharacterReducer';
+import map from './reducers/MapReducer';
 
 import { debug } from './utility';
 import { Game } from './Game';
@@ -22,12 +23,16 @@ const reducer = combineReducers({
   , battle
   , player
   , enemy
+  , map
 });
 export const store = createStore(reducer, applyMiddleware(...middleware));
 
 
-const main = () => {
+const main = async () => {
   const game = new Game();
+  
+  await game.load();
+
   game.start();
 };
 

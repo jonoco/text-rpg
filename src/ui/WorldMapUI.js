@@ -2,12 +2,15 @@ import blessed from 'blessed';
 import contrib from 'blessed-contrib';
 import MiniMap from './MiniMap';
 import { emit, on } from '../dispatch';
+import { store } from '../main';
 
 export default class WorldMapUI extends blessed.box
 {
   constructor(props)
   {
     super(props);
+
+    const map = store.getState().map;
  
     const subWidth = 25;
     const subHeight = 25;
@@ -18,12 +21,12 @@ export default class WorldMapUI extends blessed.box
 
     this.map = MiniMap({
       parent: this,
-      superWidth: 50,         // size of full map
-      superHeight: 50,
+      superWidth: map.width,       // size of full map
+      superHeight: map.height,
       subWidth: subWidth,     // size of minimap
       subHeight: subHeight,
       seed: 0,                // randomization seed
-      currentLocation: {x: 0, y: 0},  // starting location within map
+      currentLocation: {x: map.x, y: map.y},  // starting location within map
       top: 0,
       left: 0,
       width: mapWidth,
@@ -83,62 +86,36 @@ export default class WorldMapUI extends blessed.box
 
     // input hooks
     this.map.key('up', () => {
-      this.move('up', this.map, this.info);
+      emit('move.try', { direction: 'up' });
     });
 
     this.map.key('down', () => {
-      this.move('down', this.map, this.info);
+      emit('move.try', { direction: 'down' });
     });
 
     this.map.key('left', () => {
-      this.move('left', this.map, this.info);
+      emit('move.try', { direction: 'left' });
     });
 
     this.map.key('right', () => {
-      this.move('right', this.map, this.info);
+      emit('move.try', { direction: 'right' });
     });
 
-    this.updateInfo(this.info, this.map);
-  }
+    this.updateInfo();
 
-  move (direction, minimap, info)
-  {
-    if (this.detached) return;
-
-    minimap.moveLocation(direction);
-    this.updateInfo(info, minimap);
-    minimap.screen.render(); 
-
-    emit('move', { text: direction });
+    store.subscribe(this.updateInfo.bind(this));
   }
 
 
-  updateInfo (infoWidget, minimap)
+  updateInfo ()
   {
-    let sector = minimap.getCurrentSector();
-    let sectorInfo = this.getSectorInfo(sector);
+    const { x, y, map, width, height } = store.getState().map;
 
-    sectorInfo += `\n${minimap.currentLocation.x}:${minimap.currentLocation.y}`;
+    let sectorInfo = this.map.getCurrentSectorInfo();
+    let content = sectorInfo ? sectorInfo.description : 'Unknown area';
+    content += `\n${x}:${y}`;
 
-    infoWidget.setContent(sectorInfo);
-  };
-
-
-  getSectorInfo(sector)
-  {
-    switch (sector)
-    {
-      case '#':
-        return 'Empty field';
-      case 'w':
-        return 'Quiet river';
-      case '@':
-        return 'Stinking bog';
-      case 'X':
-        return 'Burnt forest';
-      default:
-        return 'No info';
-    }
+    this.info.setContent(content);
+    this.screen.render();
   }
-
 }

@@ -19,9 +19,34 @@ import { receiveItem, equipItem } from './actions/inventoryActions';
 export class Game {
   constructor() 
   {
-    // Current battle object
-    this.battle = new Battle({ game: this });
+    //
+  }  
 
+
+  /*
+    Main game entry point
+  */
+  start()
+  {
+    this.battle.start();
+    this.gameMap.start();
+    this.screen.start();
+
+    Character.createPlayer();
+
+    // Start game
+    // show introduction, character creation screen, etc.
+    // just start world movement for now
+    emit('map');
+  }
+  
+
+  async load() 
+  {
+    this.battle = new Battle({ 
+      game: this 
+    });
+    this.gameMap = new GameMap();
     this.screen = new Screen({
       smartCSR: true,
       log: 'mylog.log',
@@ -30,7 +55,11 @@ export class Game {
     });
 
     this.subscribeEvents();
-  }  
+
+    await this.battle.load();
+    await this.gameMap.load();
+    await this.screen.load();
+  }
 
 
   /*
@@ -43,7 +72,7 @@ export class Game {
     });
 
     // Check for battle after moving
-    on('move', () => { 
+    on('move.finish', () => { 
       if (this.checkStartFight())
       {
         // switch to Battle state
@@ -93,19 +122,6 @@ export class Game {
     emit('battle.poststart', { item, battle, experience });
   }
 
-
-  /*
-    Main game entry point
-  */
-  start()
-  {
-    // show introduction, character creation screen, etc.
-    Character.createPlayer();
-
-    // just start world movement for now
-    emit('map');
-  }
-  
 
   /*
     Determine whether a battle should occur

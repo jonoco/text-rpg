@@ -31,7 +31,9 @@
     - [x] allow skills to modify abilities
 - [ ] create accounting module
 - [x] allow filtering the debug ui
-- [ ] 
+- [ ] allow map to influence movement, i.e., no crossing mountains
+- [ ] create world clock
+- [x] move map state to a reducer
 
 ## Bugs
 - [x] reference to combatants not updating state during combat

@@ -1,5 +1,8 @@
 # Notes
 
+## 8/11
+Rather than generate random noise maps, heightmaps are now used to generate the game map. This brings much greater realism at little cost, while a heightmap generator is still optional in the future.
+
 ## 8/8
 Skills were initially planned to scale with use -e.g., attacking would improve strength, getting hit improved endurance- but the complexity of informing which abilities improve which skills seems unnecessesary at this stage, so a simpler experience-leveling system was implemented instead. 
 Abilities are now scaled with use, causing their effect to be a combination of use and leveling choices.

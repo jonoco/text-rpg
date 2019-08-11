@@ -13,9 +13,23 @@ export class Battle {
   constructor(props)
   {
     this.game = props.game;
-    
+  }
+
+  /**
+   * Initialize object
+   */
+  start()
+  {
     on('battle.initialize', this.initialize.bind(this));
     on('battle.player.finish', this.playerCombatant.bind(this));
+  }
+
+  /**
+   * Load resources
+   */
+  async load()
+  {
+    //
   }
 
   

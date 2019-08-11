@@ -30,7 +30,11 @@ export class Screen extends blessed.screen {
     this.game = props.game;
     this.currentScreen = null;
     this.lastScreen = null;
+  }
 
+
+  start()
+  {
     // Create UI screens 
     this.errorUI = new ErrorUI();
     this.mapUI = new WorldMapUI();
@@ -46,6 +50,15 @@ export class Screen extends blessed.screen {
     this.helpUI = new HelpUI();
 
     this.subscribeEvents();
+  }
+
+
+  /**
+   * Load resources
+   */
+  async load()
+  {
+    //
   }
 
 

@@ -9,6 +9,7 @@ Console text-based RPG engine.
 - Skills can augment abilities via an influence chain
 - Items can augment abilities via attributes
 - Added levels to debugging logs
+- Maps are generated from heightmaps
 
 ## Dev notes
 

@@ -4,6 +4,11 @@ var blessed = require('blessed')
   ;
 var seedrandom = require('seedrandom');
 
+import { debug } from '../utility';
+import { store } from '../main';
+import { GameMap } from '../GameMap';
+
+
 function MiniMap(options)
 {
   if (!(this instanceof Node)) {
@@ -23,36 +28,61 @@ function MiniMap(options)
   this.subMapWidth = options.subWidth;
   this.subMapHeight = options.subHeight;
 
-  // Central location
-  this.currentLocation = options.currentLocation;
+  this.updateMap();
 
-  // Number of map sectors
-  this.size = options.superWidth * options.superHeight;
-
-  // Map seed
-  this.seed = options.seed;
-
-  // Full map array
-  this.superMapMatrix = this.genSuperMapMatrix(this.size, options.seed);
-
-  // Subset of full map
-  this.subMapMatrix = this.genSubMapMatrix(this.superMapMatrix);
-
-  // Map formatted string content
-  this.mapContent = this.genMapContent(this.subMapMatrix);
-
-  this.setContent(this.mapContent);
+  store.subscribe(this.updateMap.bind(this));
 }
 
 
+MiniMap.prototype.updateMap = function()
+{
+  const subMapMatrix = this.genSubMapMatrix();
+
+  // Map formatted string content
+  const mapContent = this.genMapContent(subMapMatrix);
+
+  this.setContent(mapContent);
+  this.screen.render();
+}
+
+
+/*
+  Generate subset from super map
+  superMap - map to generate subset from
+*/
+MiniMap.prototype.genSubMapMatrix = function(superMap)
+{
+  const { map, x, y } = store.getState().map
+
+  let subMapMatrix = [];
+
+  let xStart = x - Math.floor(this.subMapWidth/2);
+  xStart = xStart < 0 ? this.superMapWidth + xStart : xStart;
+
+  let yStart = y - Math.floor(this.subMapHeight/2);
+  yStart = yStart < 0 ? this.superMapHeight + yStart : yStart;
+
+  for (let i = 0; i < this.subMapHeight; i++)
+  {
+    for (let j = 0; j < this.subMapWidth; j++)
+    {
+      let xOffset = (xStart + j) % this.superMapWidth;
+      let yOffset = (yStart + i) % this.superMapHeight;
+
+      subMapMatrix.push(map[xOffset + (yOffset*this.superMapWidth)]);
+    }
+  }
+
+  return subMapMatrix
+}
+
 
 /* 
-  Generate a new super map
+  Generate a new super map for random values
   size - size of map
   seed - seed for map generation
 */
-MiniMap.prototype.genSuperMapMatrix = function(size = 900, seed = 0)
-{
+MiniMap.prototype.genRandomMap = function(size = 900, seed = 0) {
   let superMap = [];
   var rng = seedrandom(seed); // seeded random number generator
   
@@ -75,43 +105,12 @@ MiniMap.prototype.genSuperMapMatrix = function(size = 900, seed = 0)
 
 
 /*
-  Generate subset from super map
-  superMap - map to generate subset from
-*/
-MiniMap.prototype.genSubMapMatrix = function(superMap)
-{
-  let subMapMatrix = [];
-
-  let xStart = this.currentLocation.x - Math.floor(this.subMapWidth/2);
-  xStart = xStart < 0 ? this.superMapWidth + xStart : xStart;
-
-  let yStart = this.currentLocation.y - Math.floor(this.subMapHeight/2);
-  yStart = yStart < 0 ? this.superMapHeight + yStart : yStart;
-
-  let locationCoord = `location (${this.currentLocation.x} : ${this.currentLocation.y})`;
-  let mapCoord = `map (${xStart} : ${yStart})`;
-
-  for (var y = 0; y < this.subMapHeight; y++)
-  {
-    for (var x = 0; x < this.subMapWidth; x++)
-    {
-      let xOffset = (xStart + x) % this.superMapWidth;
-      let yOffset = (yStart + y) % this.superMapHeight;
-
-      subMapMatrix.push(superMap[xOffset + (yOffset*this.superMapWidth)]);
-    }
-  }
-
-  return subMapMatrix
-}
-
-
-/*
   Generate map widget content: a formatted string
   mapArray - map to generate string for
 */
 MiniMap.prototype.genMapContent = function(mapArray)
 {
+  const defaultSymbol = '#';
   let mapContent = '';
   mapArray.forEach( (sec, index) => {
     
@@ -124,30 +123,18 @@ MiniMap.prototype.genMapContent = function(mapArray)
     let x = index % this.subMapWidth;
     let y = Math.floor(index / this.subMapHeight);
 
-    // highlight current location
-    // if (currentLocation.x == x && currentLocation.y == y)
+    const sectorInfo = GameMap.atlas.find(req => sec >= req.min && sec <= req.max);
+    const symbol = sectorInfo ? sectorInfo.symbol : defaultSymbol;
 
     // highlight center of map -> should indicate player location for tracking map
     if (x == Math.floor(this.subMapWidth/2) && y == Math.floor(this.subMapHeight/2))
     {
-      mapContent += `{#ffffff-fg}{blink}${sec}{/}`;
+      mapContent += `{#ffffff-fg}{blink}${symbol}{/}`;
     }
     else
-    {
-      let tag = '';
-      switch (sec)
-      {
-        case '#':
-          tag = '{#88ff66-fg}';
-          break;
-        case 'w':
-          tag = '{#0000ff-fg}';
-          break;
-        default:
-          tag = '{#dddddd-fg}';
-
-      }
-      mapContent += `${tag}${sec}`;
+    { 
+      let tag = sectorInfo ? sectorInfo.tag : '{#dddddd-fg}';
+      mapContent += `${tag}${symbol}`;
     }
 
     // add space after each sector but not end of rows
@@ -157,45 +144,6 @@ MiniMap.prototype.genMapContent = function(mapArray)
     }
   });
   return mapContent;
-}
-
-
-/*
-  Move the current location and update map
-  direction - direction of movement
-*/
-MiniMap.prototype.moveLocation = function(direction)
-{
-  switch (direction)
-  {
-    case 'up':
-      this.currentLocation.y--;
-      this.currentLocation.y = this.currentLocation.y < 0 ? this.superMapHeight-1 : this.currentLocation.y; 
-      break;
-    case 'down':
-      this.currentLocation.y++;
-      this.currentLocation.y = this.currentLocation.y == this.superMapHeight ? 0 : this.currentLocation.y; 
-      break;
-    case 'left':
-      this.currentLocation.x--;
-      this.currentLocation.x = this.currentLocation.x < 0 ? this.superMapWidth-1 : this.currentLocation.x; 
-      break;
-    case 'right':
-      this.currentLocation.x++;
-      this.currentLocation.x = this.currentLocation.x == this.superMapWidth ? 0 : this.currentLocation.x; 
-      break;
-  }
-
-  // generate new sub map from super map
-  this.subMapMatrix = this.genSubMapMatrix(this.superMapMatrix);
-
-  // convert map to string
-  this.mapContent = this.genMapContent(this.subMapMatrix);
-
-  // update map ui
-  this.setContent(this.mapContent);
-
-  this.screen.render();
 }
 
 
@@ -236,8 +184,17 @@ MiniMap.prototype.getAdjacentSector = function(direction)
 */
 MiniMap.prototype.getCurrentSector = function()
 {
-  let index = this.currentLocation.x + (this.currentLocation.y * this.superMapWidth);
-  return this.superMapMatrix[index];
+  const { x, y, map, width } = store.getState().map;
+
+  let index = x + (y * width);
+  return map[index];
+}
+
+
+MiniMap.prototype.getCurrentSectorInfo = function()
+{
+  const sector = this.getCurrentSector();
+  return GameMap.atlas.find(req => sector >= req.min && sector <= req.max);
 }
 
 
