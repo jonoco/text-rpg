@@ -6,7 +6,6 @@ import { GameMap } from './GameMap';
 import { Item } from './Item';
 import { Battle } from './Battle'
 import { message, clearScreen, debug } from './utility';
-import { CANCEL, CONFIRM, _DEBUG_ } from './constants';
 import { on, emit } from './dispatch';
 import { Screen } from './ui/Screen';
 import GameState from './GameState';

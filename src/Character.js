@@ -6,7 +6,7 @@ import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
 import { GameMap } from './GameMap';
 import { Strength, Endurance, Agility, Vitality } from './skills';
-import { Bite, Bash, Slash, DoubleSlash } from './abilities';
+import { Bite, Bash, Slash, DoubleSlash, Slap } from './abilities';
 
 export class Character {
   static get enemyList()
@@ -14,6 +14,7 @@ export class Character {
     return [
       {
           name: 'Goblin'
+        , description: 'Often mistaken for an ugly Hobbit, loves to make spookey noises.'
         , health: { min: 30, max: 80 }
         , skills: [
             new Strength()
@@ -31,6 +32,7 @@ export class Character {
       },
       {
           name: 'Slime'
+        , description: 'Experiment of the wizards of Niqlodean, attacks by falling from the sky.'
         , health: { min: 20, max: 70 }
         , skills: [
             new Strength()
@@ -45,6 +47,7 @@ export class Character {
       },
       {
           name: 'Idiot'
+        , description: 'Frequently laughs at jokes unironically, wanders in violent confusion.'
         , health: { min: 40, max: 60 }
         , skills: [
             new Strength()
@@ -61,6 +64,7 @@ export class Character {
       },
       {
           name: 'Wolf'
+        , description: 'A grotesquely mishapen rabbit, coincedentally identical to a wolf.'
         , health: { min: 30, max: 70 }
         , skills: [
             new Strength()
@@ -77,13 +81,14 @@ export class Character {
       },
       {
           name: 'Violent Fish'
+        , description: 'A salmon with nothing to lose, fiercely determined to slap.'
         , health: { min: 50, max: 90 }
         , skills: [
               new Strength()
             , new Agility()
           ]
         , abilities: [
-            new Bite()
+            new Slap()
           ]
         , experience: 30
         , environments: [ 
