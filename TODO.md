@@ -31,10 +31,10 @@
     - [x] allow skills to modify abilities
 - [ ] create accounting module
 - [x] allow filtering the debug ui
-- [ ] allow map to influence gameplay
-    - [ ]  no crossing mountains
-    - [ ]  no crossing deep water
-    - [ ]  different enemies in by environment
+- [x] allow map to influence gameplay
+    - [x]  no crossing mountains
+    - [x]  no crossing deep water
+    - [x]  different enemies in by environment
 - [ ] create world clock
 - [x] move map state to a reducer
 

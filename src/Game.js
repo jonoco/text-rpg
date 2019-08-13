@@ -12,6 +12,7 @@ import { Screen } from './ui/Screen';
 import GameState from './GameState';
 import { store } from './main';
 import { getCharacterDefaultHealth } from './selectors';
+import { getCurrentSectorInfo } from './selectors/mapSelectors';
 
 import { newCharacter, receiveAbility, receiveSkill, heal, receiveExperience } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
@@ -92,7 +93,14 @@ export class Game {
   battleState()
   {
     // Generate an enemy based on player level and location
-    Character.createRandomEnemy();
+    const sector = getCurrentSectorInfo(store.getState());
+    const enemy = Character.createRandomEnemy(sector.environment);
+    if (!enemy)
+    {
+      debug('No valid enemy found for battle', 'error');
+      emit('map');
+      return;
+    }
 
     this.screen.switchScreen(GameState.battle);
     

@@ -1,5 +1,8 @@
 # Notes
 
+## 8/12
+Map environments finally influence gameplay, prohibiting movement through deep water and mountains, and determining the enemies encountered.
+
 ## 8/11
 Rather than generate random noise maps, heightmaps are now used to generate the game map. This brings much greater realism at little cost, while a heightmap generator is still optional in the future.
 

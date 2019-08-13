@@ -4,6 +4,7 @@ import { store } from './main';
 import { receiveAbility, receiveSkill, receiveExperience, newCharacter } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
+import { GameMap } from './GameMap';
 import { Strength, Endurance, Agility, Vitality } from './skills';
 import { Bite, Bash, Slash, DoubleSlash } from './abilities';
 
@@ -22,6 +23,11 @@ export class Character {
           , new Bite()
           ]
         , experience: 25
+        , environments: [ 
+              GameMap.environments.forest
+            , GameMap.environments.hill
+            , GameMap.environments.grass
+          ]
       },
       {
           name: 'Slime'
@@ -33,6 +39,9 @@ export class Character {
             new Bash()
           ]
         , experience: 20
+        , environments: [ 
+              GameMap.environments.marsh
+          ]
       },
       {
           name: 'Idiot'
@@ -44,6 +53,11 @@ export class Character {
             new Bash()
           ]
         , experience: 20
+        , environments: [ 
+              GameMap.environments.forest
+            , GameMap.environments.hill
+            , GameMap.environments.marsh 
+          ]
       },
       {
           name: 'Wolf'
@@ -55,6 +69,26 @@ export class Character {
             new Bite()
           ]
         , experience: 30
+        , environments: [ 
+              GameMap.environments.forest
+            , GameMap.environments.hill
+            , GameMap.environments.grass 
+          ]
+      },
+      {
+          name: 'Violent Fish'
+        , health: { min: 50, max: 90 }
+        , skills: [
+              new Strength()
+            , new Agility()
+          ]
+        , abilities: [
+            new Bite()
+          ]
+        , experience: 30
+        , environments: [ 
+            GameMap.environments.water
+          ]
       }
     ]
   }
@@ -86,9 +120,18 @@ export class Character {
   /*
     Create a random character
   */
-  static createRandomEnemy()
+  static createRandomEnemy(environ)
   {
-    const enemy = getRandomChoice(Character.enemyList);
+    let enemyList = Character.enemyList;
+    if (environ) {
+      enemyList = enemyList.filter(enemy => enemy.environments.includes(environ));
+    }
+
+    if (enemyList.length === 0) {
+      return;
+    }
+
+    const enemy = getRandomChoice(enemyList);
     store.dispatch(newCharacter(
         'enemy'
       , enemy.name
@@ -104,6 +147,8 @@ export class Character {
     });
 
     store.dispatch(receiveExperience('enemy', enemy.experience));
+
+    return enemy;
   }
 
 }

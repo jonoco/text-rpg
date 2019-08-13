@@ -32,16 +32,90 @@ export class GameMap
   static get atlas()
   {
     return [
-        { min: 0, max: 20, symbol: 'W', description: 'Deep water', tag: '{#2222ff-fg}' }
-      , { min: 21, max: 30, symbol: 'w', description: 'Shallow water', tag: '{#4444ff-fg}', walkable: true }
-      , { min: 31, max: 33, symbol: 'm', description: 'Marsh', tag: '{#222222-fg}', walkable: true }
-      , { min: 34, max: 50, symbol: 'g', description: 'Grassland', tag: '{#EDDD8A-fg}', walkable: true }
-      , { min: 51, max: 70, symbol: 'o', description: 'Open field', tag: '{#ffb275-fg}', walkable: true }
-      , { min: 71, max: 90, symbol: 'f', description: 'Forest', tag: '{#22ff33-fg}', walkable: true }
-      , { min: 91, max: 100, symbol: 'F', description: 'Dark forest', tag: '{#008D1E-fg}', walkable: true }
-      , { min: 101, max: 149, symbol: 'h', description: 'Rolling hills', tag: '{#ffdf8a-fg}', walkable: true }
-      , { min: 150, max: 255, symbol: 'M', description: 'Tall mountain', tag: '{#eeeeee-fg}' }
+        { 
+          min: 0, max: 20, 
+          symbol: 'W', 
+          description: 'Deep water',
+          tag: '{#2222ff-fg}', 
+          environment: GameMap.environments.water
+        }
+      , { 
+          min: 21, max: 30, 
+          symbol: 'w', 
+          description: 'Shallow water', 
+          tag: '{#4444ff-fg}', 
+          environment: GameMap.environments.water, 
+          walkable: true 
+        }
+      , { 
+          min: 31, max: 33, 
+          symbol: 'm', 
+          description: 'Marsh', 
+          tag: '{#222222-fg}', 
+          environment: GameMap.environments.marsh, 
+          walkable: true 
+        }
+      , { 
+          min: 34, max: 50, 
+          symbol: 'g', 
+          description: 'Grassland', 
+          tag: '{#EDDD8A-fg}', 
+          environment: GameMap.environments.grass, 
+          walkable: true 
+        }
+      , { 
+          min: 51, max: 70, 
+          symbol: 'o', 
+          description: 'Open field', 
+          tag: '{#ffb275-fg}', 
+          environment: GameMap.environments.grass, 
+          walkable: true 
+        }
+      , { 
+          min: 71, max: 90, 
+          symbol: 'f', 
+          description: 'Forest', 
+          tag: '{#22ff33-fg}', 
+          environment: GameMap.environments.forest, 
+          walkable: true 
+        }
+      , { 
+          min: 91, max: 100, 
+          symbol: 'F', 
+          description: 'Dark forest', 
+          tag: '{#008D1E-fg}', 
+          environment: GameMap.environments.forest, 
+          walkable: true 
+        }
+      , { 
+          min: 101, max: 149, 
+          symbol: 'h', 
+          description: 'Rolling hills', 
+          tag: '{#ffdf8a-fg}', 
+          environment: GameMap.environments.hill, 
+          walkable: true 
+        }
+      , { 
+          min: 150, max: 255, 
+          symbol: 'M', 
+          description: 'Tall mountain', 
+          tag: '{#eeeeee-fg}', 
+          environment: GameMap.environments.mountain
+        }
     ]
+  }
+
+
+  static get environments()
+  {
+    return {
+        water: 'water'
+      , grass: 'grass'
+      , forest: 'forest'
+      , hill: 'hill'
+      , marsh: 'marsh'
+      , mountain: 'mountain'
+    }
   }
 
 
