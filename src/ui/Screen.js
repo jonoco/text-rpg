@@ -137,11 +137,6 @@ export class Screen extends blessed.screen {
       this.switchScreen(GameState.help);
     });
 
-    // Check for battle after moving
-    on('move', event => { 
-      this.mapUI.log.log(`moved ${event.text}`);
-    });
-
     on('battle.start', () => {
       this.mapUI.log.log('starting fight');
     });

@@ -3,6 +3,7 @@ import contrib from 'blessed-contrib';
 import MiniMap from './MiniMap';
 import { emit, on } from '../dispatch';
 import { store } from '../main';
+import { getCurrentSectorInfo } from '../selectors/mapSelectors';
 
 export default class WorldMapUI extends blessed.box
 {
@@ -10,23 +11,23 @@ export default class WorldMapUI extends blessed.box
   {
     super(props);
 
-    const map = store.getState().map;
+    const { x, y, width, height } = store.getState().map;
  
     const subWidth = 25;
     const subHeight = 25;
     const mapWidth = ((subWidth * 2) + 1);
     const mapHeight = (subHeight + 2);
     const infoWidth = 20;
-    const logWidth = 30;
+    const logWidth = 35;
 
     this.map = MiniMap({
       parent: this,
-      superWidth: map.width,       // size of full map
-      superHeight: map.height,
+      superWidth: width,       // size of full map
+      superHeight: height,
       subWidth: subWidth,     // size of minimap
       subHeight: subHeight,
       seed: 0,                // randomization seed
-      currentLocation: {x: map.x, y: map.y},  // starting location within map
+      currentLocation: { x: x, y: y },  // starting location within map
       top: 0,
       left: 0,
       width: mapWidth,
@@ -101,6 +102,14 @@ export default class WorldMapUI extends blessed.box
       emit('move.try', { direction: 'right' });
     });
 
+    on('move.finish', event => { 
+      this.log.log(event.text);
+    });
+
+    on('move.blocked', event => { 
+      this.log.log(event.text);
+    });
+
     this.updateInfo();
 
     store.subscribe(this.updateInfo.bind(this));
@@ -111,7 +120,7 @@ export default class WorldMapUI extends blessed.box
   {
     const { x, y, map, width, height } = store.getState().map;
 
-    let sectorInfo = this.map.getCurrentSectorInfo();
+    let sectorInfo = getCurrentSectorInfo(store.getState());
     let content = sectorInfo ? sectorInfo.description : 'Unknown area';
     content += `\n${x}:${y}`;
 

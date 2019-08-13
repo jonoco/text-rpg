@@ -77,33 +77,6 @@ MiniMap.prototype.genSubMapMatrix = function(superMap)
 }
 
 
-/* 
-  Generate a new super map for random values
-  size - size of map
-  seed - seed for map generation
-*/
-MiniMap.prototype.genRandomMap = function(size = 900, seed = 0) {
-  let superMap = [];
-  var rng = seedrandom(seed); // seeded random number generator
-  
-  for (let i = 0; i < size; i++)
-  {
-    let random = rng();
-    let sector = '#';
-    if (random > 0.9)
-      sector = 'w';
-    else if (random > 0.8)
-      sector = 'X';
-    else if (random > 0.75)
-      sector = '@';
-
-    superMap.push(sector);
-  }
-
-  return superMap;
-}
-
-
 /*
   Generate map widget content: a formatted string
   mapArray - map to generate string for
@@ -146,38 +119,6 @@ MiniMap.prototype.genMapContent = function(mapArray)
   return mapContent;
 }
 
-
-/*
-  Get sector information from a cardinal direction
-  direction - cardinal direction to check
-*/
-MiniMap.prototype.getAdjacentSector = function(direction)
-{
-  let adjacentLocation = this.currentLocation;
-
-  switch (direction)
-  {
-    case 'up':
-      adjacentLocation.y++;
-      adjacentLocation.y = adjacentLocation.y == this.superMapHeight ? 0 : adjacentLocation.y; 
-      break;
-    case 'down':
-      adjacentLocation.y--;
-      adjacentLocation.y = adjacentLocation.y < 0 ? this.superMapHeight-1 : adjacentLocation.y;
-      break;
-    case 'left':
-      adjacentLocation.x--;
-      adjacentLocation.x = adjacentLocation.x < 0 ? this.superMapWidth-1 : adjacentLocation.x; 
-      break;
-    case 'right':
-      adjacentLocation.x++;
-      adjacentLocation.x = adjacentLocation.x == this.superMapWidth ? 0 : adjacentLocation.x; 
-      break;
-  }
-
-  let index = adjacentLocation.x + (adjacentLocation.y * this.superMapWidth);
-  return this.superMapMatrix[index];
-}
 
 /*
   Get current sector

@@ -4,6 +4,7 @@ import { store } from './main';
 import { emit, on } from './dispatch';
 
 import { setMap, move } from './actions/mapActions';
+import { getAdjacentSectorInfo } from './selectors/mapSelectors';
 
 export class GameMap 
 {
@@ -32,13 +33,13 @@ export class GameMap
   {
     return [
         { min: 0, max: 20, symbol: 'W', description: 'Deep water', tag: '{#2222ff-fg}' }
-      , { min: 21, max: 30, symbol: 'w', description: 'Shallow water', tag: '{#4444ff-fg}' }
-      , { min: 31, max: 33, symbol: 'm', description: 'Marsh', tag: '{#222222-fg}' }
-      , { min: 34, max: 50, symbol: 'g', description: 'Grassland', tag: '{#EDDD8A-fg}' }
-      , { min: 51, max: 70, symbol: 'o', description: 'Open field', tag: '{#ffb275-fg}' }
-      , { min: 71, max: 90, symbol: 'f', description: 'Forest', tag: '{#22ff33-fg}' }
-      , { min: 91, max: 100, symbol: 'F', description: 'Dark forest', tag: '{#008D1E-fg}' }
-      , { min: 101, max: 149, symbol: 'h', description: 'Rolling hills', tag: '{#ffdf8a-fg}' }
+      , { min: 21, max: 30, symbol: 'w', description: 'Shallow water', tag: '{#4444ff-fg}', walkable: true }
+      , { min: 31, max: 33, symbol: 'm', description: 'Marsh', tag: '{#222222-fg}', walkable: true }
+      , { min: 34, max: 50, symbol: 'g', description: 'Grassland', tag: '{#EDDD8A-fg}', walkable: true }
+      , { min: 51, max: 70, symbol: 'o', description: 'Open field', tag: '{#ffb275-fg}', walkable: true }
+      , { min: 71, max: 90, symbol: 'f', description: 'Forest', tag: '{#22ff33-fg}', walkable: true }
+      , { min: 91, max: 100, symbol: 'F', description: 'Dark forest', tag: '{#008D1E-fg}', walkable: true }
+      , { min: 101, max: 149, symbol: 'h', description: 'Rolling hills', tag: '{#ffdf8a-fg}', walkable: true }
       , { min: 150, max: 255, symbol: 'M', description: 'Tall mountain', tag: '{#eeeeee-fg}' }
     ]
   }
@@ -95,78 +96,16 @@ export class GameMap
   move(params) 
   {
     const { direction } = params;
+    const sectorInfo = getAdjacentSectorInfo(store.getState(), direction);
 
-    // TOOD check adjacent sector for blocking before moving
-    store.dispatch(move(direction));
-    emit('move.finish');
+    
+
+    if (!sectorInfo.walkable)
+      emit('move.blocked', { text: `cannot move ${direction} to ${sectorInfo.description}`});
+    else {
+      store.dispatch(move(direction));
+      emit('move.finish', { text: `moving ${direction} to ${sectorInfo.description}` });  
+    }
   }
 
-
-  /*
-    Ask user to choose move direction
-  */
-  // async askDirection() 
-  // {
-  //   let cancel = false;
-
-  //   await inquirer
-  //     .prompt([{ 
-  //       name: "direction", 
-  //       message: "Which direction? (w,a,s,d,stop)\n",
-  //       filter: function(val) { return val.toLowerCase(); } 
-  //     }])
-  //     .then(answers => {
-  //       if (answers.direction == 'stop')
-  //       {
-  //         cancel = true;
-  //       }
-  //       else if (['w', 'a', 's', 'd'].includes(answers.direction)) 
-  //       {
-  //         return this.move(answers["direction"]);
-  //       } 
-  //       else 
-  //       {
-  //         return this.askDirection();
-  //       }
-  //     });
-
-  //   return cancel;
-  // }
-
-
-  /*
-    Returns coordinates
-  */
-  // getLocation()
-  // {
-  //   return this.location;
-  // }
-
-
-  /*
-    Returns current environment object
-  */
-  // getEnvironment() 
-  // {
-  //   const index = (this.location.y * 10) + this.location.x;
-  //   return this.environments[index];
-  // }
-
-
-  /*
-    Create environments across the map
-  */
-  // createMap()
-  // {
-  //   let locations = [
-  //       {description: "Empty field"},
-  //       {description: "Rancid Swamp"},
-  //       {description: "Dense forest"},
-  //   ];
-
-  //   for (var i = 0; i < this.width*this.height; i++) 
-  //   {
-  //     this.environments.push(locations[getRandomInt(0, locations.length)]);
-  //   }
-  // }
 }
