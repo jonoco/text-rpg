@@ -36,8 +36,11 @@
     - [x]  different enemies in by environment
 - [ ] create world clock
 - [x] move map state to a reducer
-- [ ] add colors to world log
-
+- [x] add colors to world log
+- [ ] overhaul battle module
+    - [ ] handle asynchronous behavior predictably
+    - [ ] encapulate character behavior ; simplify player/enemy handling
+    - [ ] handle multiple enemies & players
 
 ## Bugs
 - [x] reference to combatants not updating state during combat

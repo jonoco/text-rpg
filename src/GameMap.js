@@ -175,10 +175,10 @@ export class GameMap
     
 
     if (!sectorInfo.walkable)
-      emit('move.blocked', { text: `cannot move ${direction} to ${sectorInfo.description}`});
+      emit('move.blocked', { text: `cannot move ${direction} to {white-fg}${sectorInfo.description}`});
     else {
       store.dispatch(move(direction));
-      emit('move.finish', { text: `moving ${direction} to ${sectorInfo.description}` });  
+      emit('move.finish', { text: `moving ${direction} to {white-fg}${sectorInfo.description}` });  
     }
   }
 
