@@ -4,3 +4,4 @@ export { default as Bash } from './Bash';
 export { default as Slash } from './Slash';
 export { default as DoubleSlash } from './DoubleSlash';
 export { default as Slap } from './Slap';
+export { default as Heal } from './Heal';

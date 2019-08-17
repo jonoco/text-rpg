@@ -3,7 +3,7 @@ import { on, emit } from './dispatch';
 import { getRandomChoice, getRandomInt, debug } from './utility';
 import { store } from './main';
 import { nextTurn } from './actions/gameActions';
-import { hurt, heal } from './actions/characterActions';
+import { hurt, heal, incrementEffect, clearExpiredEffects } from './actions/characterActions';
 import { getCharacterActiveAbilities } from './selectors';
 
 /*
@@ -46,11 +46,50 @@ export class Battle {
 
   combatantTurnStart()
   {
+    store.dispatch(clearExpiredEffects(store.getState().player.character.character));
+    store.dispatch(clearExpiredEffects(store.getState().enemy.character.character));
+
     const isPlayerTurn = store.getState().battle.isPlayerTurn;
     if (isPlayerTurn) {
+      let skipTurn = false;
+      const player = store.getState().player.character;
+      const effects = player.effects;
+      effects.forEach(effect => {
+        if (effect.name == 'Stun')
+        {
+          emit('battle.update', { 
+            text: `{cyan-fg}${player.name}{/} is stunned!`
+          });
+          
+          store.dispatch(incrementEffect(player.character, effect));
+          skipTurn = true;
+        }
+      })
+
+      if (skipTurn)
+        return this.checkBattleState();
+
       // allow ui control
       emit('battle.player.start');
     } else {
+      let skipTurn = false;
+      const enemy = store.getState().enemy.character;
+      const effects = enemy.effects;
+      effects.forEach(effect => {
+        if (effect.name == 'Stun')
+        {
+          emit('battle.update', { 
+            text: `{cyan-fg}${enemy.name}{/} is stunned!`
+          });
+          
+          store.dispatch(incrementEffect(enemy.character, effect));
+          skipTurn = true;
+        }
+      })
+
+      if (skipTurn)
+        return this.checkBattleState();
+
       // use ai control
       setTimeout(this.autoCombatant.bind(this), 1000);
     }
@@ -63,6 +102,26 @@ export class Battle {
   {
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
+
+    // Check active effects
+    // clearExpiredEffects(player);
+
+    // let skipTurn = false;
+    // const effects = store.getState().player.character.effects;
+    // effects.forEach(effect => {
+    //   if (effect.name == 'Stun')
+    //   {
+    //     emit('battle.update', { 
+    //       text: `{cyan-fg}${player.name}{/} is stunned!`
+    //     });
+        
+    //     store.dispatch(incrementEffect(player.character, effect));
+    //     skipTurn = true;
+    //   }
+    // })
+
+    // if (skipTurn)
+    //   return this.checkBattleState();
 
     const abilityName = params.ability;
     const ability = player.abilities.find(a => abilityName == a.name);

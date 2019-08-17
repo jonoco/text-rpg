@@ -3,7 +3,8 @@ import { store } from '../main';
 import { emit } from '../dispatch';
 import Ability from './Ability';
 import { getCharacterEquippedItems } from '../selectors';
-import { useAbility, hurt } from '../actions/characterActions';
+import { useAbility, hurt,receiveEffect } from '../actions/characterActions';
+import { Stunned } from '../effects';
 
 class Bash extends Ability
 {  
@@ -15,20 +16,26 @@ class Bash extends Ability
     this.type = Ability.type.physical;
   }
 
+  static get chance()
+  {
+    return 0.1;
+  }
+
 
   get description()
   {
     const damage = this.getBaseDamage();
     return `Wail on your enemy with your fists, go ahead and do it, you dumb idiot.
       \ndamage: ${damage.min} - ${damage.max}
+      \n${Math.floor(Bash.chance*100)}% chance to stun target.
     `
   }
 
 
   getBaseDamage()
   {
-    const min = Math.floor(5 + this.uses * 0.25);
-    const max = Math.floor(10 + this.uses * 0.25);
+    const min = Math.floor(2 + this.uses * 0.25);
+    const max = Math.floor(5 + this.uses * 0.25);
     return { min, max }; 
   }
 
@@ -55,6 +62,13 @@ class Bash extends Ability
 
     store.dispatch(hurt(target.character, damage));
     store.dispatch(useAbility(combatant.character, this));
+    if (Math.random() < Bash.chance) {
+      store.dispatch(receiveEffect(target.character, new Stunned()));
+      emit('battle.update', { 
+        text: `${target.name} has been stunned by ${this.name}!`
+      });
+    }
+    
 
     emit('battle.update', { 
       text: `${this.name} hit for {white-fg}${damage}{/} damage`

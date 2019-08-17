@@ -45,11 +45,11 @@ class EquipmentUI extends blessed.box
     });
 
     this.equipment = contrib.table({
-       
-       top: '10%'
+       parent: this
+     , top: '55%'
      , left: '50%'
      , width: '50%'
-     , height: '90%'
+     , height: '45%'
      , fg: 'white'
      , selectedFg: 'white'
      , selectedBg: 'black'
@@ -64,7 +64,7 @@ class EquipmentUI extends blessed.box
       , top: '10%'
       , left: '50%'
       , width: '50%'
-      , height: '90%'
+      , height: '45%'
       , label: 'Info'
       , content: ''
       , input: false
@@ -90,13 +90,15 @@ class EquipmentUI extends blessed.box
     });
 
     on('equipment.open', () => {
-      if (this.isShowingInfo) {
-        this.remove(this.equipment);
-        this.append(this.info);
-      } else {
-        this.remove(this.info);
-        this.append(this.equipment);
-      }
+      // Toggle equipment and info
+      // if (this.isShowingInfo) {
+      //   this.remove(this.equipment);
+      //   this.append(this.info);
+      // } else {
+      //   this.remove(this.info);
+      //   this.append(this.equipment);
+      // }
+      
       this.inventory.focus();
       this.updateEquipment();
       this.updateInventory();
@@ -130,7 +132,7 @@ class EquipmentUI extends blessed.box
 
     // Update info when scrolling inventory table
     this.inventory.rows.key(['up', 'down'], () => { this.updateInfo() });
-    this.inventory.rows.key(['t'], () => { this.toggleInfo() })
+    //this.inventory.rows.key(['t'], () => { this.toggleInfo() })
   }
 
 

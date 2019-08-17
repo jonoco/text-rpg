@@ -22,11 +22,10 @@
     - [x] inventory state
     - [x] character state
 - [x] make debug ui scrollable
-- [ ] revise item system
+- [x] revise item system
     - [x] revise equipment screen
     - [x] fix item equiping
     - [x] allow equipped items to affect ability and skills
-    - [ ] allow items to grant skills and abilities while equipped
 - [x] implement skill system
     - [x] allow skills to modify abilities
 - [ ] create accounting module
@@ -37,6 +36,8 @@
     - [x]  different enemies in by environment
 - [ ] create world clock
 - [x] move map state to a reducer
+- [ ] add colors to world log
+
 
 ## Bugs
 - [x] reference to combatants not updating state during combat

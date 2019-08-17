@@ -101,6 +101,8 @@ export default class BattleUI extends blessed.box
       this.disableControl();
       emit('battle.player.finish', { ability }); // Uses ability for player
     });
+
+    // store.subscribe(this.update);
   }
 
 
@@ -150,12 +152,20 @@ export default class BattleUI extends blessed.box
 
     let enemyInfo = `${enemy.name} {cyan-fg}${!this.enabled ? '<' : ''}{/}
       \n health: {white-fg}${enemy.health}{/}/{white-fg}${enemyDefaultHealth}{/}
+      \n\n effects:
       `;
+    enemy.effects.forEach(effect => {
+      enemyInfo += `\n ${effect.name} | ${effect.turns - effect.count}`
+    });
     this.enemyText.setContent(enemyInfo);
 
     let playerInfo = `${player.name} {cyan-fg}${this.enabled ? '<' : ''}{/}
       \n health: {white-fg}${player.health}{/}/{white-fg}${playerDefaultHealth}{/}
+      \n\n effects:
       `;
+    player.effects.forEach(effect => {
+      playerInfo += `\n ${effect.name} | ${effect.turns - effect.count}`
+    });
     this.player.setContent(playerInfo);
 
     if (params)

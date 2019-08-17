@@ -21,6 +21,7 @@ function createCharacterReducer(characterType = '') {
     , skills: []
     , abilities: []
     , experience: 0
+    , effects: []
   };
 
   
@@ -63,6 +64,42 @@ function createCharacterReducer(characterType = '') {
         return {
             ...state
           , skills: [...state.skills, payload.skill]
+        }
+      case 'RECEIVE_EFFECT':
+        // renew duplicate effect
+        if (state.effects.find(effect => {effect.name === payload.effect.name}))
+          return {
+              ...state
+            , effects: effects.map(effects => {
+                if (effect.name === payload.effect.name) 
+                  effect.count = 0;
+              })
+          };
+
+        return {
+            ...state
+          , effects: [...state.effects, payload.effect]
+        }
+      case 'INCR_EFFECT':
+        return {
+          ...state,
+          effects: state.effects.map(effect => {
+            if (effect.name === payload.effect.name) {
+              effect.count += 1;
+            }
+
+            return effect;
+          })
+        }
+      case 'REMOVE_EFFECT':
+        return {
+          ...state,
+          effects: state.effects.filter(effect => effect.name !== payload.effect.name)
+        }
+      case 'EXPIRED_EFFECTS':
+        return {
+          ...state,
+          effects: state.effects.filter(effect => effect.count < effect.turns)
         }
       case 'USE_ABILITY':
         return {

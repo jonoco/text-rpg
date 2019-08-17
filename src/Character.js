@@ -1,12 +1,13 @@
 import { getRandomInt, getRandomChoice, debug } from './utility';
 import { emit, on } from './dispatch';
 import { store } from './main';
-import { receiveAbility, receiveSkill, receiveExperience, newCharacter } from './actions/characterActions';
+import { receiveAbility, receiveSkill, receiveExperience, newCharacter, receiveEffect } from './actions/characterActions';
 import { receiveItem, equipItem } from './actions/inventoryActions';
 import { Item } from './Item';
 import { GameMap } from './GameMap';
 import { Strength, Endurance, Agility, Vitality } from './skills';
-import { Bite, Bash, Slash, DoubleSlash, Slap } from './abilities';
+import { Bite, Bash, Slash, DoubleSlash, Slap, Heal } from './abilities';
+import { Stunned } from './effects';
 
 export class Character {
   static get enemyList()
@@ -47,7 +48,7 @@ export class Character {
       },
       {
           name: 'Idiot'
-        , description: 'Frequently laughs at jokes unironically, wanders in violent confusion.'
+        , description: 'Frequently dizzy and stupid, wanders in violent confusion.'
         , health: { min: 40, max: 60 }
         , skills: [
             new Strength()
@@ -94,7 +95,26 @@ export class Character {
         , environments: [ 
             GameMap.environments.water
           ]
+      },
+      {
+          name: 'Witch'
+        , description: 'Crazy broom wielding salesperson.'
+        , health: { min: 60, max: 100 }
+        , skills: [
+              new Strength()
+            , new Vitality()
+          ]
+        , abilities: [
+              new Slap()
+            , new Heal()
+          ]
+        , experience: 100
+        , environments: [ 
+              GameMap.environments.marsh
+            , GameMap.environments.forest
+          ]
       }
+
     ]
   }
 
@@ -107,6 +127,7 @@ export class Character {
     store.dispatch(receiveAbility('player', new Bite()));
     store.dispatch(receiveAbility('player', new Slash()));
     store.dispatch(receiveAbility('player', new DoubleSlash()));
+    store.dispatch(receiveAbility('player', new Heal()));
 
     store.dispatch(receiveSkill('player', new Strength()));
     store.dispatch(receiveSkill('player', new Endurance()));

@@ -56,6 +56,41 @@ export const receiveSkill = (character, skill) => {
 }
 
 
+export const receiveEffect = (character, effect) => {
+  return {
+    type: 'RECEIVE_EFFECT',
+    character,
+    payload: { effect }
+  }
+}
+
+
+export const incrementEffect = (character, effect) => {
+  return {
+    type: 'INCR_EFFECT',
+    character,
+    payload: { effect }
+  } 
+}
+
+
+export const removeEffect = (character, effect) => {
+  return {
+    type: 'REMOVE_EFFECT',
+    character,
+    payload: { effect }
+  }
+}
+
+
+export const clearExpiredEffects = character => {
+  return {
+    type: 'EXPIRED_EFFECTS',
+    character
+  }
+}
+
+
 export const useAbility = (character, ability) => {
   return {
     type: 'USE_ABILITY',
