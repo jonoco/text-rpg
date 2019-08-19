@@ -20,8 +20,7 @@ export class Battle {
    */
   start()
   {
-    on('battle.initialize', this.initialize.bind(this));
-    on('battle.player.finish', this.playerCombatant.bind(this));
+    on('battle.player.ability', this.playerCombatant.bind(this));
   }
 
   /**
@@ -36,7 +35,7 @@ export class Battle {
   /*
     Initialize a new battle
   */
-  initialize()
+  startBattle()
   {
     // start the battle
     emit('battle.start');
@@ -194,10 +193,10 @@ export class Battle {
 
     if (enemy.health <= 0) {
       // player won battle
-      emit('battle.over.win', { battle: this, enemy });
+      this.game.battleOver(this, enemy, true);
     } else if (player.health <= 0) {
       // player lost battle
-      emit('battle.over.lose', { battle: this, enemy });
+      this.game.battleOver(this, enemy, false);
     } else {
       // battle continues
       this.getNextCombatant();

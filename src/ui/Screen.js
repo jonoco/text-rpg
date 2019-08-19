@@ -137,9 +137,8 @@ export class Screen extends blessed.screen {
       this.switchScreen(GameState.help);
     });
 
-    on('battle.start', () => {
-      this.mapUI.log.log('starting fight');
-    });
+    on('battle.start', () => { this.switchScreen(GameState.battle) });
+    on('battle.over', () => { this.switchScreen(GameState.postBattle) });
 
     on('error', event => {
       this.errorUI.widget.setContent(`error:\n${event.text}`);
@@ -151,7 +150,6 @@ export class Screen extends blessed.screen {
       'skills.close', 'inventory.close', 'equipment.close', 'abilities.close'
       ], () => { this.switchScreen(GameState.world) });
 
-    on('battle.over.lose', () => { this.switchScreen(GameState.gameover) });
     on('gameover', () => { this.switchScreen(GameState.gameover) });
     on('cancel', () => { this.switchScreen(this.lastScreen) });
   }

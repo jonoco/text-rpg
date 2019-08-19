@@ -99,7 +99,7 @@ export default class BattleUI extends blessed.box
       this.log.log(`Using ${ability}.`);
       
       this.disableControl();
-      emit('battle.player.finish', { ability }); // Uses ability for player
+      emit('battle.player.ability', { ability }); // Uses ability for player
     });
 
     // store.subscribe(this.update);

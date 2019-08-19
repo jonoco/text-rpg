@@ -100,10 +100,22 @@ export class Game {
       emit('map');
       return;
     }
-
-    this.screen.switchScreen(GameState.battle);
     
-    emit('battle.initialize');
+    this.battle.startBattle();
+  }
+
+
+  /**
+   * Handle post battle
+   */
+  battleOver(battle, enemy, didWin)
+  {
+    if (didWin) {
+      emit('battle.over');
+      this.postBattleState({ battle, enemy });
+    } else {
+      emit('gameover');
+    }
   }
 
 
