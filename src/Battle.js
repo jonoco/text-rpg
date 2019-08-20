@@ -6,14 +6,16 @@ import { nextTurn } from './actions/gameActions';
 import { hurt, heal, incrementEffect, clearExpiredEffects } from './actions/characterActions';
 import { getCharacterActiveAbilities } from './selectors';
 
-/*
-  Handles battle logic
-*/
+
+/**
+ * Handles battle logic 
+ */
 export class Battle {
   constructor(props)
   {
     this.game = props.game;
   }
+
 
   /**
    * Initialize object
@@ -22,6 +24,7 @@ export class Battle {
   {
     on('battle.player.ability', this.playerCombatant.bind(this));
   }
+
 
   /**
    * Load resources
@@ -32,9 +35,9 @@ export class Battle {
   }
 
   
-  /*
-    Initialize a new battle
-  */
+  /**
+   * Initialize a new battle 
+   */
   startBattle()
   {
     // start the battle
@@ -43,6 +46,9 @@ export class Battle {
   }
 
 
+  /**
+   * Perform initial combat bahvior
+   */
   combatantTurnStart()
   {
     const player = store.getState().player.character;
@@ -96,21 +102,7 @@ export class Battle {
       emit('error', 'Error|Battle: no abilities found')
     }
 
-    emit('battle.update', { 
-      text: `{cyan-fg}${player.name}{/} targets {red-fg}${enemy.name}{/} with ${ability.name}`
-    });
-    debug(`${player.name} targets ${enemy.name} with ${ability.name}`);
-
-    // Influence chain
-    const skills = player.skills;
-    let abilityParameters = { ability, skills, augments: [] };
-    skills.forEach(skill => {
-      abilityParameters = skill.augment(abilityParameters)
-    });
-
-    const result = ability.use(player, enemy, abilityParameters);
-    
-    this.checkBattleState();
+    this.attack(player, enemy, ability);
   }
 
 
@@ -122,39 +114,43 @@ export class Battle {
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
 
-    if (!player) {
-      return emit('error', 'Error|Battle: no player found')
-    }
-
-    if (!enemy) {
-      return emit('error', 'Error|Battle: no enemy found')
-    }
-
     // Get combatant abilities and use 
     const abilities = getCharacterActiveAbilities(store.getState(), enemy.character);
     const ability = getRandomChoice(abilities);
     if (!ability) {
       return emit('error', 'Error|Battle: no abilities found')
     }
+  
+    this.attack(enemy, player, ability);
+  }
 
+
+  /**
+   * Use an ability by the combatant on the target
+   */
+  attack(combatant, target, ability)
+  {
     emit('battle.update', { 
-      text: `{red-fg}${enemy.name}{/} targets {cyan-fg}${player.name}{/} with ${ability.name}`
+      text: `{cyan-fg}${combatant.name}{/} targets {red-fg}${target.name}{/} with {white-fg}${ability.name}{/}`
     });
-    debug(`${enemy.name} targets ${player.name} with ${ability.name}`);
-    
+    debug(`${combatant.name} targets ${target.name} with ${ability.name}`);
+
     // Influence chain
-    const skills = enemy.skills;
-    let abilityParameters = { ability, skills, augments: [] }
+    const skills = combatant.skills;
+    let abilityParameters = { ability, skills, augments: [], effects: combatant.effects };
     skills.forEach(skill => {
       abilityParameters = skill.augment(abilityParameters)
     });
 
-    const result = ability.use(enemy, player, abilityParameters);
+    const result = ability.use(combatant, target, abilityParameters);
     
     this.checkBattleState();
   }
 
 
+  /**
+   * Check if battle is over or continues
+   */
   checkBattleState()
   {
     const player = store.getState().player.character;
@@ -173,6 +169,9 @@ export class Battle {
   }
 
 
+  /**
+   * Get the next character
+   */
   getNextCombatant()
   {
     const { characterTurn } = store.getState().battle;
@@ -180,7 +179,6 @@ export class Battle {
     const enemy = store.getState().enemy.character;
     const characters = [player, enemy];
     const nextCombatant = characters.find(char => char.character !== characterTurn);
-    
     
     store.dispatch(nextTurn(nextCombatant.character));
     this.combatantTurnStart();
