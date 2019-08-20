@@ -1,5 +1,8 @@
 # Notes
 
+## 8/19
+A primitive version of Effects is implemented, allowing abilities to cause different multi-turn status effects. Unlike abilities, effects handling is directly through the Battle module.
+
 ## 8/12
 Map environments finally influence gameplay, prohibiting movement through deep water and mountains, and determining the enemies encountered.
 

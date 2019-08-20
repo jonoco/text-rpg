@@ -39,7 +39,7 @@
 - [x] add colors to world log
 - [ ] overhaul battle module
     - [ ] handle asynchronous behavior predictably
-    - [ ] encapulate character behavior ; simplify player/enemy handling
+    - [x] encapulate character behavior ; simplify player/enemy handling
     - [ ] handle multiple enemies & players
 
 ## Bugs

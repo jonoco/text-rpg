@@ -24,7 +24,7 @@ export class Stunned extends Effect
 }
 
 
-export class Poisonned extends Effect
+export class Poisoned extends Effect
 {
   constructor(props)
   {

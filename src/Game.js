@@ -136,7 +136,7 @@ export class Game {
     store.dispatch(receiveItem('player', item));
 
     const defaultHealth = getCharacterDefaultHealth(store.getState(), 'player');
-    store.dispatch(heal('player', 1000, defaultHealth));
+    store.dispatch(heal('player', 10000));
 
     emit('battle.poststart', { item, battle, experience });
   }

@@ -39,60 +39,48 @@ export class Battle {
   {
     // start the battle
     emit('battle.start');
-    this.combatantTurnStart();
+    this.getNextCombatant();
   }
 
 
   combatantTurnStart()
   {
-    store.dispatch(clearExpiredEffects(store.getState().player.character.character));
-    store.dispatch(clearExpiredEffects(store.getState().enemy.character.character));
+    const player = store.getState().player.character;
+    const enemy = store.getState().enemy.character;
+    const characters = [player, enemy]
+    characters.forEach(char => store.dispatch(clearExpiredEffects(char.character)));
 
-    const isPlayerTurn = store.getState().battle.isPlayerTurn;
-    if (isPlayerTurn) {
-      let skipTurn = false;
-      const player = store.getState().player.character;
-      const effects = player.effects;
-      effects.forEach(effect => {
-        if (effect.name == 'Stun')
-        {
+    const { characterTurn } = store.getState().battle;
+    const combatant = characters.find(char => char.character === characterTurn);
+    
+    let skipTurn = false;
+    combatant.effects.forEach(effect => {
+      switch (effect.name) {
+        case 'Stun': 
           emit('battle.update', { 
-            text: `{cyan-fg}${player.name}{/} is stunned!`
+            text: `{cyan-fg}${combatant.name}{/} is stunned!`
           });
-          
-          store.dispatch(incrementEffect(player.character, effect));
           skipTurn = true;
-        }
-      })
-
-      if (skipTurn)
-        return this.checkBattleState();
-
-      // allow ui control
-      emit('battle.player.start');
-    } else {
-      let skipTurn = false;
-      const enemy = store.getState().enemy.character;
-      const effects = enemy.effects;
-      effects.forEach(effect => {
-        if (effect.name == 'Stun')
-        {
+          break;
+        case 'Poison':
           emit('battle.update', { 
-            text: `{cyan-fg}${enemy.name}{/} is stunned!`
+            text: `{cyan-fg}${combatant.name}{/} is poisoned!`
           });
-          
-          store.dispatch(incrementEffect(enemy.character, effect));
-          skipTurn = true;
-        }
-      })
+          store.dispatch(hurt(combatant.character, 5));
+          break;
+      }
+      store.dispatch(incrementEffect(combatant.character, effect));
+    })
 
-      if (skipTurn)
-        return this.checkBattleState();
+    if (skipTurn)
+      return this.checkBattleState();
 
-      // use ai control
+    if (combatant.playable)
+      emit('battle.player.start'); // allow and wait for player input
+    else
       setTimeout(this.autoCombatant.bind(this), 1000);
-    }
   }
+
 
   /**
    * Playable combat routine
@@ -101,26 +89,6 @@ export class Battle {
   {
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
-
-    // Check active effects
-    // clearExpiredEffects(player);
-
-    // let skipTurn = false;
-    // const effects = store.getState().player.character.effects;
-    // effects.forEach(effect => {
-    //   if (effect.name == 'Stun')
-    //   {
-    //     emit('battle.update', { 
-    //       text: `{cyan-fg}${player.name}{/} is stunned!`
-    //     });
-        
-    //     store.dispatch(incrementEffect(player.character, effect));
-    //     skipTurn = true;
-    //   }
-    // })
-
-    // if (skipTurn)
-    //   return this.checkBattleState();
 
     const abilityName = params.ability;
     const ability = player.abilities.find(a => abilityName == a.name);
@@ -144,6 +112,7 @@ export class Battle {
     
     this.checkBattleState();
   }
+
 
   /**
    * AI combat routine
@@ -206,7 +175,14 @@ export class Battle {
 
   getNextCombatant()
   {
-    store.dispatch(nextTurn());
+    const { characterTurn } = store.getState().battle;
+    const player = store.getState().player.character;
+    const enemy = store.getState().enemy.character;
+    const characters = [player, enemy];
+    const nextCombatant = characters.find(char => char.character !== characterTurn);
+    
+    
+    store.dispatch(nextTurn(nextCombatant.character));
     this.combatantTurnStart();
   }
 }

@@ -121,7 +121,7 @@ export class Character {
 
   static createPlayer()
   {
-    store.dispatch(newCharacter('player', 'Inigio', 100));    
+    store.dispatch(newCharacter('player', 'Inigio', 100, true));    
 
     store.dispatch(receiveAbility('player', new Bash()));
     store.dispatch(receiveAbility('player', new Bite()));
@@ -162,6 +162,7 @@ export class Character {
         'enemy'
       , enemy.name
       , getRandomInt(enemy.health.min, enemy.health.max)
+      , false
     ));
 
     enemy.skills.forEach(s => {

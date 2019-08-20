@@ -62,7 +62,7 @@ class Heal extends Ability
     store.dispatch(useAbility(combatant.character, this));
 
     emit('battle.update', { 
-      text: `${this.name} healed for {white-fg}${health}{/} health`
+      text: `${combatant.name} healed for {white-fg}${health}{/} health`
     });
 
     return abilityParameters;

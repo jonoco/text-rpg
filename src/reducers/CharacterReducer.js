@@ -22,6 +22,7 @@ function createCharacterReducer(characterType = '') {
     , abilities: []
     , experience: 0
     , effects: []
+    , playable: false
   };
 
   
@@ -37,6 +38,7 @@ function createCharacterReducer(characterType = '') {
           , name: payload.name
           , health: payload.health
           , defaultHealth: payload.health
+          , playable: payload.playable
         }
       case 'HURT':
         return hurt(state, payload);
@@ -145,10 +147,8 @@ const hurt = (state, payload) =>
 
 const heal = (state, payload) =>
 {
-  const { defaultHealth, heal} = payload;
-
-  let health = state.health + heal;
-  health = health > defaultHealth ? defaultHealth : health;
+  let health = state.health + payload.heal;
+  health = health > state.defaultHealth ? state.defaultHealth : health;
 
   return {
       ...state

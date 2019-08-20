@@ -5,11 +5,11 @@
  * @param  {number} health      Character default health
  * @return {object}             Action
  */
-export const newCharacter = (character, name, health) => {
+export const newCharacter = (character, name, health, playable) => {
   return {
     type: 'NEW_CHARACTER',
     character,
-    payload: { name, health }
+    payload: { name, health, playable }
   }
 }
 
@@ -29,11 +29,11 @@ export const hurt = (character, damage) => {
 }
 
 
-export const heal = (character, heal, defaultHealth) => {
+export const heal = (character, heal) => {
   return {
     type: 'HEAL',
     character,
-    payload: { heal, defaultHealth }
+    payload: { heal }
   }
 }
 
