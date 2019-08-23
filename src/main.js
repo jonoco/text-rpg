@@ -12,7 +12,16 @@ import { Game } from './Game';
 const middleware = [];
 
 const loggerOptions = {
-  log: text => debug(text, 'action')
+  log: text => debug(text, 'action'),
+  stateTransformer: state => {
+    return {
+      ...state,
+     map: {
+       ...state.map,
+       map: 'EXCLUDED'
+     }
+    }
+  }
 };
 const logger = createCLILogger(loggerOptions);
 middleware.push(logger);
