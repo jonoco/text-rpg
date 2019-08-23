@@ -39,9 +39,10 @@ class EquipmentUI extends blessed.box
      , selectedBg: 'white'
      , interactive: true
      , label: 'Inventory'
+     , align: 'right'
      , border: { type: 'line', fg: 'cyan' }
-     , columnSpacing: 10
-     , columnWidth: [25, 8, 8]
+     , columnSpacing: 4
+     , columnWidth: [30, 10, 10]
     });
 
     this.equipment = contrib.table({
@@ -54,7 +55,7 @@ class EquipmentUI extends blessed.box
      , selectedFg: 'white'
      , selectedBg: 'black'
      , label: 'Equipment'
-     , border: { type: 'line', fg: 'cyan' }
+     , border: { type: 'line', fg: 'green' }
      , columnSpacing: 10
      , columnWidth: [10, 30]
     });
@@ -166,10 +167,10 @@ class EquipmentUI extends blessed.box
     
     let infoContent = '';
     if (item) {
-      infoContent = `name: ${item.name}`;  
+      infoContent = `{bold}${item.name}{/bold}\n`;  
       Object.keys(item.attributes).forEach(attr => {
         if (item.attributes[attr])
-          infoContent += `\n${attr}: ${item.attributes[attr]}`;
+          infoContent += `\n${attr}: {cyan-fg}${item.attributes[attr]}{/}`;
       });
     }
     
