@@ -8,6 +8,9 @@ const characterSelector = (state, character) => state[character];
 export const getCharacterEquippedItems = createSelector(
   characterSelector,
   (character) => {
+    if (!character)
+      throw new Error('getCharacterDefaultHealth | No character located for selector');
+    
     return character.inventory.items.filter(item => (character.inventory[item.slot] === item.id));
   }
 )
@@ -16,6 +19,9 @@ export const getCharacterEquippedItems = createSelector(
 export const getCharacterDefaultHealth = createSelector(
   characterSelector,
   (character) => {
+    if (!character)
+      throw new Error('getCharacterDefaultHealth | No character located for selector');
+
     let health = character.character.defaultHealth;
     
     const endurance = character.character.skills.find(skill => skill.name === 'Endurance');

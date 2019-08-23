@@ -4,7 +4,7 @@ import { getRandomChoice, getRandomInt, debug } from './utility';
 import { store } from './main';
 import { nextTurn } from './actions/gameActions';
 import { hurt, heal, incrementEffect, clearExpiredEffects } from './actions/characterActions';
-import { getCharacterActiveAbilities } from './selectors';
+import { getCharacterActiveAbilities, getCharacterDefaultHealth } from './selectors';
 
 
 /**
@@ -40,6 +40,15 @@ export class Battle {
    */
   startBattle()
   {
+    // Get all characters to full health
+    const player = store.getState().player.character;
+    const enemy = store.getState().enemy.character;
+    const characters = [player, enemy];
+    characters.forEach(char => {
+      let defaultHealth = getCharacterDefaultHealth(store.getState(), char.character);
+      store.dispatch(heal(char.character, defaultHealth, defaultHealth));
+    });
+
     // start the battle
     emit('battle.start');
     this.getNextCombatant();

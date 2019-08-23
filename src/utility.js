@@ -2,6 +2,16 @@ import { _DEBUG_ } from './constants';
 import { emit } from './dispatch'; 
 
 
+/**
+ * Solves Quadratic Equation
+ */
+export const quadratic = (a, b, c) => {
+    var result = (-1 * b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+    var result2 = (-1 * b - Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a);
+    return {r1: result, r2: result2}
+}
+
+
 /*
   Returns random int from [min, max)
 */

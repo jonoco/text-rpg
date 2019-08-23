@@ -2,7 +2,7 @@ import { getRandomInt, debug } from '../utility';
 import { store } from '../main';
 import { emit } from '../dispatch';
 import Ability from './Ability';
-import { getCharacterEquippedItems } from '../selectors';
+import { getCharacterEquippedItems, getCharacterDefaultHealth } from '../selectors';
 import { Item } from '../Item';
 import { useAbility, hurt, heal } from '../actions/characterActions';
 
@@ -58,7 +58,8 @@ class Heal extends Ability
 
     health = Math.floor(health);
 
-    store.dispatch(heal(combatant.character, health));
+    const defaultHealth = getCharacterDefaultHealth(store.getState(), combatant.character);
+    store.dispatch(heal(combatant.character, health, defaultHealth));
     store.dispatch(useAbility(combatant.character, this));
 
     emit('battle.update', { 

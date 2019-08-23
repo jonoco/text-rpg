@@ -41,6 +41,7 @@
     - [ ] handle asynchronous behavior predictably
     - [x] encapulate character behavior ; simplify player/enemy handling
     - [ ] handle multiple enemies & players
+- [ ] scale enemies by player total experience
 
 ## Bugs
 - [x] reference to combatants not updating state during combat

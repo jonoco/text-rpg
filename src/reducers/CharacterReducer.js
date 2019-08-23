@@ -21,6 +21,7 @@ function createCharacterReducer(characterType = '') {
     , skills: []
     , abilities: []
     , experience: 0
+    , totalExperience: 0
     , effects: []
     , playable: false
   };
@@ -41,13 +42,14 @@ function createCharacterReducer(characterType = '') {
           , playable: payload.playable
         }
       case 'HURT':
-        return hurt(state, payload);
+        return hurt(state, action);
       case 'HEAL':
-        return heal(state, payload);
+        return heal(state, action);
       case 'RECEIVE_EXPERIENCE':
         return {
           ...state
          , experience: state.experience + payload.experience
+         , totalExperience: state.totalExperience + payload.experience
         }
       case 'RECEIVE_ABILITY':
         // Ignore duplicate ability
@@ -133,8 +135,10 @@ function createCharacterReducer(characterType = '') {
 }
 
 
-const hurt = (state, payload) =>
+const hurt = (state, action) =>
 {
+  const { payload } = action;
+
   let health = state.health - payload.damage;
   health = health < 0 ? 0 : health;
 
@@ -145,10 +149,14 @@ const hurt = (state, payload) =>
 }
 
 
-const heal = (state, payload) =>
+const heal = (state, action) =>
 {
+  const { payload } = action;
+
   let health = state.health + payload.heal;
-  health = health > state.defaultHealth ? state.defaultHealth : health;
+  let defaultHealth = payload.maxHeal;
+  
+  health = health > defaultHealth ? defaultHealth : health;
 
   return {
       ...state

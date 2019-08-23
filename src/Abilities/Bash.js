@@ -1,4 +1,4 @@
-import { getRandomInt } from '../utility';
+import { getRandomInt, debug } from '../utility';
 import { store } from '../main';
 import { emit } from '../dispatch';
 import Ability from './Ability';
@@ -73,6 +73,8 @@ class Bash extends Ability
     emit('battle.update', { 
       text: `${this.name} hit for {white-fg}${damage}{/} damage`
     });
+
+    debug(`${combatant.name} | ${this.name} hit for {white-fg}${damage}{/} damage`);
 
     return abilityParameters;
   }

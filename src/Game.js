@@ -93,7 +93,10 @@ export class Game {
   {
     // Generate an enemy based on player level and location
     const sector = getCurrentSectorInfo(store.getState());
-    const enemy = Character.createRandomEnemy(sector.environment);
+    const enemy = Character.createRandomEnemy({
+      environ: sector.environment,
+      level: store.getState().player.character.totalExperience
+    });
     if (!enemy)
     {
       debug('No valid enemy found for battle', 'error');
@@ -136,7 +139,7 @@ export class Game {
     store.dispatch(receiveItem('player', item));
 
     const defaultHealth = getCharacterDefaultHealth(store.getState(), 'player');
-    store.dispatch(heal('player', 10000));
+    store.dispatch(heal('player', defaultHealth, defaultHealth));
 
     emit('battle.poststart', { item, battle, experience });
   }

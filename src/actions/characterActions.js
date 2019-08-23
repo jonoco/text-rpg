@@ -28,12 +28,18 @@ export const hurt = (character, damage) => {
   }
 }
 
-
-export const heal = (character, heal) => {
+/**
+ * Heal a character
+ * @param  {string} character Character type - [player, enemy]
+ * @param  {number} heal      Amount to heal
+ * @param  {number} maxHeal   Maximum amount to heal, i.e. default health
+ * @return {object}           Action
+ */
+export const heal = (character, heal, maxHeal) => {
   return {
     type: 'HEAL',
     character,
-    payload: { heal }
+    payload: { heal, maxHeal }
   }
 }
 

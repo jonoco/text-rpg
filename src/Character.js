@@ -18,7 +18,8 @@ export class Character {
         , description: 'Often mistaken for an ugly Hobbit, loves to make spookey noises.'
         , health: { min: 30, max: 80 }
         , skills: [
-            new Strength()
+              new Strength()
+            , new Endurance()
           ]
         , abilities: [
             new Bash()
@@ -36,7 +37,8 @@ export class Character {
         , description: 'Experiment of the wizards of Niqlodean, attacks by falling from the sky.'
         , health: { min: 20, max: 70 }
         , skills: [
-            new Strength()
+              new Strength()
+            , new Endurance()
           ]
         , abilities: [
             new Bash()
@@ -51,7 +53,8 @@ export class Character {
         , description: 'Frequently dizzy and stupid, wanders in violent confusion.'
         , health: { min: 40, max: 60 }
         , skills: [
-            new Strength()
+              new Strength()
+            , new Endurance()
           ]
         , abilities: [
             new Bash()
@@ -68,7 +71,8 @@ export class Character {
         , description: 'A grotesquely mishapen rabbit, coincedentally identical to a wolf.'
         , health: { min: 30, max: 70 }
         , skills: [
-            new Strength()
+              new Strength()
+            , new Endurance()
           ]
         , abilities: [
             new Bite()
@@ -87,6 +91,7 @@ export class Character {
         , skills: [
               new Strength()
             , new Agility()
+            , new Endurance()
           ]
         , abilities: [
             new Slap()
@@ -102,7 +107,7 @@ export class Character {
         , health: { min: 60, max: 100 }
         , skills: [
               new Strength()
-            , new Vitality()
+            , new Endurance()
           ]
         , abilities: [
               new Slap()
@@ -146,8 +151,10 @@ export class Character {
   /*
     Create a random character
   */
-  static createRandomEnemy(environ)
+  static createRandomEnemy(params)
   {
+    const { environ, level } = params;
+
     let enemyList = Character.enemyList;
     if (environ) {
       enemyList = enemyList.filter(enemy => enemy.environments.includes(environ));
@@ -166,6 +173,10 @@ export class Character {
     ));
 
     enemy.skills.forEach(s => {
+      const maxLevel = s.maximumLevel(level);
+
+      // Scale enemy's skill levels to between 50-80% of player's experience
+      s.level = getRandomInt(maxLevel * 0.5, maxLevel * 0.8)
       store.dispatch(receiveSkill('enemy', s));
     });
 

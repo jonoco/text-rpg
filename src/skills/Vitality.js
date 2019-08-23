@@ -8,7 +8,6 @@ class Vitality extends Skill
     
     this.name = 'Vitality';
     this.description = 'Improves health and stamina.';
-    this.level = 0;
   }
 }
 
