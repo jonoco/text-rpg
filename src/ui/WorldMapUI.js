@@ -56,7 +56,7 @@ export default class WorldMapUI extends blessed.box
       top: 0,
       left: this.map.width,
       width: infoWidth,
-      height: 10,
+      height: 13,
       label: 'Location',
       content: '',
       tags: true,
@@ -73,14 +73,46 @@ export default class WorldMapUI extends blessed.box
         }
       }
     });
+    
+
+    this.help = blessed.text({
+      parent: this,
+      top: this.info.height,
+      left: this.map.width,
+      width: infoWidth,
+      height: 14,
+      label: 'Help',
+      content: '',
+      tags: true,
+      border: {
+        type: 'line'
+      },
+      style: {
+        fg: 'white',
+        border: {
+          fg: '#ffffff'
+        },
+        hover: {
+          bg: 'green'
+        }
+      }
+    });
+    this.help.setContent([
+      'h - help',
+      'a - abilities',
+      's - skills',
+      'e - equipment',
+      'c - cancel',
+      'q - quit'
+    ].join('\n'));
 
     this.log = contrib.log({ 
         parent: this
       , fg: "green"
       , label: 'Log'      
       , left: this.map.width + this.info.width
+      , right: 0
       , height: "100%"
-      , width: logWidth
       , tags: true      
       , border: {type: "line", fg: "cyan"} 
     });
