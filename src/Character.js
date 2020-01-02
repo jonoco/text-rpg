@@ -17,10 +17,14 @@ export class Character {
           name: 'Goblin'
         , description: 'Often mistaken for an ugly Hobbit, loves to make spookey noises.'
         , health: { min: 30, max: 80 }
-        , skills: [
-              new Strength()
-            , new Endurance()
-          ]
+        , skills: {
+            strength: getRandomInt(3, 6)
+          , constitution: getRandomInt(3, 6)
+          , dexterity: getRandomInt(3, 6)
+          , intelligence: getRandomInt(3, 6)
+          , wisdom: getRandomInt(3, 6)
+          , charisma: getRandomInt(3, 6)
+        }
         , abilities: [
             new Bash()
           , new Bite()
@@ -35,11 +39,15 @@ export class Character {
       {
           name: 'Slime'
         , description: 'Experiment of the wizards of Niqlodean, attacks by falling from the sky.'
-        , health: { min: 20, max: 70 }
-        , skills: [
-              new Strength()
-            , new Endurance()
-          ]
+        , health: { min: 20, max: 60 }
+        , skills: {
+            strength: getRandomInt(3, 6)
+          , constitution: getRandomInt(3, 6)
+          , dexterity: getRandomInt(3, 6)
+          , intelligence: getRandomInt(3, 6)
+          , wisdom: getRandomInt(3, 6)
+          , charisma: getRandomInt(3, 6)
+        }
         , abilities: [
             new Bash()
           ]
@@ -52,10 +60,14 @@ export class Character {
           name: 'Idiot'
         , description: 'Frequently dizzy and stupid, wanders in violent confusion.'
         , health: { min: 40, max: 60 }
-        , skills: [
-              new Strength()
-            , new Endurance()
-          ]
+        , skills: {
+            strength: getRandomInt(3, 6)
+          , constitution: getRandomInt(3, 6)
+          , dexterity: getRandomInt(3, 6)
+          , intelligence: getRandomInt(3, 6)
+          , wisdom: getRandomInt(3, 6)
+          , charisma: getRandomInt(3, 6)
+        }
         , abilities: [
             new Bash()
           ]
@@ -69,11 +81,15 @@ export class Character {
       {
           name: 'Wolf'
         , description: 'A grotesquely mishapen rabbit, coincedentally identical to a wolf.'
-        , health: { min: 30, max: 70 }
-        , skills: [
-              new Strength()
-            , new Endurance()
-          ]
+        , health: { min: 30, max: 60 }
+        , skills: {
+            strength: getRandomInt(3, 6)
+          , constitution: getRandomInt(3, 6)
+          , dexterity: getRandomInt(3, 6)
+          , intelligence: getRandomInt(3, 6)
+          , wisdom: getRandomInt(3, 6)
+          , charisma: getRandomInt(3, 6)
+        }
         , abilities: [
             new Bite()
           ]
@@ -88,11 +104,14 @@ export class Character {
           name: 'Violent Fish'
         , description: 'A salmon with nothing to lose, fiercely determined to slap.'
         , health: { min: 50, max: 90 }
-        , skills: [
-              new Strength()
-            , new Agility()
-            , new Endurance()
-          ]
+        , skills: {
+            strength: getRandomInt(3, 6)
+          , constitution: getRandomInt(3, 6)
+          , dexterity: getRandomInt(3, 6)
+          , intelligence: getRandomInt(3, 6)
+          , wisdom: getRandomInt(3, 6)
+          , charisma: getRandomInt(3, 6)
+        }
         , abilities: [
             new Slap()
           ]
@@ -105,10 +124,14 @@ export class Character {
           name: 'Witch'
         , description: 'Crazy broom wielding salesperson.'
         , health: { min: 60, max: 100 }
-        , skills: [
-              new Strength()
-            , new Endurance()
-          ]
+        , skills: {
+            strength: getRandomInt(3, 6)
+          , constitution: getRandomInt(3, 6)
+          , dexterity: getRandomInt(3, 6)
+          , intelligence: getRandomInt(3, 6)
+          , wisdom: getRandomInt(3, 6)
+          , charisma: getRandomInt(3, 6)
+        }
         , abilities: [
               new Slap()
             , new Heal()
@@ -126,18 +149,25 @@ export class Character {
 
   static createPlayer()
   {
-    store.dispatch(newCharacter('player', 'Inigio', 100, true));    
+    store.dispatch(newCharacter(
+      'player', 
+      'Inigio', 
+      100, 
+      true,
+      {
+          strength: getRandomInt(3, 6)
+        , constitution: getRandomInt(3, 6)
+        , dexterity: getRandomInt(3, 6)
+        , intelligence: getRandomInt(3, 6)
+        , wisdom: getRandomInt(3, 6)
+        , charisma: getRandomInt(3, 6)
+      }));    
 
     store.dispatch(receiveAbility('player', new Bash()));
     store.dispatch(receiveAbility('player', new Bite()));
     store.dispatch(receiveAbility('player', new Slash()));
     store.dispatch(receiveAbility('player', new DoubleSlash()));
     store.dispatch(receiveAbility('player', new Heal()));
-
-    store.dispatch(receiveSkill('player', new Strength()));
-    store.dispatch(receiveSkill('player', new Endurance()));
-    store.dispatch(receiveSkill('player', new Agility()));
-    store.dispatch(receiveSkill('player', new Vitality()));
 
     // starting equipment
     for (let i = 0; i < 4; i++) {
@@ -170,15 +200,8 @@ export class Character {
       , enemy.name
       , getRandomInt(enemy.health.min, enemy.health.max)
       , false
+      , enemy.skills
     ));
-
-    enemy.skills.forEach(s => {
-      const maxLevel = s.maximumLevel(level);
-
-      // Scale enemy's skill levels to between 50-80% of player's experience
-      s.level = getRandomInt(maxLevel * 0.5, maxLevel * 0.8)
-      store.dispatch(receiveSkill('enemy', s));
-    });
 
     enemy.abilities.forEach(a => {
       store.dispatch(receiveAbility('enemy', a));

@@ -18,7 +18,14 @@ function createCharacterReducer(characterType = '') {
     , name: null
     , health: 0
     , defaultHealth: 0
-    , skills: []
+    , skills: {
+        strength: 0
+      , constitution: 0
+      , dexterity: 0
+      , intelligence: 0
+      , wisdom: 0
+      , charisma: 0
+    }
     , abilities: []
     , experience: 0
     , totalExperience: 0
@@ -40,6 +47,7 @@ function createCharacterReducer(characterType = '') {
           , health: payload.health
           , defaultHealth: payload.health
           , playable: payload.playable
+          , skills: payload.skills
         }
       case 'HURT':
         return hurt(state, action);

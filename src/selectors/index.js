@@ -23,14 +23,7 @@ export const getCharacterDefaultHealth = createSelector(
       throw new Error('getCharacterDefaultHealth | No character located for selector');
 
     let health = character.character.defaultHealth;
-    
-    const endurance = character.character.skills.find(skill => skill.name === 'Endurance');
-    if (endurance)
-      health += endurance.level * 10;
-
-    const vitality = character.character.skills.find(skill => skill.name === 'Vitality');
-    if (vitality)
-      health += vitality.level * 15;
+    health += character.character.skills.constitution * 10;
 
     return health;
   }
@@ -47,7 +40,7 @@ export const getCharacterActiveAbilities = createSelector(
           itemRequirements = true;
 
       ability.skillRequirements.forEach(req => {
-        if (!character.character.skills.find(skill => skill.name === req.name && skill.level >= req.level))
+        if (!Object.entries(character.character.skills).find(skill => skill[0] == req.name && skill[1] >= req.level))
           skillRequirements = false;
       });
 

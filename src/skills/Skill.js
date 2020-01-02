@@ -13,6 +13,13 @@ export default class Skill
   }
 
 
+  getModifier()
+  {
+    return (Math.floor(this.level/2) - 5)
+  }
+
+
+  // AUDIT
   requiredExperience()
   {
     return this.base + this.level*this.multiplier;
@@ -22,12 +29,14 @@ export default class Skill
   /**
    * Returns the maximum level for a given experience allotment
    */
+  // AUDIT
   maximumLevel(experience)
   {
     return Math.floor(quadratic(this.multiplier/2, this.base/2, -experience).r1);
   }
 
 
+  // AUDIT
   augment(params)
   {
     return params;

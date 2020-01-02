@@ -50,10 +50,10 @@ class Slash extends Ability
     damage += itemAttack;
 
     // Influence chain
-    abilityParameters.augments.forEach(augment => {
-      damage += augment.damage;  
-      damage *= augment.damageRatio;
-    });
+    // abilityParameters.augments.forEach(augment => {
+    //   damage += augment.damage;  
+    //   damage *= augment.damageRatio;
+    // });
 
     damage = Math.floor(damage);
 

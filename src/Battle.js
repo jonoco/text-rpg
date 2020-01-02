@@ -154,15 +154,16 @@ export class Battle {
     });
     debug(`${combatant.name} targets ${target.name} with ${ability.name}`);
 
+    // DEPRECATED
     // Augment ability with character skills ; Influence chain
-    const skills = combatant.skills;
-    let abilityParameters = { ability, skills, augments: [], effects: combatant.effects };
-    skills.forEach(skill => {
-      abilityParameters = skill.augment(abilityParameters)
-    });
-
+    // const skills = combatant.skills;
+    // let abilityParameters = { ability, skills, augments: [], effects: combatant.effects };
+    // skills.forEach(skill => {
+    //   abilityParameters = skill.augment(abilityParameters)
+    // });
+    
     // Use augmented ability
-    const result = ability.use(combatant, target, abilityParameters);
+    const result = ability.use(combatant, target);
     
     // Continue battle
     this.checkBattleState();

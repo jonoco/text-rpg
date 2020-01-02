@@ -38,10 +38,10 @@ class Bite extends Ability
     let damage = getRandomInt(baseDamage.min, baseDamage.max);
 
     // Inlfuence chain
-    abilityParameters.augments.forEach(augment => {
-      damage += augment.damage;  
-      damage *= augment.damageRatio;
-    });
+    // abilityParameters.augments.forEach(augment => {
+    //   damage += augment.damage;  
+    //   damage *= augment.damageRatio;
+    // });
 
     damage = Math.floor(damage);
 

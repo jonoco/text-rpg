@@ -97,6 +97,7 @@ export class Game {
       environ: sector.environment,
       level: store.getState().player.character.totalExperience
     });
+    
     if (!enemy)
     {
       debug('No valid enemy found for battle', 'error');

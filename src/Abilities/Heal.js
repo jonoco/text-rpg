@@ -49,10 +49,10 @@ class Heal extends Ability
     health += itemMagic ? itemMagic : 0;
 
     // Influence chain
-    abilityParameters.augments.forEach(augment => {
-      health += augment.health || 0;  
-      health *= augment.healthRatio || 1;
-    });
+    // abilityParameters.augments.forEach(augment => {
+    //   health += augment.health || 0;  
+    //   health *= augment.healthRatio || 1;
+    // });
 
     debug(`healing ${combatant.name} for ${health}`);
 

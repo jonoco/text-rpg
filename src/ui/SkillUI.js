@@ -77,11 +77,11 @@ class SkillUI extends blessed.box
     this.skillTable.rows.on('select', node => {
       if (this.detached) return;
 
-      const index = this.skillTable.rows.selected;
-      const skill = store.getState().player.character.skills[index];
+      // const index = this.skillTable.rows.selected;
+      // const skill = store.getState().player.character.skills[index];
 
-      store.dispatch(levelupSkill('player', skill))
-      this.update();
+      // store.dispatch(levelupSkill('player', skill))
+      // this.update();
     });
 
     // Update info when scrolling equipment table
@@ -102,11 +102,9 @@ class SkillUI extends blessed.box
       text: `SkillUI - no skills found for ${character.name}`
     });
 
-    const skillContent = character.skills.map(skill => [skill.name, skill.level]);
-
     this.skillTable.setData({ 
       headers: ['skill', 'level'], 
-      data: skillContent
+      data: Object.entries(character.skills)
     });
 
     this.updateInfo();
@@ -121,16 +119,13 @@ class SkillUI extends blessed.box
     const character = store.getState().player.character;
 
     const index = this.skillTable.rows.selected;
-    const skill = character.skills[index];
+    const skill = Object.entries(character.skills)[index];
 
     let infoContent = 'no skill found';
     if (skill)
     {
-      infoContent = `experience: ${character.experience}\n\n`
-        + `${skill.name}\n\n`
-        + `${skill.description}\n\n`
-        + `level: ${skill.level}\n\n`
-        + `required experience: ${skill.requiredExperience()}`
+      infoContent = `${skill[0]}\n\n`
+        + `level: ${skill[1]}\n\n`
         ;
     }
     
