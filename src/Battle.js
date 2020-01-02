@@ -60,14 +60,19 @@ export class Battle {
    */
   combatantTurnStart()
   {
+    // Get all characters
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
     const characters = [player, enemy]
+
+    // Clear expired effects on all characters
     characters.forEach(char => store.dispatch(clearExpiredEffects(char.character)));
 
+    // Get the next fighting character
     const { characterTurn } = store.getState().battle;
     const combatant = characters.find(char => char.character === characterTurn);
     
+    // Apply all active effects
     let skipTurn = false;
     combatant.effects.forEach(effect => {
       switch (effect.name) {
@@ -90,6 +95,7 @@ export class Battle {
     if (skipTurn)
       return this.checkBattleState();
 
+    // Let AI run or allow player to input
     if (combatant.playable)
       emit('battle.player.start'); // allow and wait for player input
     else
@@ -105,12 +111,14 @@ export class Battle {
     const player = store.getState().player.character;
     const enemy = store.getState().enemy.character;
 
+    // Find ability used
     const abilityName = params.ability;
     const ability = player.abilities.find(a => abilityName == a.name);
     if (!ability) {
       emit('error', 'Error|Battle: no abilities found')
     }
 
+    // Call ability
     this.attack(player, enemy, ability);
   }
 
@@ -129,7 +137,8 @@ export class Battle {
     if (!ability) {
       return emit('error', 'Error|Battle: no abilities found')
     }
-  
+    
+    // Call ability
     this.attack(enemy, player, ability);
   }
 
@@ -139,20 +148,23 @@ export class Battle {
    */
   attack(combatant, target, ability)
   {
+    // Update BattleUI
     emit('battle.update', { 
       text: `{cyan-fg}${combatant.name}{/} targets {red-fg}${target.name}{/} with {white-fg}${ability.name}{/}`
     });
     debug(`${combatant.name} targets ${target.name} with ${ability.name}`);
 
-    // Influence chain
+    // Augment ability with character skills ; Influence chain
     const skills = combatant.skills;
     let abilityParameters = { ability, skills, augments: [], effects: combatant.effects };
     skills.forEach(skill => {
       abilityParameters = skill.augment(abilityParameters)
     });
 
+    // Use augmented ability
     const result = ability.use(combatant, target, abilityParameters);
     
+    // Continue battle
     this.checkBattleState();
   }
 
