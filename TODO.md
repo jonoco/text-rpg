@@ -43,6 +43,11 @@
     - [ ] handle multiple enemies & players
 - [x] scale enemies by player total experience
 - [ ] update outdated README sections
+- [x] Change skills from class to value
+    - [ ] Update abilities to use skill values
+- [ ] Refactor effects into new component
+- [ ] Create character creation screen
+
 
 ## Bugs
 - [x] reference to combatants not updating state during combat
