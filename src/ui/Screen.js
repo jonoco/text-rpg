@@ -16,6 +16,7 @@ import SkillUI from './SkillUI';
 import StateUI from './StateUI';
 import DebugUI from './DebugUI';
 import HelpUI from './HelpUI';
+import CharCreationUI from './CharCreationUI';
 
 
 export class Screen extends blessed.screen {
@@ -48,6 +49,7 @@ export class Screen extends blessed.screen {
     this.debugUI = new DebugUI();
     this.stateUI = new StateUI();
     this.helpUI = new HelpUI();
+    this.charCreationUI = new CharCreationUI();
 
     this.subscribeEvents();
   }
@@ -215,6 +217,10 @@ export class Screen extends blessed.screen {
         break;
       case GameState.help:
         this.append(this.helpUI);
+        break;
+      case GameState.create:
+        this.charCreationUI.open()
+        this.append(this.charCreationUI);
         break;
       default:
         // load an error or menu

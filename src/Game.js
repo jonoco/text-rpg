@@ -37,7 +37,7 @@ export class Game {
     // Start game
     // show introduction, character creation screen, etc.
     // just start world movement for now
-    emit('map');
+    emit('map'); 
   }
   
 
